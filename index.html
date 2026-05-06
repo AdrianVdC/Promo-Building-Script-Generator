@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,7 @@
   <title>RTC Top Up Script Generator</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
+    
 
     :root {
       --bg: #0e0e0f;
@@ -25,7 +26,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       min-height: 100vh;
       padding: 2.5rem 2rem;
     }
@@ -61,14 +62,24 @@
 
     .header-info {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 12px;
+      color: #9090a0;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+    }
+
+    #info-shared, #info-offer-type {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 16px 18px;
-      font-size: 12px;
-      color: #9090a0;
-      font-family: 'Inter', sans-serif;
-      line-height: 1.7;
+    }
+
+    #info-offer-type:empty {
+      display: none;
     }
 
     #days-container {
@@ -77,8 +88,12 @@
       gap: 0.75rem;
     }
 
+    #days-container.bg-layout {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
     .eyebrow {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 11px;
       letter-spacing: 0.15em;
       color: #ffffff;
@@ -87,7 +102,7 @@
     }
 
     h1 {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 28px;
       font-weight: 800;
       color: #ffffff;
@@ -125,19 +140,17 @@
     }
 
     .day-number {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       color: #ffffff;
       font-size: 14px;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
     }
 
     .reset-btn {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 10px;
-      color: var(--muted);
+      color: #7070a0;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -154,7 +167,7 @@
       letter-spacing: 0.05em;
       margin-bottom: 6px;
       display: block;
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
     }
 
     input[type="text"], input[type="number"] {
@@ -163,7 +176,7 @@
       border-radius: 6px;
       padding: 7px 10px;
       font-size: 13px;
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       color: var(--text);
       outline: none;
       transition: border-color 0.15s;
@@ -181,9 +194,11 @@
     }
 
     .amt-btn {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 12px;
-      padding: 4px 12px;
+      padding: 4px 0;
+      width: 72px;
+      text-align: center;
       border-radius: 5px;
       border: 1px solid var(--border);
       background: var(--surface2);
@@ -226,11 +241,11 @@
     }
 
     .btn-edit-images {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 16px;
       padding: 10px 18px;
-      background: #C78E14;
-      color: #fff;
+      background: #378ADD;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -240,7 +255,7 @@
     .btn-edit-images:hover { opacity: 0.85; }
 
     .btn-generate {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 18px;
       font-weight: 400;
       padding: 10px 20px;
@@ -254,13 +269,15 @@
     }
 
     .btn-generate:hover { opacity: 0.9; }
+    .btn-generate.faded { background: #0e0e0f; color: #6b6b70; border: 1px solid #3a3a3f; cursor: not-allowed; opacity: 1; }
+    .btn-generate.faded:hover { opacity: 1; }
 
     .btn-reset {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 16px;
       padding: 0 18px;
       background: transparent;
-      color: var(--muted);
+      color: #7070a0;
       border: 1px solid var(--border);
       border-radius: 8px;
       cursor: pointer;
@@ -269,25 +286,24 @@
     .btn-reset:hover { color: var(--text); border-color: #3a3a3f; }
 
     .btn-add-day {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 16px;
       padding: 10px 18px;
-      background: #C0B7F8;
-      color: #111;
-      border: none;
+      background: transparent;
+      color: #7070a0;
+      border: 1px solid var(--border);
       border-radius: 8px;
       cursor: pointer;
       letter-spacing: 0.05em;
-      transition: opacity 0.15s;
     }
 
-    .btn-add-day:hover { opacity: 0.85; }
+    .btn-add-day:hover { color: var(--text); border-color: #3a3a3f; }
 
     .btn-edit-hiw {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 16px;
       padding: 10px 18px;
-      background: #522CFE;
+      background: #0C447C;
       color: #ffffff;
       border: none;
       border-radius: 8px;
@@ -298,11 +314,11 @@
     .btn-edit-hiw:hover { opacity: 0.85; }
 
     .btn-edit-tc {
-      font-family: 'Anton', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 16px;
       padding: 10px 18px;
-      background: #FDDD95;
-      color: #111;
+      background: #185FA5;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -342,7 +358,7 @@
     }
 
     .modal-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       font-size: 15px;
       font-weight: 700;
       color: var(--text);
@@ -362,7 +378,7 @@
       flex: 1;
       width: 100%;
       min-height: 360px;
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 11px;
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -392,7 +408,7 @@
     }
 
     .script-title {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 11px;
       color: var(--muted);
       letter-spacing: 0.1em;
@@ -400,7 +416,7 @@
     }
 
     .copy-btn {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 11px;
       padding: 5px 14px;
       background: var(--surface2);
@@ -416,7 +432,7 @@
     textarea#script-output {
       width: 100%;
       height: 380px;
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 11px;
       resize: vertical;
       background: var(--surface);
@@ -431,7 +447,7 @@
       font-size: 12px;
       color: var(--muted);
       margin-top: 10px;
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
     }
 
     .hint code {
@@ -442,12 +458,45 @@
     }
 
     #run-instructions code {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       background: var(--surface2);
       color: var(--accent);
       padding: 2px 7px;
       border-radius: 4px;
       font-size: 12px;
+    }
+
+    .offer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.15s;
+    }
+    .offer-row.on {
+      background: #ffffff;
+      border-color: #ffffff;
+    }
+    .offer-row.on .offer-label {
+      color: #000000;
+      font-weight: 500;
+    }
+    .offer-row.off {
+      opacity: 0.4;
+    }
+    .offer-label {
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .offer-arrow {
+      font-size: 11px;
+      color: var(--muted);
     }
 
     .divider {
@@ -478,13 +527,118 @@
     }
 
     .header-info code {
-      font-family: 'DM Mono', monospace;
+      font-family: 'SF Mono', ui-monospace, monospace;
       font-size: 11px;
       background: var(--surface2);
       color: var(--accent2);
       padding: 1px 5px;
       border-radius: 3px;
     }
+
+    .run-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+
+    .run-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .run-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .run-card-header svg {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .run-card-title {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .run-step {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      color: #9090a0;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .run-step-num {
+      font-size: 11px;
+      font-weight: 500;
+      color: #9090a0;
+      min-width: 14px;
+    }
+
+    .run-step strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .run-step a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+
+    .run-cmd-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .run-cmd-row code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      flex: 1;
+      font-size: 11px;
+    }
+
+    .run-copy-btn {
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      background: transparent;
+      color: #7070a0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .run-copy-btn:hover { color: var(--text); border-color: #3a3a3f; }
+    .run-copy-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .run-copy-btn:disabled:hover { color: #7070a0; border-color: var(--border); background: transparent; }
+    .run-cmd-row.ready .run-copy-btn { color: #ffffff; border-color: rgba(255,255,255,0.4); }
+    .run-cmd-row.ready .run-copy-btn:hover { background: rgba(255,255,255,0.15); border-color: #ffffff; }
+    .run-cmd-row code { color: #505060; transition: color 0.2s; }
+    .run-cmd-row code.ready { color: #ffffff; }
+    .run-cmd-row.ready { background: #185FA5; border-color: #185FA5; transition: background 0.2s, border-color 0.2s; }
   </style>
 </head>
 <body>
@@ -492,9 +646,9 @@
 <header>
   <div class="header-left">
     <div>
-      <img src="data:image/png;base64,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" alt="Fanatics Logo" style="width: 80px; height: auto; display: block;" />
-      <div class="eyebrow" style="margin-top: 10px; font-size: 28px; font-family: 'Anton', sans-serif; letter-spacing: normal; text-transform: none;">Fanatics</div>
-      <h1>RTC Top Up<br><span>Script Generator</span></h1>
+      <img src="data:image/png;base64,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" alt="Fanatics" style="display:block;width:52px;height:auto;" />
+      <div class="eyebrow" style="margin-top: 10px; font-size: 28px; font-family: system-ui, -apple-system, sans-serif; letter-spacing: normal; text-transform: none;">Fanatics</div>
+      <h1 style="font-size: 28px; line-height: 1.2;">NATS Bonus Creator</h1>
       <p class="subtitle">Configure dates & amounts — generate a ready-to-run Python script.</p>
     </div>
     <div class="header-actions">
@@ -505,10 +659,18 @@
         <button class="btn-edit-images" onclick="openModal('images')">Edit Images</button>
         <button class="btn-add-day" onclick="addDay()">+ Add Day</button>
         <button class="btn-reset" onclick="resetAll()" style="padding: 10px 14px;">Reset All</button>
+        <button class="btn-reset" onclick="clearSettings()" style="padding: 10px 14px; color: #c05050;">Clear Saved Settings</button>
       </div>
       <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
-        <label style="font-family: 'Inter', sans-serif; font-size: 14px; color: #ffffff; letter-spacing: 0.05em; text-transform: uppercase;">Region</label>
-        <select id="jurisdiction-select" style="font-family: 'Inter', sans-serif; font-size: 14px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; flex: 1;">
+        <label style="font-family: system-ui, -apple-system, sans-serif; font-size: 16px; color: #ffffff; white-space: nowrap;">Offer Type</label>
+        <select id="offer-type-select" onchange="onOfferTypeChange()" style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; flex: 1;">
+          <option value="RTC">RTC Top Up</option>
+          <option value="BG">Bet &amp; Get</option>
+        </select>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+        <label style="font-family: system-ui, -apple-system, sans-serif; font-size: 16px; color: #ffffff; white-space: nowrap;">Region</label>
+        <select id="jurisdiction-select" style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; flex: 1;">
           <option value="US" selected>US — United States</option>
           <option value="MI">MI — Michigan</option>
           <option value="WV">WV — West Virginia</option>
@@ -522,21 +684,48 @@
     </div>
   </div>
 
-  <div class="header-info">
-    <ul>
-      <li><strong>Editing HIW + T&Cs:</strong> Please copy &amp; paste a full version of the HIW or T&Cs, which will be applied to all future versions once saved.</li>
-      <li><strong>Editing Images:</strong> Image naming convention is important — make sure all images are PNGs.
-        <ul>
-          <li><strong>Masthead Image:</strong> There can only be one Masthead image in the folder at a time, and the file name must be <code>Masthead</code>.</li>
-          <li><strong>Promo Detail Image:</strong> There can only be one Promo Detail image in the folder at a time, and the file name must be <code>Promo Detail</code>.</li>
-          <li><strong>Discover Image(s):</strong> The script looks for the AMOUNT in Google Drive and finds the Discover Image with the matching file name. Script will fail if no image matches the selected AMOUNT.
-            <ul>
-              <li>e.g. For a bonus amount of <code>800</code>, the Discover image must be called <code>800</code>.</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
+  <div class="header-info" id="header-info-panel">
+    <div id="info-shared">
+      <ul>
+        <li><strong>Getting Python:</strong>
+          <ul>
+            <li><strong>Mac:</strong> Install from <a href="https://www.python.org/downloads/" target="_blank" style="color:var(--accent2);">python.org</a>, then run <code>pip3 install playwright --break-system-packages</code> and <code>playwright install chromium</code> in Terminal.</li>
+            <li><strong>Windows:</strong> Install from <a href="https://www.python.org/downloads/" target="_blank" style="color:var(--accent2);">python.org</a> — check <strong>"Add Python to PATH"</strong> during install. Then run <code>pip install playwright</code> and <code>playwright install chromium</code> in Command Prompt.</li>
+          </ul>
+        </li>
+        <li><strong>Adding Google Drive to Finder / File Explorer:</strong>
+          <ul>
+            <li><strong>Mac:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once installed and signed in, Google Drive appears in the Finder sidebar under Locations. You can then browse Shared Drives directly from Finder and use those paths in the script.</li>
+            <li><strong>Windows:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once signed in it mounts as a drive (e.g. <code>G:\</code>) in File Explorer. Shared Drives will appear under <strong>Google Drive &gt; Shared drives</strong> and can be used as the image path.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <div id="info-offer-type"></div>
+    <div id="info-run-cards">
+      <div class="run-cards">
+        <div class="run-card">
+          <div class="run-card-header">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#9090a0;width:18px;height:18px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <span class="run-card-title">Mac — Terminal</span>
+          </div>
+          <div class="run-step"><span class="run-step-num">1.</span><span>Navigate to Downloads</span></div>
+          <div class="run-cmd-row"><code>cd ~/Downloads</code><button class="run-copy-btn" id="mac-cd-btn" disabled onclick="copyRunCmd(this,'cd ~/Downloads')">Copy</button></div>
+          <div class="run-step"><span class="run-step-num">2.</span><span>Run the script</span></div>
+          <div class="run-cmd-row"><code id="mac-run-cmd">Generate a script first</code><button class="run-copy-btn" id="mac-run-btn" disabled onclick="copyRunCmd(this,document.getElementById('mac-run-cmd').textContent)">Copy</button></div>
+        </div>
+        <div class="run-card">
+          <div class="run-card-header">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="color:#9090a0;width:18px;height:18px;"><path d="M3 12V6.75l6-1.32v6.57H3zm17 0V3l-8 1.43v7.57h8zm-17 .75H9v6.57l-6-1.32V12.75zm17 0h-8v7.57L20 21V12.75z"/></svg>
+            <span class="run-card-title">Windows — Command Prompt</span>
+          </div>
+          <div class="run-step"><span class="run-step-num">1.</span><span>Navigate to Downloads</span></div>
+          <div class="run-cmd-row"><code>cd %USERPROFILE%\Downloads</code><button class="run-copy-btn" id="win-cd-btn" disabled onclick="copyRunCmd(this,'cd %USERPROFILE%\\Downloads')">Copy</button></div>
+          <div class="run-step"><span class="run-step-num">2.</span><span>Run the script</span></div>
+          <div class="run-cmd-row"><code id="win-run-cmd">Generate a script first</code><button class="run-copy-btn" id="win-run-btn" disabled onclick="copyRunCmd(this,document.getElementById('win-run-cmd').textContent)">Copy</button></div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -551,23 +740,23 @@
 
       <!-- Step 1 -->
       <div style="background: var(--surface2); border-radius: 8px; padding: 12px 14px;">
-        <p style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px;">STEP 1 — OPEN THE SHARED FOLDER</p>
+        <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px;">STEP 1 — OPEN THE SHARED FOLDER</p>
         <p style="font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.6;">All images live in a shared Google Drive folder. Click below to open it. You can add or replace images here — changes apply on the next script run.</p>
-        <a id="drive-link" href="https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh" target="_blank" style="font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); text-decoration: none; display: inline-block; padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;">Open Shared Images Folder ↗</a>
+        <a id="drive-link" href="https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh" target="_blank" style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 12px; color: var(--accent2); text-decoration: none; display: inline-block; padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px;">Open Shared Images Folder ↗</a>
       </div>
 
       <!-- Step 2 -->
       <div style="background: var(--surface2); border-radius: 8px; padding: 12px 14px;">
-        <p style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px;">STEP 2 — SET YOUR LOCAL FOLDER PATH</p>
+        <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 6px;">STEP 2 — SET YOUR LOCAL FOLDER PATH</p>
         <p style="font-size: 12px; color: var(--muted); margin-bottom: 8px; line-height: 1.6;">The script needs to access images from your computer. Make sure <strong style="color: var(--text);">Google Drive for Desktop</strong> is installed and the shared folder is synced, then follow these steps:</p>
         <ol style="font-size: 12px; color: var(--muted); line-height: 2; padding-left: 18px;">
           <li>Open <strong style="color: var(--text);">Finder</strong> and locate the synced images folder</li>
           <li>Right-click the folder → <strong style="color: var(--text);">Get Info</strong></li>
           <li>Copy the full path shown under <strong style="color: var(--text);">"Where:"</strong></li>
-          <li>Paste it below, then add <code style="font-family:'DM Mono',monospace; background:var(--surface); color:var(--accent2); padding:1px 5px; border-radius:3px;">/[folder name]</code> at the end</li>
+          <li>Paste it below, then add <code style="font-family: 'SF Mono', ui-monospace, monospace; background:var(--surface); color:var(--accent2); padding:1px 5px; border-radius:3px;">/[folder name]</code> at the end</li>
         </ol>
         <input type="text" id="images-path" style="width: 100%; margin-top: 10px;" placeholder="/Users/yourname/Library/CloudStorage/GoogleDrive-.../Shared drives/..." />
-        <p style="font-size: 11px; color: var(--muted); margin-top: 6px; font-family: 'DM Mono', monospace;">This is saved locally to your browser and only needs to be set once.</p>
+        <p style="font-size: 11px; color: var(--muted); margin-top: 6px; font-family: 'SF Mono', ui-monospace, monospace;">This is saved locally to your browser and only needs to be set once.</p>
       </div>
 
     </div>
@@ -612,7 +801,6 @@
 
 <div id="script-area">
   <div class="divider"></div>
-  <div id="run-instructions" style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); line-height: 1.9; margin-bottom: 1rem;"></div>
   <div class="script-header">
     <span class="script-title">Generated Script</span>
     <button class="copy-btn" id="copy-btn" onclick="copyScript()">Copy</button>
@@ -625,9 +813,16 @@ const DEFAULT_AMOUNTS = [2, 4, 5, 10, 20, 40, 50, 100, 200, 400, 800];
 const NUM_DAYS = 9;
 let days = [];
 
-const DEFAULT_HIW = `1. Opt-in to the promotion
+const DEFAULT_HIW_RTC = `1. Opt-in to the promotion
 2. We'll instantly drop Casino Credit into your account
 3. Play the Casino Credit on any of your favorite games today only`;
+
+const DEFAULT_HIW_BG = `1. Opt in to the promotion
+2. Place your qualifying cumulative cash wagers in the Fanatics Casino during the Promotional Period
+3. We'll reward you with FanCash within 72 hours of the Promotional Period ending
+See below for full Terms & Conditions.`;
+
+const DEFAULT_HIW = DEFAULT_HIW_RTC;
 
 const DEFAULT_TC = `PROMOTIONAL TERMS AND CONDITIONS
 FANATICS CASINO - CASINO CREDIT $200 SURPRISE DROP - 12.1.25 (ID: CAS_5963) 
@@ -700,22 +895,96 @@ Rewards recipients will be solely responsible for all federal, state, and local 
 Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
 
 const DRIVE_URL = "https://drive.google.com/drive/folders/";
+
+const DEFAULT_TC_BG = `1. Description of Promotion
+This "Promotion" is offered by FBG Enterprises Opco, LLC ("Fanatics Casino"). Select customers who opt in and place {bet_fmt} in cumulative cash wagers on any game(s) in the Fanatics Casino within twenty-four (24) hours of being presented with this offer, will receive {get_fmt} in FanCash ("Rewards").
+
+2. Promotional Period
+This "Promotion" begins at 12:00 a.m. ET on {date_fmt}, and ends at 11:59 p.m. ET on November 13, 2026 (the "Promotional Period").
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Sportsbook and Casino Account ("Account"). To participate in this Promotion: (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states; and (iii) you must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer cannot be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+To participate and be eligible for the Rewards, each time you are presented with the offer to participate in this Promotion, you must: (i) opt in via the Discover or Promos page in the Fanatics Sportsbook and Casino App, the standalone Casino App, or the Fanatics Casino Website ("App"); and (ii) place {bet_fmt} in cumulative cash wagers in the Fanatics Casino within twenty-four (24) hours of receiving the invitation to participate. To count towards the minimum, bets must be placed with cash and not Casino Credit, Free Spins or other promotional credit.
+
+5. Claiming Promotional Offer
+Rewards will be added to eligible Accounts within 72 hours of satisfying the cumulative wager requirement. Rewards expire at 11:59 p.m. ET on the 7th day following issuance.
+FanCash Terms:
+● FanCash can only be used in accordance with our FanCash Program Terms and Conditions, available here ("FanCash Terms"): https://sportsbook.fanatics.com/legal/all/fancash-program-terms.
+● FanCash issued in connection with this Promotion expires at 11:59 p.m. ET seven (7) days from the date of issuance. Promotional FanCash expiring first will automatically be applied first.
+● Rewards are non-withdrawable and are not redeemable for cash or cash equivalent.
+● Rewards are not transferable and cannot be substituted, except in Fanatics Sportsbook & Casino's sole discretion.
+
+6. Casino Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino's Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino's sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees', officers' and directors' immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+Bets must be placed with cash. Bets placed with Free Spins, Casino Credit, or any other promotional credit will not count towards your cumulative wager.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Free Spin, select "Free Spin" in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Free Spins you may have, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Any cash wagers in the Fanatics Casino during the Promotional Period will count towards your cumulative wager.
+
+11. Restrictions on Withdrawal
+Casino Credit, Free Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Free Spins.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+● Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+● Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+● Participation in this Promotion is subject to Fanatics Sportsbook & Casino's Terms of Service, House, Rules, game rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook's Privacy Policy.
+● In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook & Casino's Terms of Service, these Promotional Terms and Conditions will prevail.
+● References to "you" or "your" throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+● Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards' value may be reported for tax purposes as required by law.
+● Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
 const DEFAULT_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RTC Top Up";
 
-function getImagePath() { return localStorage.getItem('rtc_image_path') || DEFAULT_IMAGE_PATH; }
-function getHIW() { return localStorage.getItem('rtc_hiw') || DEFAULT_HIW; }
-function getTC() { return localStorage.getItem('rtc_tc') || DEFAULT_TC; }
+const DEFAULT_BG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Wednesday B&G";
+
+function getImagePath() {
+  const isBG = getOfferType() === 'BG';
+  return localStorage.getItem(isBG ? 'bg_image_path' : 'rtc_image_path') || (isBG ? DEFAULT_BG_IMAGE_PATH : DEFAULT_IMAGE_PATH);
+}
+function getHIW() {
+  const isBG = getOfferType() === 'BG';
+  return localStorage.getItem(isBG ? 'bg_hiw' : 'rtc_hiw') || (isBG ? DEFAULT_HIW_BG : DEFAULT_HIW_RTC);
+}
+function getTC() {
+  const isBG = getOfferType() === 'BG';
+  return localStorage.getItem(isBG ? 'bg_tc' : 'rtc_tc') || (isBG ? DEFAULT_TC_BG : DEFAULT_TC);
+}
 
 function openModal(type) {
   if (type === 'hiw') {
+    document.getElementById('hiw-textarea').value = '';
     document.getElementById('hiw-textarea').value = getHIW();
     document.getElementById('modal-hiw').classList.add('open');
   } else if (type === 'tc') {
+    document.getElementById('tc-textarea').value = '';
     document.getElementById('tc-textarea').value = getTC();
     document.getElementById('modal-tc').classList.add('open');
   } else if (type === 'images') {
-    document.getElementById('images-path').value = getImagePath();
-    document.getElementById('modal-images').classList.add('open');
+    const isBG = getOfferType() === 'BG';
+    document.getElementById('drive-link').href = isBG
+      ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
+      : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
+    const path = getImagePath();
+    const el = document.getElementById('images-path');
+    el.value = path;
+    const overlay = document.getElementById('modal-images');
+    overlay.classList.add('open');
+    setTimeout(() => { el.value = path; }, 0);
   }
 }
 
@@ -724,12 +993,13 @@ function closeModal(type) {
 }
 
 function saveModal(type) {
+  const isBG = getOfferType() === 'BG';
   if (type === 'hiw') {
-    localStorage.setItem('rtc_hiw', document.getElementById('hiw-textarea').value);
+    localStorage.setItem(isBG ? 'bg_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem('rtc_tc', document.getElementById('tc-textarea').value);
+    localStorage.setItem(isBG ? 'bg_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem('rtc_image_path', document.getElementById('images-path').value);
+    localStorage.setItem(isBG ? 'bg_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -743,37 +1013,95 @@ function getTodayMMDDYY() {
 }
 
 function initDays() {
-  days = Array.from({ length: NUM_DAYS }, (_, i) => ({
-    date: i === 0 ? getTodayMMDDYY() : '',
-    amounts: new Set()
+  const numDays = getOfferType() === 'BG' ? 4 : NUM_DAYS;
+  days = Array.from({ length: numDays }, (_, i) => ({
+    date: '',
+    amounts: new Set(),
+    offers: new Set()
   }));
+  updateGenerateButton();
+}
+
+const DEFAULT_BG_OFFERS = [
+  { bet: 100, get: 2 },
+  { bet: 200, get: 5 },
+  { bet: 2000, get: 50 },
+  { bet: 20000, get: 500 }
+];
+
+function getOfferType() {
+  return document.getElementById('offer-type-select') ? document.getElementById('offer-type-select').value : 'RTC';
+}
+
+const INFO_RTC = `<ul>
+  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> You can use either button if you need to overwrite the How it Works or Terms &amp; Conditions if required.</li>
+  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "RTC Top Up" folder — having multiple in there will cause your generated script to fail.</li>
+  <li><strong>Discover Image(s):</strong> These are pulled based on the Amount(s) selected for each day. The preset amount value(s) can also be changed, but if there is no Discover Image in the Google Drive matching a selected amount, your script will fail.</li>
+</ul>`;
+
+const INFO_BG = `<ul>
+  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> Certain fields of this copy is dynamic based on bet amounts &amp; get amounts so no updates should be needed between scripts.</li>
+  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "RTC Top Up" folder — having multiple in there will cause your generated script to fail.</li>
+  <li><strong>Discover Image(s):</strong> These are pulled based on the <span style="color:#ffffff;">BET AMOUNT(s)</span> selected for each day. The preset amount value can also be changed, but if there is no Discover Image in the Google Drive matching a selected amount, your script will fail. If there are duplicates of a certain BET AMOUNT your script will fail.</li>
+</ul>`;
+
+function onOfferTypeChange() {
+  const type = getOfferType();
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : INFO_RTC;
+  initDays();
+  renderAll();
+  document.getElementById('script-area').style.display = 'none';
+  // Pre-set the images-path input so it always reflects the current offer type
+  document.getElementById('images-path').value = getImagePath();
 }
 
 function renderAll() {
   const container = document.getElementById('days-container');
   container.innerHTML = '';
+  const isBG = getOfferType() === 'BG';
+  if (isBG) { container.classList.add('bg-layout'); }
+  else { container.classList.remove('bg-layout'); }
   days.forEach((day, i) => {
     const card = document.createElement('div');
     card.className = 'day-card';
-    card.innerHTML = `
-      <div class="day-header">
-        <span class="day-number">Day ${i + 1}</span>
-        <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
-      </div>
-      <span class="field-label">Date (MMDDYY)</span>
-      <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 053026" value="${day.date}"
-        oninput="days[${i}].date = this.value" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
-      <span class="field-label">Amounts</span>
-      <div id="amounts-${i}" class="amounts-grid"></div>
-      <div class="add-row">
-        <input type="number" id="custom-${i}" placeholder="Add amount..." style="width: 140px;"
-          onkeydown="if(event.key==='Enter') addAmount(${i})" />
-        <button class="reset-btn" onclick="addAmount(${i})">+ Add</button>
-        <button class="reset-btn" onclick="selectAll(${i})">Select All</button>
-      </div>
-    `;
+    if (isBG) {
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        <span class="field-label">Date (MMDDYY)</span>
+        <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 052826" value="${day.date}"
+          oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
+        <span class="field-label">Offers</span>
+        <div id="offers-${i}"></div>
+        <div class="add-row" style="margin-top: 8px;">
+          <button class="reset-btn" onclick="addOffer(${i})">+ Add</button>
+          <button class="reset-btn" onclick="selectAllOffers(${i})">Select All</button>
+        </div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        <span class="field-label">Date (MMDDYY)</span>
+        <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 053026" value="${day.date}"
+          oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
+        <span class="field-label">Amounts</span>
+        <div id="amounts-${i}" class="amounts-grid"></div>
+        <div class="add-row">
+          <input type="number" id="custom-${i}" placeholder="Add amount..." style="width: 140px;"
+            onkeydown="if(event.key==='Enter') addAmount(${i})" />
+          <button class="reset-btn" onclick="addAmount(${i})">+ Add</button>
+          <button class="reset-btn" onclick="selectAll(${i})">Select All</button>
+        </div>
+      `;
+    }
     container.appendChild(card);
-    renderAmounts(i);
+    if (isBG) renderOffers(i);
+    else renderAmounts(i);
   });
 }
 
@@ -794,6 +1122,7 @@ function renderAmounts(i) {
     };
     grid.appendChild(btn);
   });
+  updateGenerateButton();
 }
 
 function addAmount(i) {
@@ -807,7 +1136,9 @@ function addAmount(i) {
 }
 
 function addDay() {
-  days.push({ date: '', amounts: new Set() });
+  const maxDays = getOfferType() === 'BG' ? 8 : 99;
+  if (days.length >= maxDays) return;
+  days.push({ date: '', amounts: new Set(), offers: new Set() });
   renderAll();
   document.getElementById('days-container').lastElementChild.scrollIntoView({ behavior: 'smooth' });
 }
@@ -819,7 +1150,55 @@ function selectAll(i) {
 
 function resetDay(i) {
   days[i].amounts = new Set();
-  renderAmounts(i);
+  days[i].offers = new Set();
+  days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: false }));
+  if (getOfferType() === 'BG') renderOffers(i);
+  else renderAmounts(i);
+  updateGenerateButton();
+}
+
+function renderOffers(i) {
+  const container = document.getElementById(`offers-${i}`);
+  if (!container) return;
+  if (!days[i].offerData) {
+    days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: false }));
+  }
+  container.innerHTML = '';
+  days[i].offerData.forEach((offer, j) => {
+    const row = document.createElement('div');
+    row.style.cssText = `border: ${offer.active ? '1.5px solid #ffffff' : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
+    row.innerHTML = `
+      <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Bet</span>
+      <input type="number" value="${offer.bet || ''}" placeholder="0" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+        oninput="days[${i}].offerData[${j}].bet = parseFloat(this.value) || 0;" />
+      <span style="font-size:12px; color:var(--muted);">→</span>
+      <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Get</span>
+      <input type="number" value="${offer.get || ''}" placeholder="0" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+        oninput="days[${i}].offerData[${j}].get = parseFloat(this.value) || 0;" />
+      <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
+        onchange="days[${i}].offerData[${j}].active = this.checked; renderOffers(${i});" />
+    `;
+    container.appendChild(row);
+  });
+  updateGenerateButton();
+}
+
+function addOffer(i) {
+  if (!days[i].offerData) days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: false }));
+  days[i].offerData.push({ bet: 0, get: 0, active: false });
+  renderOffers(i);
+}
+
+function selectAllOffers(i) {
+  if (!days[i].offerData) days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: true }));
+  else days[i].offerData.forEach(o => o.active = true);
+  renderOffers(i);
+}
+
+function clearSettings() {
+  if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
+  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path'].forEach(k => localStorage.removeItem(k));
+  alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
 function resetAll() {
@@ -828,6 +1207,390 @@ function resetAll() {
   document.getElementById('script-area').style.display = 'none';
 }
 
+function buildBGScript(namesStr, hiwText, tcText, imagePath) {
+  return `import asyncio
+import subprocess
+from datetime import datetime, timedelta
+from playwright.async_api import async_playwright
+
+URL = "https://trading.1.betfanatics.com/"
+IMAGE_FOLDER = "${imagePath}"
+
+NAMES = [
+${namesStr}
+]
+
+def parse_dates(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    dt_end = dt + timedelta(days=1)
+    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
+    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    return start, end
+
+def parse_bet_get(code):
+    parts = code.split("_")
+    bet, get = None, None
+    for part in parts:
+        if part.startswith("B") and part[1:].isdigit():
+            bet = part[1:]
+        if part.startswith("G") and part[1:].isdigit():
+            get = part[1:]
+    return bet, get
+
+def format_currency(amount_str):
+    amount = int(amount_str)
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def ordinal(n):
+    if 11 <= n % 100 <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+def format_long_date(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    return f"{dt.strftime('%B')} {ordinal(dt.day)}, {dt.strftime('%Y')}"
+
+def parse_voucher(code):
+    date_part = code.split("_")[0]
+    mmdd = date_part[0:4]
+    bet, get = parse_bet_get(code)
+    return f"CAS_B{bet}_G{get}_{mmdd}"
+
+def format_hiw(code):
+    bet, get = parse_bet_get(code)
+    bet_fmt = format_currency(bet) + "+"
+    get_fmt = format_currency(get)
+    date_fmt = format_long_date(code)
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    bet, get = parse_bet_get(code)
+    bet_fmt = format_currency(bet) + "+"
+    get_fmt = format_currency(get)
+    date_fmt = format_long_date(code)
+    return f"""${tcText}"""
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "B&G Script" sound name "Glass"'])
+
+async def upload_image(page, label_title, filepath):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(5000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Rich text filled: {label_title}")
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    await page.locator("img[alt='FBG logo']").click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    for _ in range(5):
+        await page.locator("span.h3", has_text="Cms").click()
+        await page.wait_for_timeout(1000)
+        promos = page.get_by_text("Promos", exact=True)
+        if await promos.is_visible():
+            await promos.click()
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Promos page")
+            return
+    raise Exception("Could not find Promos button")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    await page.locator("img[alt='FBG logo']").click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    for _ in range(5):
+        await page.locator("span.h3", has_text="Bonuses").click()
+        await page.wait_for_timeout(1000)
+        bonus = page.get_by_text("Bonus Manager", exact=True)
+        if await bonus.is_visible():
+            await bonus.click()
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Bonus Manager page")
+            return
+    raise Exception("Could not find Bonus Manager button")
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).click()
+    await page.locator("#forBonus").check()
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Segment done: {name}")
+
+async def create_promo(page, name):
+    print(f"\\n  Creating promotion: {name}")
+    await page.get_by_text("Create Promotion", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    bet, get = parse_bet_get(name)
+    get_fmt = format_currency(get)
+    header_text = f"Bet & Get {get_fmt} FanCash"
+    await upload_image(page, "Promo Detail Image Upload", f"${imagePath}/Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"${imagePath}/Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"${imagePath}/{bet}.png")
+    await page.locator("input[placeholder='Promo Header Text']").fill(header_text)
+    await page.locator("input[placeholder='Title']").fill(header_text)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill("Play Now!")
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill("/docs/usered/casgenericgamelist")
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Promotion done: {name}")
+
+async def create_bonus(page, name):
+    print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_timeout(2000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(20):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+    bet, get = parse_bet_get(name)
+    get_fmt = format_currency(get)
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(f"Bet & Get {get_fmt} FanCash")
+    await page.get_by_text("Send To XP", exact=True).click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("External Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+    voucher_code = parse_voucher(name)
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Voucher Code: {voucher_code}")
+    await page.get_by_text("FanCash", exact=True).click()
+    await page.wait_for_timeout(500)
+    amount_input = page.locator("td.ant-table-cell.center").locator("input.ant-input-number-input[aria-valuemin='0']")
+    await amount_input.click()
+    await amount_input.fill(get)
+    await page.wait_for_timeout(500)
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Fancash Settlement"))
+    await days_row.locator("input.ant-input-number-input").click()
+    await days_row.locator("input.ant-input-number-input").fill("7")
+    await page.wait_for_timeout(500)
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill("1")
+    await page.wait_for_timeout(500)
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill("1")
+    await page.wait_for_timeout(500)
+    status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+    date_part = name.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    dt_start = dt - timedelta(days=1)
+    act_start = f"{dt_start.strftime('%d')}-{dt_start.strftime('%m')}-{dt_start.strftime('%Y')} 00:00:00"
+    act_end = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 23:59:59"
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"    ✅ Activation Dates: {act_start} → {act_end}")
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    await page.get_by_text(name, exact=True).nth(1).click()
+    await page.wait_for_timeout(500)
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    await page.locator("div.ant-select-item-option-content", has_text=name).first.click()
+    await page.wait_for_timeout(500)
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Opt-In Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("Other")
+    await page.wait_for_timeout(500)
+    await page.locator("div.ant-select-item-option-content", has_text="Other").click()
+    await page.wait_for_timeout(500)
+    type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row2.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="Retention").first.click()
+    await page.wait_for_timeout(500)
+    await page.locator("button.ant-btn-primary.save").click()
+    await page.wait_for_timeout(2000)
+    modal = page.locator(".ant-modal-content")
+    await modal.wait_for(state="visible", timeout=10000)
+    await modal.locator("button.ant-btn-primary").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Bonus done: {name}")
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+        print("\\n👉 Please log in to the site in the browser window.")
+        print("   Once logged in, come back here and press Enter.\\n")
+        input("Press Enter when ready...")
+        await page.wait_for_timeout(2000)
+        await page.locator("span", has_text="Expand All").click()
+        await page.wait_for_load_state("networkidle")
+        print("✅ Menu expanded")
+
+        print("\\n─── Creating Segments ───")
+        await page.get_by_text("Account Segments", exact=True).click()
+        await page.wait_for_load_state("networkidle")
+        for name in NAMES:
+            await create_segment(page, name)
+            await page.wait_for_timeout(1000)
+        print("\\n✅ All segments created!")
+
+        await nav_to_promos(page)
+        print("\\n─── Creating Promotions ───")
+        for name in NAMES:
+            await create_promo(page, name)
+            await page.wait_for_timeout(1000)
+        print("\\n✅ All promotions created!")
+
+        await nav_to_bonus(page)
+        print("\\n─── Creating Bonuses ───")
+        for name in NAMES:
+            await create_bonus(page, name)
+            await page.wait_for_timeout(1000)
+        print("\\n✅ All bonuses created!")
+
+        notify(f"✅ B&G complete! {len(NAMES)} codes created.")
+        print("\\n🎉 All done!")
+        await browser.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+`;
+}
+
+
+function updateGenerateButton() {
+  const offerType = getOfferType();
+  let ready = false;
+  for (let i = 0; i < days.length; i++) {
+    const d = days[i];
+    const dateEl = document.getElementById('date-input-' + i);
+    const date = dateEl ? dateEl.value.trim() : d.date;
+    if (!date) continue;
+    if (offerType === 'BG') {
+      const offers = (d.offerData || []).filter(o => o.active);
+      if (offers.length > 0) { ready = true; break; }
+    } else {
+      if (d.amounts && d.amounts.size > 0) { ready = true; break; }
+    }
+  }
+  const btn = document.querySelector('.btn-generate');
+  if (btn) {
+    if (ready) { btn.classList.remove('faded'); }
+    else { btn.classList.add('faded'); }
+  }
+}
 function generateScript() {
   try {
   // Sync all date inputs to days array first
@@ -837,23 +1600,34 @@ function generateScript() {
   }
 
   const jurisdiction = document.getElementById('jurisdiction-select').value;
+  const offerType = getOfferType();
   const allNames = [];
   for (let i = 0; i < days.length; i++) {
     const date = days[i].date;
     if (!date) continue;
     if (date.length !== 6) { alert(`Day ${i + 1}: please enter a valid 6-digit date (MMDDYY).`); return; }
-    const amounts = [...days[i].amounts].sort((a, b) => a - b);
-    if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
-    amounts.forEach(a => allNames.push(`${date}_CAS_RET_RTC_${jurisdiction}_CC_${a}`));
+    if (offerType === 'BG') {
+      const offers = (days[i].offerData || []).filter(o => o.active);
+      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      offers.forEach(o => allNames.push(`${date}_CAS_RET_BG_${jurisdiction}_FC_B${o.bet}_G${o.get}`));
+    } else {
+      const amounts = [...days[i].amounts].sort((a, b) => a - b);
+      if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
+      amounts.forEach(a => allNames.push(`${date}_CAS_RET_RTC_${jurisdiction}_CC_${a}`));
+    }
   }
-  if (allNames.length === 0) { alert('Please enter at least one date with amounts selected.'); return; }
+  if (allNames.length === 0) { alert('Please enter at least one date with offers selected.'); return; }
 
   const namesStr = allNames.map(n => `    "${n}",`).join('\n');
   const hiwText = getHIW().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const tcText = getTC().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const imagePath = getImagePath();
 
-  const script = `import asyncio
+  let script;
+  if (offerType === 'BG') {
+    script = buildBGScript(namesStr, hiwText, tcText, imagePath);
+  } else {
+    script = `import asyncio
 import subprocess
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
@@ -1167,10 +1941,10 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 `;
+  } // end else (RTC)
 
   document.getElementById('script-output').value = script;
   document.getElementById('script-area').style.display = 'block';
-  document.getElementById('script-area').scrollIntoView({ behavior: 'smooth' });
 
   // Auto-download the script
   const today = new Date();
@@ -1179,7 +1953,17 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = `${offerType === 'BG' ? 'bg' : 'rtc_top_up'}_${mm}${dd}${yy}_${hh}${min}.py`;
+
+  // Update run cards
+  document.getElementById('mac-run-cmd').textContent = `python3 ${filename}`;
+  document.getElementById('win-run-cmd').textContent = `python ${filename}`;
+  ['mac-cd-btn','mac-run-btn','win-cd-btn','win-run-btn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+  document.querySelectorAll('.run-cmd-row').forEach(el => el.classList.add('ready'));
+  document.querySelectorAll('.run-cmd-row code').forEach(el => el.classList.add('ready'));
+
   const blob = new Blob([script], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1188,14 +1972,6 @@ if __name__ == "__main__":
   a.click();
   URL.revokeObjectURL(url);
 
-  // Update instructions
-  document.getElementById('run-instructions').innerHTML = `
-    <strong>Script downloaded!</strong> To run it:<br><br>
-    1. Open <strong>Terminal</strong><br>
-    2. <span style="display:inline-flex; align-items:center; gap:8px;">Type: <code>cd ~/Downloads</code> <button onclick="copyCmd('cd ~/Downloads', this)" style="font-family:'DM Mono',monospace; font-size:10px; padding:2px 8px; background:var(--surface2); color:var(--accent2); border:1px solid var(--border); border-radius:4px; cursor:pointer;">Copy</button></span><br>
-    3. <span style="display:inline-flex; align-items:center; gap:8px;">Type: <code>python3 ${filename}</code> <button onclick="copyCmd('python3 ${filename}', this)" style="font-family:'DM Mono',monospace; font-size:10px; padding:2px 8px; background:var(--surface2); color:var(--accent2); border:1px solid var(--border); border-radius:4px; cursor:pointer;">Copy</button></span>
-  `;
-
   } catch(e) {
     alert('Error generating script: ' + e.message);
     console.error(e);
@@ -1203,6 +1979,14 @@ if __name__ == "__main__":
 }
 
 function copyCmd(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function copyRunCmd(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
     const orig = btn.textContent;
     btn.textContent = 'Copied!';
@@ -1219,6 +2003,7 @@ function copyScript() {
   setTimeout(() => btn.textContent = 'Copy', 2000);
 }
 
+document.getElementById('info-offer-type').innerHTML = INFO_RTC;
 initDays();
 renderAll();
 </script>
