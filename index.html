@@ -1393,7 +1393,7 @@ async def create_promo(page, name):
     header_text = f"Bet & Get {get_fmt} FanCash"
     await upload_image(page, "Promo Detail Image Upload", f"${imagePath}/Promo Detail.png")
     await upload_image(page, "Masthead Image Upload", f"${imagePath}/Masthead.png")
-    await upload_image(page, "Discover Image Upload", f"${imagePath}/{bet}.png")
+    await upload_image(page, "Discover Image Upload", f"${imagePath}/B{bet}_G{get}.png")
     await page.locator("input[placeholder='Promo Header Text']").fill(header_text)
     await page.locator("input[placeholder='Title']").fill(header_text)
     bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
