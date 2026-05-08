@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RTC Top Up Script Generator</title>
   <link rel="icon" type="image/png" href="favicon.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     
 
@@ -657,7 +658,7 @@
       <div class="header-actions-row">
         <button class="btn-edit-hiw" onclick="openModal('hiw')">Edit HIW</button>
         <button class="btn-edit-tc" onclick="openModal('tc')">Edit T&Cs</button>
-        <button class="btn-edit-images" onclick="openModal('images')">Edit Images</button>
+        <button id="btn-edit-images" class="btn-edit-images" onclick="openModal('images')">Edit Images</button>
         <button class="btn-add-day" onclick="addDay()">+ Add Day</button>
         <button class="btn-reset" onclick="resetAll()" style="padding: 10px 14px;">Reset All</button>
         <button class="btn-reset" onclick="clearSettings()" style="padding: 10px 14px; color: #c05050;">Clear Saved Settings</button>
@@ -695,7 +696,7 @@
             <li><strong>Windows:</strong> Install from <a href="https://www.python.org/downloads/" target="_blank" style="color:var(--accent2);">python.org</a> — check <strong>"Add Python to PATH"</strong> during install. Then run <code>pip install playwright</code> and <code>playwright install chromium</code> in Command Prompt.</li>
           </ul>
         </li>
-        <li><strong>Adding Google Drive to Finder / File Explorer:</strong>
+        <li id="info-shared-gdrive"><strong>Adding Google Drive to Finder / File Explorer:</strong>
           <ul>
             <li><strong>Mac:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once installed and signed in, Google Drive appears in the Finder sidebar under Locations. You can then browse Shared Drives directly from Finder and use those paths in the script.</li>
             <li><strong>Windows:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once signed in it mounts as a drive (e.g. <code>G:\</code>) in File Explorer. Shared Drives will appear under <strong>Google Drive &gt; Shared drives</strong> and can be used as the image path.</li>
@@ -1105,26 +1106,49 @@ function getOfferType() {
 }
 
 const INFO_RTC = `<ul>
-  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> You can use either button if you need to overwrite the How it Works or Terms &amp; Conditions if required.</li>
-  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "RTC Top Up" folder — having multiple in there will cause your generated script to fail.</li>
-  <li><strong>Discover Image(s):</strong> These are pulled based on the Amount(s) selected for each day. The preset amount value(s) can also be changed, but if there is no Discover Image in the Google Drive matching a selected amount, your script will fail.</li>
+  <li><strong>How it Works:</strong> This copy is always the same with a dynamic field entered to account for the bonus amount, which varies for each code.</li>
+  <li><strong>Terms &amp; Conditions:</strong> This copy is always the same with a dynamic field entered to account for different bonus amounts, which varies for each code. T&amp;Cs are submitted to regulators every 6 months in the United States. <span style="color:#ffffff;">Please reach out to Adrian Van de Camp on Slack if the T&amp;Cs need to be updated after legal signoff.</span></li>
+  <li><strong>Images:</strong> The 3 images attached to each promotion all require a distinct naming convention. The Masthead image must be named "Masthead", the Promo Detail Image must be named "Promo Detail", and the Discover Image must be named after the bonus amount. (e.g. for an $800 bonus, the Discover Image file must be "800")
+    <ul>
+      <li>These images are almost never changed, so they are stored in &amp; pulled from a Google Drive. <span style="color:#ffffff;">To add new values, please reach out to Adrian Van de Camp.</span></li>
+    </ul>
+  </li>
 </ul>`;
 
 const INFO_BG = `<ul>
-  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> Certain fields of this copy is dynamic based on bet amounts &amp; get amounts so no updates should be needed between scripts.</li>
-  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "RTC Top Up" folder — having multiple in there will cause your generated script to fail.</li>
-  <li><strong>Discover Image(s):</strong> These are pulled based on the <span style="color:#ffffff;">BET AMOUNT(s)</span> selected for each day. The preset amount value can also be changed, but if there is no Discover Image in the Google Drive matching a selected amount, your script will fail. If there are duplicates of a certain BET AMOUNT your script will fail.</li>
+  <li><strong>How it Works:</strong> This copy is always the same and static across tiers.</li>
+  <li><strong>Terms &amp; Conditions:</strong> This copy is always the same with a dynamic field entered to account for different bet and get amounts, which varies for each code. T&amp;Cs are submitted to regulators every 6 months in the United States. <span style="color:#ffffff;">Please reach out to Adrian Van de Camp on Slack if the T&amp;Cs need to be updated after legal sign-off.</span></li>
+  <li><strong>Images:</strong> Please attach a ZIP file with the 3 images for each promotion. Your ZIP file can contain one Masthead image, one Promo Detail image, and as many Discover Images as needed. Files all require a distinct naming convention. If files do not follow the proper naming convention, your script will fail.
+    <ul>
+      <li><span style="color:#ffffff;">The Masthead image must be named "Masthead", the Promo Detail Image must be named "Promo Detail", and the Discover Image must be named based on the Bet &amp; Get amounts in the format "B(AMOUNT)_G(AMOUNT)".</span>
+        <ul>
+          <li><span style="color:#ffffff;">e.g. for a Bet $50 &amp; Get $2 offer, the filename should be "B50_G2".</span></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
 </ul>`;
 
 function onOfferTypeChange() {
 const INFO_DM = `<ul>
-  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> Certain fields of this copy is dynamic based on percentage &amp; max amounts so no updates should be needed between scripts.</li>
-  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "Friday Deposit Match" folder — having multiple in there will cause your generated script to fail.</li>
-  <li><strong>Discover Image(s):</strong> These are pulled based on the <span style="color:#ffffff;">% and Max combination</span> selected for each day (e.g. 20% up to $500 = <code>20M500.png</code>). If there is no matching image in Google Drive your script will fail.</li>
+  <li><strong>How it Works:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. There is also a dynamic field for the promotion run dates.</li>
+  <li><strong>Terms &amp; Conditions:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. T&amp;Cs are submitted to regulators every 6 months in the United States. <span style="color:#ffffff;">Please reach out to Adrian Van de Camp on Slack if the T&amp;Cs need to be updated after legal sign-off.</span></li>
+  <li><strong>Images:</strong> Please attach a ZIP file with the 3 images for each promotion. Your ZIP file can contain one Masthead image, one Promo Detail image, and as many Discover Images as needed. Files all require a distinct naming convention. If files do not follow the proper naming convention, your script will fail.
+    <ul>
+      <li><span style="color:#ffffff;">The Masthead image must be named "Masthead", the Promo Detail Image must be named "Promo Detail", and the Discover Image must be named based on the Match Percentage and Max Bonus amounts in the format "(MATCH%)_M(MAX AMOUNT)".</span>
+        <ul>
+          <li><span style="color:#ffffff;">e.g. for a 20% Deposit Match up to $500, the filename should be "20M500".</span></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Campaign Name:</strong> This field is what will be entered into 3 different sections — the "Promo Header" and "Title" sections of the promotion, and the "Description" section of the bonus.</li>
 </ul>`;
 
   const type = getOfferType();
   document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : INFO_RTC;
+  document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG') ? 'none' : '';
+  document.getElementById('info-shared-gdrive').style.display = type === 'RTC' ? '' : 'none';
   initDays();
   renderAll();
   document.getElementById('script-area').style.display = 'none';
@@ -1154,6 +1178,17 @@ function renderAll() {
         ${isDM ? `<span class="field-label">Campaign Name</span>
         <input type="text" id="campaign-name-${i}" placeholder="e.g. Friday Deposit Match" value="${day.campaignName || 'Friday Deposit Match'}"
           oninput="days[${i}].campaignName = this.value" style="width: 100%; margin-bottom: 14px;" />` : ''}
+        ${(isDM || isBG) ? `<span class="field-label">Images</span>
+        <div style="margin-bottom: 14px;">
+          <input type="file" id="zip-input-${i}" accept=".zip" style="display:none;" onchange="handleZipUpload(${i}, this)" />
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button class="reset-btn" style="padding:5px 12px; color:${day.dmZipImages ? '#a0d070' : '#7070a0'}; border-color:${day.dmZipImages ? '#a0d070' : 'var(--border)'};" onclick="document.getElementById('zip-input-${i}').click()">
+              ${day.dmZipImages ? '✓ ZIP Attached' : '📎 Attach ZIP'}
+            </button>
+            ${day.dmZipName ? `<span style="font-family:'SF Mono',ui-monospace,monospace; font-size:10px; color:var(--muted);">${day.dmZipName}</span>` : ''}
+          </div>
+          ${day.dmZipStatus ? `<div style="margin-top:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:10px; line-height:1.8;">${day.dmZipStatus}</div>` : ''}
+        </div>` : ''}
         <span class="field-label">Offers</span>
         <div id="offers-${i}"></div>
         <div class="add-row" style="margin-top: 8px;">
@@ -1296,10 +1331,38 @@ function resetDay(i) {
   days[i].rtcSendToXP = true;
   days[i].rtcDaysToOptin = 0;
   days[i].rtcDaysToEntitlement = 0;
+  days[i].dmZipImages = null;
+  days[i].dmZipName = null;
+  days[i].dmZipStatus = null;
   if (getOfferType() === 'BG') renderOffers(i);
   else if (getOfferType() === 'DM') renderDMOffers(i);
   else renderAmounts(i);
   updateGenerateButton();
+}
+
+async function handleZipUpload(i, input) {
+  const file = input.files[0];
+  if (!file) return;
+  days[i].dmZipName = file.name;
+  days[i].dmZipImages = {};
+  try {
+    const zip = await JSZip.loadAsync(file);
+    const loaded = {};
+    for (const [filename, entry] of Object.entries(zip.files)) {
+      if (entry.dir) continue;
+      const base = filename.split('/').pop();
+      if (base.startsWith('._') || filename.includes('__MACOSX')) continue;
+      const b64 = await entry.async('base64');
+      loaded[base] = b64;
+    }
+    days[i].dmZipImages = loaded;
+
+    const pngCount = Object.keys(loaded).filter(f => f.endsWith('.png')).length;
+    days[i].dmZipStatus = `<span style="color:#a0d070;">${pngCount} image${pngCount !== 1 ? 's' : ''} loaded</span>`;
+  } catch(e) {
+    days[i].dmZipStatus = `<span style="color:#f04e4e;">Failed to read ZIP: ${e.message}</span>`;
+  }
+  renderAll();
 }
 
 function renderOffers(i) {
@@ -1391,14 +1454,16 @@ function resetAll() {
   document.getElementById('script-area').style.display = 'none';
 }
 
-function buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, imagePath) {
+function buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, bgImagesStr) {
   return `import asyncio
+import base64
+import os
 import subprocess
+import tempfile
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
 
 URL = "https://trading.1.betfanatics.com/"
-IMAGE_FOLDER = "${imagePath}"
 
 NAMES = [
 ${namesStr}
@@ -1423,6 +1488,17 @@ ${daysToOptinStr}
 DAYS_TO_ENTITLEMENT = [
 ${daysToEntitlementStr}
 ]
+
+IMAGES = {
+${bgImagesStr}
+}
+
+def get_image_path(name, filename):
+    b64 = IMAGES[name][filename]
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
+    tmp.write(base64.b64decode(b64))
+    tmp.close()
+    return tmp.name
 
 def parse_dates(code):
     date_part = code.split("_")[0]
@@ -1483,7 +1559,7 @@ def format_tc(code):
 def notify(message):
     subprocess.run(["osascript", "-e", f'display notification "{message}" with title "B&G Script" sound name "Glass"'])
 
-async def upload_image(page, label_title, filepath):
+async def upload_image(page, label_title, filepath, display_name=None):
     row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
     await row.get_by_text("Add").click()
     await page.wait_for_timeout(1000)
@@ -1496,8 +1572,8 @@ async def upload_image(page, label_title, filepath):
     await page.wait_for_timeout(5000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
-    print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
-
+    print(f"    ✅ Image uploaded: {display_name or os.path.basename(filepath)}")
+    os.unlink(filepath)
 async def fill_rich_text(page, label_title, content):
     print(f"    Filling rich text: {label_title}...")
     row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
@@ -1595,9 +1671,9 @@ async def create_promo(page, name):
     bet, get = parse_bet_get(name)
     get_fmt = format_currency(get)
     header_text = f"Bet & Get {get_fmt} FanCash"
-    await upload_image(page, "Promo Detail Image Upload", f"${imagePath}/Promo Detail.png")
-    await upload_image(page, "Masthead Image Upload", f"${imagePath}/Masthead.png")
-    await upload_image(page, "Discover Image Upload", f"${imagePath}/B{bet}_G{get}.png")
+    await upload_image(page, "Promo Detail Image Upload", get_image_path(name, "Promo Detail.png"), "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", get_image_path(name, "Masthead.png"), "Masthead.png")
+    await upload_image(page, "Discover Image Upload", get_image_path(name, f"B{bet}_G{get}.png"), f"B{bet}_G{get}.png")
     await page.locator("input[placeholder='Promo Header Text']").fill(header_text)
     await page.locator("input[placeholder='Title']").fill(header_text)
     bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
@@ -1698,8 +1774,8 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(1000)
-    await page.locator("div.ant-select-item-option-content", has_text=name).first.click()
+    await page.wait_for_timeout(2000)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
     await page.wait_for_timeout(500)
     reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
     await reporting_row.locator(".ant-select-selector").click()
@@ -1803,14 +1879,16 @@ function updateGenerateButton() {
   }
 }
 
-function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, imagePath) {
+function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, dmImagesStr) {
   return `import asyncio
+import base64
+import os
 import subprocess
+import tempfile
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
 
 URL = "https://trading.1.betfanatics.com/"
-IMAGE_FOLDER = "${imagePath}"
 
 NAMES = [
 ${namesStr}
@@ -1835,6 +1913,17 @@ ${daysToOptinStr}
 DAYS_TO_ENTITLEMENT = [
 ${daysToEntitlementStr}
 ]
+
+IMAGES = {
+${dmImagesStr}
+}
+
+def get_image_path(name, filename):
+    b64 = IMAGES[name][filename]
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
+    tmp.write(base64.b64decode(b64))
+    tmp.close()
+    return tmp.name
 
 def parse_dates(code):
     date_part = code.split("_")[0]
@@ -1945,7 +2034,7 @@ Fanatics Casino aims to consistently care for our customers and promote responsi
 def notify(message):
     subprocess.run(["osascript", "-e", f'display notification "{message}" with title "DM Setup Script" sound name "Glass"'])
 
-async def upload_image(page, label_title, filepath):
+async def upload_image(page, label_title, filepath, display_name=None):
     row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
     await row.get_by_text("Add").click()
     await page.wait_for_timeout(1000)
@@ -1958,7 +2047,8 @@ async def upload_image(page, label_title, filepath):
     await page.wait_for_timeout(5000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
-    print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
+    print(f"    ✅ Image uploaded: {display_name or os.path.basename(filepath)}")
+    os.unlink(filepath)
 
 async def fill_rich_text(page, label_title, content):
     print(f"    Filling rich text: {label_title}...")
@@ -2039,9 +2129,9 @@ async def create_promo(page, name):
     await page.get_by_text("Save", exact=True).click()
     await page.wait_for_load_state("networkidle")
     pct, max_bonus = parse_dm(name)
-    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png")
-    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png")
-    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{pct}M{max_bonus}.png")
+    await upload_image(page, "Promo Detail Image Upload", get_image_path(name, "Promo Detail.png"), "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", get_image_path(name, "Masthead.png"), "Masthead.png")
+    await upload_image(page, "Discover Image Upload", get_image_path(name, f"{pct}M{max_bonus}.png"), f"{pct}M{max_bonus}.png")
     campaign_name = CAMPAIGN_NAMES[NAMES.index(name)]
     await page.locator("input[placeholder='Promo Header Text']").fill(campaign_name)
     await page.locator("input[placeholder='Title']").fill(campaign_name)
@@ -2233,8 +2323,8 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(1000)
-    await page.locator("div.ant-select-item-option-content", has_text=name).first.click()
+    await page.wait_for_timeout(2000)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
     await page.wait_for_timeout(500)
     print(f"    ✅ Promotion Tile: {name}")
 
@@ -2342,20 +2432,58 @@ function generateScript() {
     if (offerType === 'BG') {
       const offers = (days[i].offerData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      if (!days[i].dmZipImages) { alert(`Day ${i + 1} has no ZIP attached. Please attach an images ZIP for this day.`); return; }
+      const zip = days[i].dmZipImages;
+      const missingShared = ['Promo Detail.png', 'Masthead.png'].filter(f => !zip[f]);
+      if (missingShared.length) { alert(`Day ${i + 1} ZIP is missing: ${missingShared.join(', ')}`); return; }
       const bgSendToXP = days[i].sendToXP !== false;
       const bgExternalBonus = days[i].externalBonus === true;
       const bgDaysToOptin = days[i].daysToOptin !== undefined ? days[i].daysToOptin : 1;
       const bgDaysToEntitlement = days[i].daysToEntitlement !== undefined ? days[i].daysToEntitlement : 1;
-      offers.forEach(o => allNames.push({ code: `${date}_CAS_RET_BG_${jurisdiction}_FC_B${o.bet}_G${o.get}`, sendToXP: bgSendToXP, externalBonus: bgExternalBonus, daysToOptin: bgDaysToOptin, daysToEntitlement: bgDaysToEntitlement }));
+      offers.forEach(o => {
+        const discoverFile = `B${o.bet}_G${o.get}.png`;
+        if (!zip[discoverFile]) { alert(`Day ${i + 1} ZIP is missing discover image: ${discoverFile}`); return; }
+        allNames.push({
+          code: `${date}_CAS_RET_BG_${jurisdiction}_FC_B${o.bet}_G${o.get}`,
+          sendToXP: bgSendToXP,
+          externalBonus: bgExternalBonus,
+          daysToOptin: bgDaysToOptin,
+          daysToEntitlement: bgDaysToEntitlement,
+          imgPromoDetail: zip['Promo Detail.png'],
+          imgMasthead: zip['Masthead.png'],
+          imgDiscover: zip[discoverFile],
+          discoverFile
+        });
+      });
     } else if (offerType === 'DM') {
       const offers = (days[i].dmOfferData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      if (!days[i].dmZipImages) { alert(`Day ${i + 1} has no ZIP attached. Please attach an images ZIP for this day.`); return; }
+      const zip = days[i].dmZipImages;
+      // Validate required images exist in zip
+      const missingShared = ['Promo Detail.png', 'Masthead.png'].filter(f => !zip[f]);
+      if (missingShared.length) { alert(`Day ${i + 1} ZIP is missing: ${missingShared.join(', ')}`); return; }
       const cname = (days[i].campaignName || 'Friday Deposit Match').trim();
       const dmSendToXP = days[i].sendToXP !== false;
-      const dmExternalBonus = false; // External Bonus not applicable for DM
+      const dmExternalBonus = false;
       const dmDaysToOptin = days[i].daysToOptin !== undefined ? days[i].daysToOptin : 1;
       const dmDaysToEntitlement = days[i].daysToEntitlement !== undefined ? days[i].daysToEntitlement : 1;
-      offers.forEach(o => allNames.push({ code: `${date}_CAS_RET_DM_${jurisdiction}_FC_M10_${o.pct}M${o.max}`, campaign: cname, sendToXP: dmSendToXP, externalBonus: dmExternalBonus, daysToOptin: dmDaysToOptin, daysToEntitlement: dmDaysToEntitlement }));
+      offers.forEach(o => {
+        const discoverFile = `${o.pct}M${o.max}.png`;
+        if (!zip[discoverFile]) { alert(`Day ${i + 1} ZIP is missing discover image: ${discoverFile}`); return; }
+        allNames.push({
+          code: `${date}_CAS_RET_DM_${jurisdiction}_FC_M10_${o.pct}M${o.max}`,
+          campaign: cname,
+          sendToXP: dmSendToXP,
+          externalBonus: dmExternalBonus,
+          daysToOptin: dmDaysToOptin,
+          daysToEntitlement: dmDaysToEntitlement,
+          imgPromoDetail: zip['Promo Detail.png'],
+          imgMasthead: zip['Masthead.png'],
+          imgDiscover: zip[discoverFile],
+          discoverFile
+        });
+      });
     } else {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
@@ -2386,11 +2514,21 @@ function generateScript() {
   const tcText = getTC().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const imagePath = getImagePath();
 
+  // Build per-code image data map for DM
+  const dmImagesStr = isDMScript
+    ? allNames.map(n => `    "${n.code}": {\n        "Promo Detail.png": "${n.imgPromoDetail}",\n        "Masthead.png": "${n.imgMasthead}",\n        "${n.discoverFile}": "${n.imgDiscover}"\n    },`).join('\n')
+    : '';
+
+  // Build per-code image data map for BG
+  const bgImagesStr = isBGScript
+    ? allNames.map(n => `    "${n.code}": {\n        "Promo Detail.png": "${n.imgPromoDetail}",\n        "Masthead.png": "${n.imgMasthead}",\n        "${n.discoverFile}": "${n.imgDiscover}"\n    },`).join('\n')
+    : '';
+
   let script;
   if (offerType === 'BG') {
-    script = buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, imagePath);
+    script = buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, bgImagesStr);
   } else if (offerType === 'DM') {
-    script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, imagePath);
+    script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, dmImagesStr);
   } else {
     script = `import asyncio
 import subprocess
@@ -2674,8 +2812,8 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(1000)
-    await page.locator("div.ant-select-item-option-content", has_text=name).first.click()
+    await page.wait_for_timeout(2000)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
     await page.wait_for_timeout(500)
     await page.locator("button.ant-btn-primary.save").click()
     await page.wait_for_load_state("networkidle")
@@ -2788,6 +2926,8 @@ function copyScript() {
 }
 
 document.getElementById('info-offer-type').innerHTML = INFO_RTC;
+document.getElementById('btn-edit-images').style.display = '';
+document.getElementById('info-shared-gdrive').style.display = '';
 initDays();
 renderAll();
 </script>
