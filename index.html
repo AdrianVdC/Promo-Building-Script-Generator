@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -666,6 +667,7 @@
         <select id="offer-type-select" onchange="onOfferTypeChange()" style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; flex: 1;">
           <option value="RTC">RTC Top Up</option>
           <option value="BG">Bet &amp; Get</option>
+          <option value="DM">Deposit Match</option>
         </select>
       </div>
       <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -951,18 +953,78 @@ Fanatics Casino aims to consistently care for our customers and promote responsi
 const DEFAULT_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RTC Top Up";
 
 const DEFAULT_BG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Wednesday B&G";
+const DEFAULT_DM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Friday Deposit Match";
 
 function getImagePath() {
-  const isBG = getOfferType() === 'BG';
-  return localStorage.getItem(isBG ? 'bg_image_path' : 'rtc_image_path') || (isBG ? DEFAULT_BG_IMAGE_PATH : DEFAULT_IMAGE_PATH);
+  const t = getOfferType();
+  if (t === 'BG') return localStorage.getItem('bg_image_path') || DEFAULT_BG_IMAGE_PATH;
+  if (t === 'DM') return localStorage.getItem('dm_image_path') || DEFAULT_DM_IMAGE_PATH;
+  return localStorage.getItem('rtc_image_path') || DEFAULT_IMAGE_PATH;
 }
 function getHIW() {
-  const isBG = getOfferType() === 'BG';
-  return localStorage.getItem(isBG ? 'bg_hiw' : 'rtc_hiw') || (isBG ? DEFAULT_HIW_BG : DEFAULT_HIW_RTC);
+  const t = getOfferType();
+  if (t === 'BG') return localStorage.getItem('bg_hiw') || DEFAULT_HIW_BG;
+  if (t === 'DM') return localStorage.getItem('dm_hiw') || `1. Opt in
+2. Make a Qualifying Deposit during the Promotional Period
+3. Rewards will equal {pct}% of your Qualifying Deposit amount in FanCash, up to \${max} in FanCash
+This Promotion begins at 12:00 a.m. ET on {code_date} and ends at 11:59 p.m. ET on {code_date} (the "Promotional Period").  See below for more details.`;
+  return localStorage.getItem('rtc_hiw') || DEFAULT_HIW_RTC;
 }
 function getTC() {
-  const isBG = getOfferType() === 'BG';
-  return localStorage.getItem(isBG ? 'bg_tc' : 'rtc_tc') || (isBG ? DEFAULT_TC_BG : DEFAULT_TC);
+  const t = getOfferType();
+  if (t === 'BG') return localStorage.getItem('bg_tc') || DEFAULT_TC_BG;
+  if (t === 'DM') return localStorage.getItem('dm_tc') || `1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC ("Fanatics Casino"). Select Fanatics Casino customers who opt in and make a $10+ deposit ("Qualifying Deposit") will receive a {pct}% deposit match, up to \${max} in FanCash ("Rewards"). See below for more details.
+
+2. Promotional Period
+This Promotion begins at 12:00 a.m. ET on March 20, 2026 and ends at 11:59 p.m. ET on September 20, 2026 (the "Promotional Period").
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Fanatics Casino account in MI, NJ, PA, or WV ("Account"). To participate in this Promotion: (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states to use your Account; and (iii) you must receive the invite to participate in this Promotion directly from Fanatics Casino (offer cannot be shared or forwarded). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+To participate in this Promotion, each time you are eligible to participate, you must: (i) opt in via the Promos page in the Fanatics Casino app, Fanatics Sportsbook & Casino app, or the Fanatics Casino website app (collectively, the "App"); and (ii) make a Qualifying Deposit within twenty-four (24) hours of being presented with this offer. Rewards will equal {pct}% of your Qualifying Deposit amount in FanCash, up to \${max} in FanCash. If you do not make a Qualifying Deposit within twenty-four (24) hours you are ineligible for the Rewards. Only your first Qualifying Deposit after opting in will be eligible for the Rewards.
+
+5. Claiming Promotional Offer
+FanCash Terms:
+● FanCash can only be used in accordance with our FanCash Program Terms and Conditions, available here ("FanCash Terms"): https://sportsbook.fanatics.com/legal/all/fancash-program-terms.
+● FanCash issued in connection with this Promotion expires at 11:59 p.m. ET seven (7) days from the date of issuance. Promotional FanCash expiring first will automatically be applied first.
+● Rewards are non-withdrawable and are not redeemable for cash or cash equivalent.
+● Rewards are not transferable and cannot be substituted, except in Fanatics Sportsbook and Casino's sole discretion.
+
+6. Casino Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino's Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Qualifying Deposit and one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino's sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees', officers' and directors' immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+There are no wagering requirements for this Promotion. Your Qualifying Deposit can be played through on any games in the Fanatics Casino.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Free Spin, select "Free Spin" in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Free Spins you may have, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Does not apply, as there are no wagering requirements for this Promotion. Your Qualifying Deposit can be played through on any games in the Fanatics Casino.
+
+11. Restrictions on Withdrawal
+Your Qualifying Deposit must be played through one (1) time. Any attempt to withdraw any portion of your Qualifying Deposit without playing through the full amount one (1) time may disqualify you from participating in this Promotion, or any other Fanatics Sportsbook & Casino promotions, and may make you ineligible for the Rewards for this Promotion. Casino Credit, Free Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Free Spins.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+● Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+● Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+● Participation in this Promotion is subject to Fanatics Sportsbook and Casino's Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook & Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino's Privacy Policy.
+● In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino's Terms of Service, these Promotional Terms and Conditions will prevail.
+● References to "you" or "your" throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+● Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards' value may be reported for tax purposes as required by law.
+● Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+  return localStorage.getItem('rtc_tc') || DEFAULT_TC;
 }
 
 function openModal(type) {
@@ -975,9 +1037,11 @@ function openModal(type) {
     document.getElementById('tc-textarea').value = getTC();
     document.getElementById('modal-tc').classList.add('open');
   } else if (type === 'images') {
-    const isBG = getOfferType() === 'BG';
-    document.getElementById('drive-link').href = isBG
+    const lt = getOfferType();
+    document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
+      : lt === 'DM'
+      ? 'https://drive.google.com/drive/folders/1DXkrR-eb2YJAfXKqwSvvekW-fZJe3pN3'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
     const path = getImagePath();
     const el = document.getElementById('images-path');
@@ -995,11 +1059,11 @@ function closeModal(type) {
 function saveModal(type) {
   const isBG = getOfferType() === 'BG';
   if (type === 'hiw') {
-    localStorage.setItem(isBG ? 'bg_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
+    const t2 = getOfferType(); localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem(isBG ? 'bg_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(isBG ? 'bg_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1013,7 +1077,7 @@ function getTodayMMDDYY() {
 }
 
 function initDays() {
-  const numDays = getOfferType() === 'BG' ? 4 : NUM_DAYS;
+  const numDays = (getOfferType() === 'BG' || getOfferType() === 'DM') ? 4 : NUM_DAYS;
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
     amounts: new Set(),
@@ -1021,6 +1085,13 @@ function initDays() {
   }));
   updateGenerateButton();
 }
+
+const DEFAULT_DM_OFFERS = [
+  { pct: 20, max: 10, active: false },
+  { pct: 20, max: 20, active: false },
+  { pct: 20, max: 50, active: false },
+  { pct: 20, max: 500, active: false },
+];
 
 const DEFAULT_BG_OFFERS = [
   { bet: 100, get: 2 },
@@ -1046,8 +1117,14 @@ const INFO_BG = `<ul>
 </ul>`;
 
 function onOfferTypeChange() {
+const INFO_DM = `<ul>
+  <li><strong>How it Works &amp; Terms &amp; Conditions:</strong> The How it Works and Terms &amp; Conditions have preset copy based on the current offers. <span style="color:#ffffff;">If this preset copy needs to be changed please reach out to Adrian Van de Camp on Slack to change it.</span> Certain fields of this copy is dynamic based on percentage &amp; max amounts so no updates should be needed between scripts.</li>
+  <li><strong>Masthead Image &amp; Promo Detail Image:</strong> These are preset based on the files with matching names in the Google Drive linked through the Edit Images button. There should only be one of each file in the "Friday Deposit Match" folder — having multiple in there will cause your generated script to fail.</li>
+  <li><strong>Discover Image(s):</strong> These are pulled based on the <span style="color:#ffffff;">% and Max combination</span> selected for each day (e.g. 20% up to $500 = <code>20M500.png</code>). If there is no matching image in Google Drive your script will fail.</li>
+</ul>`;
+
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : INFO_RTC;
   initDays();
   renderAll();
   document.getElementById('script-area').style.display = 'none';
@@ -1059,12 +1136,13 @@ function renderAll() {
   const container = document.getElementById('days-container');
   container.innerHTML = '';
   const isBG = getOfferType() === 'BG';
-  if (isBG) { container.classList.add('bg-layout'); }
+  const isDM = getOfferType() === 'DM';
+  if (isBG || isDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   days.forEach((day, i) => {
     const card = document.createElement('div');
     card.className = 'day-card';
-    if (isBG) {
+    if (isBG || isDM) {
       card.innerHTML = `
         <div class="day-header">
           <span class="day-number">Day ${i + 1}</span>
@@ -1073,11 +1151,40 @@ function renderAll() {
         <span class="field-label">Date (MMDDYY)</span>
         <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 052826" value="${day.date}"
           oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
+        ${isDM ? `<span class="field-label">Campaign Name</span>
+        <input type="text" id="campaign-name-${i}" placeholder="e.g. Friday Deposit Match" value="${day.campaignName || 'Friday Deposit Match'}"
+          oninput="days[${i}].campaignName = this.value" style="width: 100%; margin-bottom: 14px;" />` : ''}
         <span class="field-label">Offers</span>
         <div id="offers-${i}"></div>
         <div class="add-row" style="margin-top: 8px;">
-          <button class="reset-btn" onclick="addOffer(${i})">+ Add</button>
-          <button class="reset-btn" onclick="selectAllOffers(${i})">Select All</button>
+          <button class="reset-btn" onclick="isBG ? addOffer(${i}) : addDMOffer(${i})">+ Add</button>
+          <button class="reset-btn" onclick="isBG ? selectAllOffers(${i}) : selectAllDMOffers(${i})">Select All</button>
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].sendToXP = !days[${i}].sendToXP; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.sendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.sendToXP !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            Send to XP
+          </label>
+          ${isBG ? `<label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].externalBonus = !days[${i}].externalBonus; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.externalBonus ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.externalBonus ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            External Bonus
+          </label>` : ''}
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Opt In</span>
+            <input type="number" min="1" value="${day.daysToOptin !== undefined ? day.daysToOptin : 1}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].daysToOptin = parseInt(this.value) || 1;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Entitlement</span>
+            <input type="number" min="1" value="${day.daysToEntitlement !== undefined ? day.daysToEntitlement : 1}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].daysToEntitlement = parseInt(this.value) || 1;" />
+          </div>
         </div>
       `;
     } else {
@@ -1097,10 +1204,31 @@ function renderAll() {
           <button class="reset-btn" onclick="addAmount(${i})">+ Add</button>
           <button class="reset-btn" onclick="selectAll(${i})">Select All</button>
         </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].rtcSendToXP = !days[${i}].rtcSendToXP; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.rtcSendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.rtcSendToXP !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            Send to XP
+          </label>
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Opt In</span>
+            <input type="number" min="0" value="${day.rtcDaysToOptin !== undefined ? day.rtcDaysToOptin : 0}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].rtcDaysToOptin = parseInt(this.value) || 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Entitlement</span>
+            <input type="number" min="0" value="${day.rtcDaysToEntitlement !== undefined ? day.rtcDaysToEntitlement : 0}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].rtcDaysToEntitlement = parseInt(this.value) || 0;" />
+          </div>
+        </div>
       `;
     }
     container.appendChild(card);
     if (isBG) renderOffers(i);
+    else if (isDM) renderDMOffers(i);
     else renderAmounts(i);
   });
 }
@@ -1136,7 +1264,7 @@ function addAmount(i) {
 }
 
 function addDay() {
-  const maxDays = getOfferType() === 'BG' ? 8 : 99;
+  const maxDays = (getOfferType() === 'BG' || getOfferType() === 'DM') ? 8 : 99;
   if (days.length >= maxDays) return;
   days.push({ date: '', amounts: new Set(), offers: new Set() });
   renderAll();
@@ -1145,6 +1273,14 @@ function addDay() {
 
 function selectAll(i) {
   days[i].amounts = new Set(DEFAULT_AMOUNTS);
+  days[i].campaignName = days[i].campaignName || 'Friday Deposit Match';
+  if (days[i].rtcSendToXP === undefined) days[i].rtcSendToXP = true;
+  if (days[i].rtcDaysToOptin === undefined) days[i].rtcDaysToOptin = 0;
+  if (days[i].rtcDaysToEntitlement === undefined) days[i].rtcDaysToEntitlement = 0;
+  if (days[i].sendToXP === undefined) days[i].sendToXP = true;
+  if (days[i].externalBonus === undefined) days[i].externalBonus = false;
+  if (days[i].daysToOptin === undefined) days[i].daysToOptin = 1;
+  if (days[i].daysToEntitlement === undefined) days[i].daysToEntitlement = 1;
   renderAmounts(i);
 }
 
@@ -1152,7 +1288,16 @@ function resetDay(i) {
   days[i].amounts = new Set();
   days[i].offers = new Set();
   days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: false }));
+  days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: false }));
+  days[i].sendToXP = true;
+  days[i].externalBonus = false;
+  days[i].daysToOptin = 1;
+  days[i].daysToEntitlement = 1;
+  days[i].rtcSendToXP = true;
+  days[i].rtcDaysToOptin = 0;
+  days[i].rtcDaysToEntitlement = 0;
   if (getOfferType() === 'BG') renderOffers(i);
+  else if (getOfferType() === 'DM') renderDMOffers(i);
   else renderAmounts(i);
   updateGenerateButton();
 }
@@ -1169,11 +1314,11 @@ function renderOffers(i) {
     row.style.cssText = `border: ${offer.active ? '1.5px solid #ffffff' : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
     row.innerHTML = `
       <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Bet</span>
-      <input type="number" value="${offer.bet || ''}" placeholder="0" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+      <input type="number" value="${offer.bet || ''}" placeholder="e.g. 100" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
         oninput="days[${i}].offerData[${j}].bet = parseFloat(this.value) || 0;" />
       <span style="font-size:12px; color:var(--muted);">→</span>
       <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Get</span>
-      <input type="number" value="${offer.get || ''}" placeholder="0" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+      <input type="number" value="${offer.get || ''}" placeholder="e.g. 2" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
         oninput="days[${i}].offerData[${j}].get = parseFloat(this.value) || 0;" />
       <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
         onchange="days[${i}].offerData[${j}].active = this.checked; renderOffers(${i});" />
@@ -1181,6 +1326,45 @@ function renderOffers(i) {
     container.appendChild(row);
   });
   updateGenerateButton();
+}
+
+
+function renderDMOffers(i) {
+  const container = document.getElementById(`offers-${i}`);
+  if (!container) return;
+  if (!days[i].dmOfferData) {
+    days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: false }));
+  }
+  container.innerHTML = '';
+  days[i].dmOfferData.forEach((offer, j) => {
+    const row = document.createElement('div');
+    row.style.cssText = `border: ${offer.active ? '1.5px solid #ffffff' : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
+    row.innerHTML = `
+      <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">%</span>
+      <input type="number" value="${offer.pct || ''}" placeholder="e.g. 20" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+        oninput="days[${i}].dmOfferData[${j}].pct = parseFloat(this.value) || 0;" />
+      <span style="font-size:12px; color:var(--muted);">→</span>
+      <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Max</span>
+      <input type="number" value="${offer.max || ''}" placeholder="e.g. 500" style="width:100px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+        oninput="days[${i}].dmOfferData[${j}].max = parseFloat(this.value) || 0;" />
+      <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
+        onchange="days[${i}].dmOfferData[${j}].active = this.checked; renderDMOffers(${i});" />
+    `;
+    container.appendChild(row);
+  });
+  updateGenerateButton();
+}
+
+function addDMOffer(i) {
+  if (!days[i].dmOfferData) days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: false }));
+  days[i].dmOfferData.push({ pct: 0, max: 0, active: false });
+  renderDMOffers(i);
+}
+
+function selectAllDMOffers(i) {
+  if (!days[i].dmOfferData) days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: true }));
+  else days[i].dmOfferData.forEach(o => o.active = true);
+  renderDMOffers(i);
 }
 
 function addOffer(i) {
@@ -1197,7 +1381,7 @@ function selectAllOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -1207,7 +1391,7 @@ function resetAll() {
   document.getElementById('script-area').style.display = 'none';
 }
 
-function buildBGScript(namesStr, hiwText, tcText, imagePath) {
+function buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, imagePath) {
   return `import asyncio
 import subprocess
 from datetime import datetime, timedelta
@@ -1218,6 +1402,26 @@ IMAGE_FOLDER = "${imagePath}"
 
 NAMES = [
 ${namesStr}
+]
+
+CAMPAIGN_NAMES = [
+${campaignNamesStr}
+]
+
+SEND_TO_XP = [
+${sendToXPStr}
+]
+
+EXTERNAL_BONUS = [
+${externalBonusStr}
+]
+
+DAYS_TO_OPTIN = [
+${daysToOptinStr}
+]
+
+DAYS_TO_ENTITLEMENT = [
+${daysToEntitlementStr}
 ]
 
 def parse_dates(code):
@@ -1425,11 +1629,14 @@ async def create_bonus(page, name):
     await page.get_by_text("Opt In", exact=True).click()
     await page.wait_for_timeout(500)
     await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
-    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(f"Bet & Get {get_fmt} FanCash")
-    await page.get_by_text("Send To XP", exact=True).click()
-    await page.wait_for_timeout(500)
-    await page.get_by_text("External Bonus", exact=True).click()
-    await page.wait_for_timeout(500)
+    idx = NAMES.index(name)
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(CAMPAIGN_NAMES[idx])
+    if SEND_TO_XP[idx]:
+        await page.get_by_text("Send To XP", exact=True).click()
+        await page.wait_for_timeout(500)
+    if EXTERNAL_BONUS[idx]:
+        await page.get_by_text("External Bonus", exact=True).click()
+        await page.wait_for_timeout(500)
     for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
@@ -1451,11 +1658,11 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
     await optin_row.locator("input.ant-input-number-input").click()
-    await optin_row.locator("input.ant-input-number-input").fill("1")
+    await optin_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_OPTIN[idx]))
     await page.wait_for_timeout(500)
     entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
     await entitlement_row.locator("input.ant-input-number-input").click()
-    await entitlement_row.locator("input.ant-input-number-input").fill("1")
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_ENTITLEMENT[idx]))
     await page.wait_for_timeout(500)
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
     await status_row.locator("input.ant-checkbox-input").click()
@@ -1509,7 +1716,7 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     await page.keyboard.type("Other")
     await page.wait_for_timeout(500)
-    await page.locator("div.ant-select-item-option-content", has_text="Other").click()
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="Other").first.click()
     await page.wait_for_timeout(500)
     type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
     await type_row2.locator(".ant-select-selector").click()
@@ -1557,7 +1764,8 @@ async def main():
         print("\\n─── Creating Bonuses ───")
         for name in NAMES:
             await create_bonus(page, name)
-            await page.wait_for_timeout(1000)
+            await page.wait_for_load_state("networkidle")
+            await page.wait_for_timeout(3000)
         print("\\n✅ All bonuses created!")
 
         notify(f"✅ B&G complete! {len(NAMES)} codes created.")
@@ -1581,6 +1789,9 @@ function updateGenerateButton() {
     if (offerType === 'BG') {
       const offers = (d.offerData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'DM') {
+      const offers = (d.dmOfferData || []).filter(o => o.active);
+      if (offers.length > 0) { ready = true; break; }
     } else {
       if (d.amounts && d.amounts.size > 0) { ready = true; break; }
     }
@@ -1591,6 +1802,528 @@ function updateGenerateButton() {
     else { btn.classList.add('faded'); }
   }
 }
+
+function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, imagePath) {
+  return `import asyncio
+import subprocess
+from datetime import datetime, timedelta
+from playwright.async_api import async_playwright
+
+URL = "https://trading.1.betfanatics.com/"
+IMAGE_FOLDER = "${imagePath}"
+
+NAMES = [
+${namesStr}
+]
+
+CAMPAIGN_NAMES = [
+${campaignNamesStr}
+]
+
+SEND_TO_XP = [
+${sendToXPStr}
+]
+
+EXTERNAL_BONUS = [
+${externalBonusStr}
+]
+
+DAYS_TO_OPTIN = [
+${daysToOptinStr}
+]
+
+DAYS_TO_ENTITLEMENT = [
+${daysToEntitlementStr}
+]
+
+def parse_dates(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    dt_end = dt + timedelta(days=1)
+    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
+    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    return start, end
+
+def parse_voucher(code):
+    date_part = code.split("_")[0]
+    mmdd = date_part[0:4]
+    pct, max_bonus = parse_dm(code)
+    return f"CAS_{pct}P_{max_bonus}M_{mmdd}_FC"
+
+def parse_dm(code):
+    parts = code.split("_")
+    pct, max_bonus = None, None
+    for part in parts:
+        if "M" in part and not part.startswith("M"):
+            idx = part.index("M")
+            pct = part[:idx]
+            max_bonus = part[idx+1:]
+    return pct, max_bonus
+
+def format_currency(amount_str):
+    amount = int(amount_str)
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def ordinal(n):
+    if 11 <= n % 100 <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+def format_long_date(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    return f"{dt.strftime('%B')} {ordinal(dt.day)}, {dt.strftime('%Y')}"
+
+def format_hiw(code):
+    pct, max_bonus = parse_dm(code)
+    max_fmt = format_currency(max_bonus)
+    date_fmt = format_long_date(code)
+    return f"""1. Opt in
+2. Make a Qualifying Deposit during the Promotional Period
+3. Rewards will equal {pct}% of your Qualifying Deposit amount in FanCash, up to {max_fmt} in FanCash
+This Promotion begins at 12:00 a.m. ET on {date_fmt} and ends at 11:59 p.m. ET on {date_fmt} (the "Promotional Period").  See below for more details."""
+
+def format_tc(code):
+    pct, max_bonus = parse_dm(code)
+    max_fmt = format_currency(max_bonus)
+    return f"""1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC ("Fanatics Casino"). Select Fanatics Casino customers who opt in and make a $10+ deposit ("Qualifying Deposit") will receive a {pct}% deposit match, up to {max_fmt} in FanCash ("Rewards"). See below for more details.
+
+2. Promotional Period
+This Promotion begins at 12:00 a.m. ET on March 20, 2026 and ends at 11:59 p.m. ET on September 20, 2026 (the "Promotional Period").
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Fanatics Casino account in MI, NJ, PA, or WV ("Account"). To participate in this Promotion: (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states to use your Account; and (iii) you must receive the invite to participate in this Promotion directly from Fanatics Casino (offer cannot be shared or forwarded). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+To participate in this Promotion, each time you are eligible to participate, you must: (i) opt in via the Promos page in the Fanatics Casino app, Fanatics Sportsbook & Casino app, or the Fanatics Casino website app (collectively, the "App"); and (ii) make a Qualifying Deposit within twenty-four (24) hours of being presented with this offer. Rewards will equal {pct}% of your Qualifying Deposit amount in FanCash, up to {max_fmt} in FanCash. If you do not make a Qualifying Deposit within twenty-four (24) hours you are ineligible for the Rewards. Only your first Qualifying Deposit after opting in will be eligible for the Rewards.
+
+5. Claiming Promotional Offer
+FanCash Terms:
+\\u25cf FanCash can only be used in accordance with our FanCash Program Terms and Conditions, available here ("FanCash Terms"): https://sportsbook.fanatics.com/legal/all/fancash-program-terms.
+\\u25cf FanCash issued in connection with this Promotion expires at 11:59 p.m. ET seven (7) days from the date of issuance. Promotional FanCash expiring first will automatically be applied first.
+\\u25cf Rewards are non-withdrawable and are not redeemable for cash or cash equivalent.
+\\u25cf Rewards are not transferable and cannot be substituted, except in Fanatics Sportsbook and Casino's sole discretion.
+
+6. Casino Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino's Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Qualifying Deposit and one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino's sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees', officers' and directors' immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+There are no wagering requirements for this Promotion. Your Qualifying Deposit can be played through on any games in the Fanatics Casino.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Free Spin, select "Free Spin" in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Free Spins you may have, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Does not apply, as there are no wagering requirements for this Promotion. Your Qualifying Deposit can be played through on any games in the Fanatics Casino.
+
+11. Restrictions on Withdrawal
+Your Qualifying Deposit must be played through one (1) time. Any attempt to withdraw any portion of your Qualifying Deposit without playing through the full amount one (1) time may disqualify you from participating in this Promotion, or any other Fanatics Sportsbook & Casino promotions, and may make you ineligible for the Rewards for this Promotion. Casino Credit, Free Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Free Spins.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+\\u25cf Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+\\u25cf Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+\\u25cf Participation in this Promotion is subject to Fanatics Sportsbook and Casino's Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook & Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino's Privacy Policy.
+\\u25cf In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino's Terms of Service, these Promotional Terms and Conditions will prevail.
+\\u25cf References to "you" or "your" throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+\\u25cf Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards' value may be reported for tax purposes as required by law.
+\\u25cf Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto."""
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "DM Setup Script" sound name "Glass"'])
+
+async def upload_image(page, label_title, filepath):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(5000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Rich text filled: {label_title}")
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    await page.locator("img[alt='FBG logo']").click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    for _ in range(5):
+        await page.locator("span.h3", has_text="Cms").click()
+        await page.wait_for_timeout(1000)
+        promos = page.get_by_text("Promos", exact=True)
+        if await promos.is_visible():
+            await promos.click()
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Promos page")
+            return
+    raise Exception("Could not find Promos button")
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).click()
+    await page.locator("#forBonus").check()
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Segment done: {name}")
+
+async def create_promo(page, name):
+    print(f"\\n  Creating promotion: {name}")
+    await page.get_by_text("Create Promotion", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    pct, max_bonus = parse_dm(name)
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{pct}M{max_bonus}.png")
+    campaign_name = CAMPAIGN_NAMES[NAMES.index(name)]
+    await page.locator("input[placeholder='Promo Header Text']").fill(campaign_name)
+    await page.locator("input[placeholder='Title']").fill(campaign_name)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill("Deposit Now!")
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill("/docs/usered/casgenericgamelist")
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Promotion done: {name}")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    await page.locator("img[alt='FBG logo']").click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    for _ in range(5):
+        await page.locator("span.h3", has_text="Bonuses").click()
+        await page.wait_for_timeout(1000)
+        bonus = page.get_by_text("Bonus Manager", exact=True)
+        if await bonus.is_visible():
+            await bonus.click()
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Bonus Manager page")
+            return
+    raise Exception("Could not find Bonus Manager button")
+
+
+async def create_bonus(page, name):
+    print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_timeout(2000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(20):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+
+    # Step 3 — Opt In
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    # Step 4 — Bonus internal name
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+
+    # Step 5 — Description
+    campaign_name = CAMPAIGN_NAMES[NAMES.index(name)]
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(campaign_name)
+
+    # Step 6 — Send To XP / External Bonus
+    idx = NAMES.index(name)
+    if SEND_TO_XP[idx]:
+        await page.get_by_text("Send To XP", exact=True).click()
+        await page.wait_for_timeout(500)
+    if EXTERNAL_BONUS[idx]:
+        await page.get_by_text("External Bonus", exact=True).click()
+        await page.wait_for_timeout(500)
+
+    # Steps 7-8 — Remove COMBO tags
+    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+
+    # Step 9 — Voucher Code
+    voucher_code = parse_voucher(name)
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Voucher Code: {voucher_code}")
+
+    # Step 10 — Select FanCash
+    await page.get_by_text("FanCash", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    # Step 11 — Check Bonus (%) checkbox
+    await page.locator("span", has_text="Bonus (%)").click()
+    await page.wait_for_timeout(500)
+
+    # Step 12 — Enter percentage in Bonus (%) input
+    pct, max_bonus = parse_dm(name)
+    pct_input = page.locator("input.ant-input-number-input[aria-valuemin='0'][aria-valuemax='100']")
+    await pct_input.click()
+    await pct_input.fill(pct)
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Bonus %: {pct}%")
+
+    # Steps 13-15 — Days fields
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Fancash Settlement"))
+    await days_row.locator("input.ant-input-number-input").click()
+    await days_row.locator("input.ant-input-number-input").fill("7")
+    await page.wait_for_timeout(500)
+
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_OPTIN[idx]))
+    await page.wait_for_timeout(500)
+
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_ENTITLEMENT[idx]))
+    await page.wait_for_timeout(500)
+    print("    ✅ Days fields filled")
+
+    # Step 16 — Set Entitlement Type to Deposit
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"DEPOSIT\\"]').click()")
+    await page.wait_for_timeout(500)
+    print("    ✅ Entitlement Type: Deposit")
+
+    # Step 17 — Bonus % field (scoped by label text)
+    bonus_pct_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bonus %"))
+    bonus_pct_input = bonus_pct_row.locator("input.ant-input-number-input[step='1']").first
+    await bonus_pct_input.click()
+    await bonus_pct_input.fill(pct)
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Bonus %: {pct}")
+
+    # Step 17b — Bonus card Amount / Maximum (max bonus from code)
+    bonus_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Bonus"))
+    bonus_amount_input = bonus_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await bonus_amount_input.click()
+    await bonus_amount_input.fill(max_bonus)
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Bonus Amount: {max_bonus}")
+
+    # Step 18 — Minimum Deposit (always 10)
+    min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
+    min_deposit_input = min_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await min_deposit_input.click()
+    await min_deposit_input.fill("10")
+    await page.wait_for_timeout(500)
+    print("    ✅ Minimum Deposit: 10")
+
+    # Step 19 — Maximum Deposit (always 1000000)
+    max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
+    max_deposit_input = max_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await max_deposit_input.click()
+    await max_deposit_input.fill("1000000")
+    await page.wait_for_timeout(500)
+    print("    ✅ Maximum Deposit: 1000000")
+
+    # Step 20 — Check Status Active
+    status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+
+    # Step 21 — Activation Dates
+    date_part = name.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    dt_start = dt - timedelta(days=1)
+    act_start = f"{dt_start.strftime('%d')}-{dt_start.strftime('%m')}-{dt_start.strftime('%Y')} 00:00:00"
+    act_end = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 23:59:59"
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"    ✅ Activation Dates: {act_start} → {act_end}")
+
+    # Step 22 — Select Segment
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    await page.get_by_text(name, exact=True).nth(1).click()
+    await page.wait_for_timeout(500)
+
+    # Step 23 — Click bonus name to deselect segment dropdown
+    await page.locator("input[placeholder=\\"Bonus\\' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+
+    # Step 24 — Select Promotion Tile
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    await page.locator("div.ant-select-item-option-content", has_text=name).first.click()
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Promotion Tile: {name}")
+
+    # Step 25 — Bonus Reporting Platform Code
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    # Step 26 — Bonus Origin: Retention
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Retention", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    # Step 27 — Series: Other
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("Other")
+    await page.wait_for_timeout(500)
+    await page.locator("div.ant-select-item-option-content", has_text="Other").click()
+    await page.wait_for_timeout(500)
+
+    # Step 28 — Type: Retention
+    type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row2.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="Retention").first.click()
+    await page.wait_for_timeout(500)
+
+    # Step 29 — Save
+    await page.locator("button.ant-btn-primary.save").click()
+    await page.wait_for_timeout(2000)
+    modal = page.locator(".ant-modal-content")
+    await modal.wait_for(state="visible", timeout=10000)
+    await modal.locator("button.ant-btn-primary").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Bonus done: {name}")
+
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+        print("\\n👉 Please log in to the site in the browser window.")
+        print("   Once logged in, come back here and press Enter.\\n")
+        input("Press Enter when ready...")
+        await page.wait_for_timeout(2000)
+        await page.locator("span", has_text="Expand All").click()
+        await page.wait_for_load_state("networkidle")
+        print("✅ Menu expanded")
+
+        print("\\n─── Creating Segments ───")
+        await page.get_by_text("Account Segments", exact=True).click()
+        await page.wait_for_load_state("networkidle")
+        for name in NAMES:
+            await create_segment(page, name)
+            await page.wait_for_timeout(1000)
+        print("\\n✅ All segments created!")
+
+        await nav_to_promos(page)
+        print("\\n─── Creating Promotions ───")
+        for name in NAMES:
+            await create_promo(page, name)
+            await page.wait_for_timeout(1000)
+        print("\\n✅ All promotions created!")
+
+        await nav_to_bonus(page)
+        print("\\n─── Creating Bonuses ───")
+        for name in NAMES:
+            await create_bonus(page, name)
+            await page.wait_for_load_state("networkidle")
+            await page.wait_for_timeout(3000)
+        print("\\n✅ All bonuses created!")
+
+        notify(f"✅ DM complete! {len(NAMES)} codes created.")
+        print("\\n🎉 All done!")
+        await browser.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+`;
+}
+
 function generateScript() {
   try {
   // Sync all date inputs to days array first
@@ -1609,23 +2342,55 @@ function generateScript() {
     if (offerType === 'BG') {
       const offers = (days[i].offerData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
-      offers.forEach(o => allNames.push(`${date}_CAS_RET_BG_${jurisdiction}_FC_B${o.bet}_G${o.get}`));
+      const bgSendToXP = days[i].sendToXP !== false;
+      const bgExternalBonus = days[i].externalBonus === true;
+      const bgDaysToOptin = days[i].daysToOptin !== undefined ? days[i].daysToOptin : 1;
+      const bgDaysToEntitlement = days[i].daysToEntitlement !== undefined ? days[i].daysToEntitlement : 1;
+      offers.forEach(o => allNames.push({ code: `${date}_CAS_RET_BG_${jurisdiction}_FC_B${o.bet}_G${o.get}`, sendToXP: bgSendToXP, externalBonus: bgExternalBonus, daysToOptin: bgDaysToOptin, daysToEntitlement: bgDaysToEntitlement }));
+    } else if (offerType === 'DM') {
+      const offers = (days[i].dmOfferData || []).filter(o => o.active);
+      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      const cname = (days[i].campaignName || 'Friday Deposit Match').trim();
+      const dmSendToXP = days[i].sendToXP !== false;
+      const dmExternalBonus = false; // External Bonus not applicable for DM
+      const dmDaysToOptin = days[i].daysToOptin !== undefined ? days[i].daysToOptin : 1;
+      const dmDaysToEntitlement = days[i].daysToEntitlement !== undefined ? days[i].daysToEntitlement : 1;
+      offers.forEach(o => allNames.push({ code: `${date}_CAS_RET_DM_${jurisdiction}_FC_M10_${o.pct}M${o.max}`, campaign: cname, sendToXP: dmSendToXP, externalBonus: dmExternalBonus, daysToOptin: dmDaysToOptin, daysToEntitlement: dmDaysToEntitlement }));
     } else {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
-      amounts.forEach(a => allNames.push(`${date}_CAS_RET_RTC_${jurisdiction}_CC_${a}`));
+      const rtcSendToXP = days[i].rtcSendToXP !== false;
+      const rtcDaysToOptin = days[i].rtcDaysToOptin !== undefined ? days[i].rtcDaysToOptin : 0;
+      const rtcDaysToEntitlement = days[i].rtcDaysToEntitlement !== undefined ? days[i].rtcDaysToEntitlement : 0;
+      amounts.forEach(a => allNames.push({ code: `${date}_CAS_RET_RTC_${jurisdiction}_CC_${a}`, sendToXP: rtcSendToXP, daysToOptin: rtcDaysToOptin, daysToEntitlement: rtcDaysToEntitlement }));
     }
   }
   if (allNames.length === 0) { alert('Please enter at least one date with offers selected.'); return; }
 
-  const namesStr = allNames.map(n => `    "${n}",`).join('\n');
+  const isDMScript = offerType === 'DM';
+  const isBGScript = offerType === 'BG';
+  const isRTCScript = offerType === 'RTC';
+  const namesStr = allNames.map(n => `    "${typeof n === 'object' ? n.code : n}",`).join('\n');
+  const campaignNamesStr = isDMScript
+    ? allNames.map(n => `    "${n.campaign}",`).join('\n')
+    : isBGScript
+    ? allNames.map(n => { const get = n.code.match(/G(\d+)/)[1]; return `    "Bet & Get $${get} FanCash",`; }).join('\n')
+    : '';
+  const sendToXPStr = allNames.map(n => `    ${typeof n === 'object' ? (n.sendToXP ? 'True' : 'False') : 'True'},`).join('\n');
+  const externalBonusStr = (isDMScript || isBGScript)
+    ? allNames.map(n => `    ${n.externalBonus ? 'True' : 'False'},`).join('\n')
+    : '';
+  const daysToOptinStr = allNames.map(n => `    ${typeof n === 'object' ? n.daysToOptin : 0},`).join('\n');
+  const daysToEntitlementStr = allNames.map(n => `    ${typeof n === 'object' ? n.daysToEntitlement : 0},`).join('\n');
   const hiwText = getHIW().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const tcText = getTC().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const imagePath = getImagePath();
 
   let script;
   if (offerType === 'BG') {
-    script = buildBGScript(namesStr, hiwText, tcText, imagePath);
+    script = buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, hiwText, tcText, imagePath);
+  } else if (offerType === 'DM') {
+    script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, imagePath);
   } else {
     script = `import asyncio
 import subprocess
@@ -1637,6 +2402,22 @@ IMAGE_FOLDER = "${imagePath}"
 
 NAMES = [
 ${namesStr}
+]
+
+SEND_TO_XP = [
+${sendToXPStr}
+]
+
+EXTERNAL_BONUS = [
+${externalBonusStr}
+]
+
+DAYS_TO_OPTIN = [
+${daysToOptinStr}
+]
+
+DAYS_TO_ENTITLEMENT = [
+${daysToEntitlementStr}
 ]
 
 HOW_IT_WORKS = """${hiwText}"""
@@ -1814,8 +2595,10 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
     await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(f"\${amount} of Casino Credit")
-    await page.get_by_text("Send To XP", exact=True).click()
-    await page.wait_for_timeout(500)
+    idx = NAMES.index(name)
+    if SEND_TO_XP[idx]:
+        await page.get_by_text("Send To XP", exact=True).click()
+        await page.wait_for_timeout(500)
     for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
@@ -1931,7 +2714,8 @@ async def main():
         print("\\n─── Creating Bonuses ───")
         for name in NAMES:
             await create_bonus(page, name)
-            await page.wait_for_timeout(1000)
+            await page.wait_for_load_state("networkidle")
+            await page.wait_for_timeout(3000)
         print("\\n✅ All bonuses created!")
 
         notify(f"✅ RTC Top Up complete! {len(NAMES)} codes created.")
@@ -1953,7 +2737,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = `${offerType === 'BG' ? 'bg' : 'rtc_top_up'}_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `python3 ${filename}`;
