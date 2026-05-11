@@ -1691,10 +1691,11 @@ async def create_promo(page, name):
 
 async def create_bonus(page, name):
     print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
     await page.wait_for_timeout(2000)
     create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
     await create_bonus_btn.wait_for(state="visible", timeout=15000)
-    for _ in range(20):
+    for _ in range(60):
         if await create_bonus_btn.is_enabled():
             break
         await page.wait_for_timeout(500)
@@ -2167,10 +2168,11 @@ async def nav_to_bonus(page):
 
 async def create_bonus(page, name):
     print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
     await page.wait_for_timeout(2000)
     create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
     await create_bonus_btn.wait_for(state="visible", timeout=15000)
-    for _ in range(20):
+    for _ in range(60):
         if await create_bonus_btn.is_enabled():
             break
         await page.wait_for_timeout(500)
@@ -2719,10 +2721,11 @@ async def create_promo(page, name):
 
 async def create_bonus(page, name):
     print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
     await page.wait_for_timeout(2000)
     create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
     await create_bonus_btn.wait_for(state="visible", timeout=15000)
-    for _ in range(20):
+    for _ in range(60):
         if await create_bonus_btn.is_enabled():
             break
         await page.wait_for_timeout(500)
