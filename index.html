@@ -1458,6 +1458,7 @@ function buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr
   return `import asyncio
 import base64
 import os
+import re
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
@@ -1776,7 +1777,7 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
     await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
     await page.wait_for_timeout(500)
     reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
     await reporting_row.locator(".ant-select-selector").click()
@@ -1884,6 +1885,7 @@ function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr
   return `import asyncio
 import base64
 import os
+import re
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
@@ -2326,7 +2328,7 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
     await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
     await page.wait_for_timeout(500)
     print(f"    ✅ Promotion Tile: {name}")
 
@@ -2533,6 +2535,7 @@ function generateScript() {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, dmImagesStr);
   } else {
     script = `import asyncio
+import re
 import subprocess
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
@@ -2816,7 +2819,7 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
     await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=name).first.click()
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
     await page.wait_for_timeout(500)
     await page.locator("button.ant-btn-primary.save").click()
     await page.wait_for_load_state("networkidle")
