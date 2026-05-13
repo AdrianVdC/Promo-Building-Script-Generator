@@ -1776,8 +1776,9 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
     await page.wait_for_timeout(500)
     reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
     await reporting_row.locator(".ant-select-selector").click()
@@ -2327,8 +2328,9 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"    ✅ Promotion Tile: {name}")
 
@@ -2818,8 +2820,9 @@ async def create_bonus(page, name):
     await promo_tile_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.keyboard.type(name)
-    await page.wait_for_timeout(2000)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first.click()
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
     await page.wait_for_timeout(500)
     await page.locator("button.ant-btn-primary.save").click()
     await page.wait_for_load_state("networkidle")
