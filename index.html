@@ -872,6 +872,13 @@
       <span class="modal-title">Edit T&Cs</span>
       <button class="modal-close" onclick="closeModal('tc')">✕</button>
     </div>
+    <div id="tc-terms-ids-bar" style="display:none; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;">
+      <div>
+        <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 4px;">TERMS EXPIRY &amp; IDS</p>
+        <p style="font-size: 12px; color: #9090a0; margin: 0; line-height: 1.6;">Set the promotional dates and per-amount Terms IDs. These populate <code style="font-family:'SF Mono',ui-monospace,monospace;font-size:11px;background:var(--surface);color:var(--accent2);padding:1px 5px;border-radius:3px;">{terms_id}</code>, <code style="font-family:'SF Mono',ui-monospace,monospace;font-size:11px;background:var(--surface);color:var(--accent2);padding:1px 5px;border-radius:3px;">{start_date_*}</code>, and <code style="font-family:'SF Mono',ui-monospace,monospace;font-size:11px;background:var(--surface);color:var(--accent2);padding:1px 5px;border-radius:3px;">{end_date_*}</code> fields.</p>
+      </div>
+      <button class="btn-edit-tc" style="white-space:nowrap; flex-shrink:0; font-size:13px; padding:8px 14px;" onclick="openTermsIDModal()">Edit Terms Expiry &amp; Terms IDs</button>
+    </div>
     <div class="field-bar" id="tc-field-bar">
       <span class="field-bar-label">DYNAMIC FIELDS — click to copy, then paste into the text below</span>
       <div class="field-bar-row" id="tc-field-chips"></div>
@@ -880,6 +887,55 @@
     <div class="modal-footer">
       <button class="btn-reset" onclick="closeModal('tc')">Cancel</button>
       <button class="btn-edit-tc" onclick="saveModal('tc')">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Terms IDs Modal -->
+<div class="modal-overlay" id="modal-terms-ids">
+  <div class="modal" style="width: 500px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <span class="modal-title">Edit Terms Expiry &amp; Terms IDs</span>
+      <button class="modal-close" onclick="closeTermsIDModal()">✕</button>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">PROMOTIONAL START DATE</p>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <input type="text" id="terms-start-date-input" placeholder="MM/DD/YY" maxlength="8" oninput="updateTermsDatePreviews()" style="width: 110px; font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: #9090a0;" id="terms-start-preview"></span>
+      </div>
+      <p style="font-size: 11px; color: var(--muted); margin: 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {start_date_short} and {start_date_long} in the T&amp;C.</p>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">PROMOTIONAL END DATE</p>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <input type="text" id="terms-end-date-input" placeholder="MM/DD/YY" maxlength="8" oninput="updateTermsDatePreviews()" style="width: 110px; font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: #9090a0;" id="terms-end-preview"></span>
+      </div>
+      <p style="font-size: 11px; color: var(--muted); margin: 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {end_date_short} and {end_date_long} in the T&amp;C.</p>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">TERMS IDS — PER AMOUNT</p>
+      <div style="display: grid; grid-template-columns: 80px 1fr; gap: 8px 12px; align-items: center;">
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em;">AMOUNT</span>
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em;">TERMS ID</span>
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$2</span><input type="text" id="terms-id-2" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$4</span><input type="text" id="terms-id-4" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$5</span><input type="text" id="terms-id-5" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$10</span><input type="text" id="terms-id-10" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$20</span><input type="text" id="terms-id-20" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$40</span><input type="text" id="terms-id-40" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$50</span><input type="text" id="terms-id-50" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$100</span><input type="text" id="terms-id-100" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$200</span><input type="text" id="terms-id-200" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$400</span><input type="text" id="terms-id-400" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">$800</span><input type="text" id="terms-id-800" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />
+      </div>
+      <p style="font-size: 11px; color: var(--muted); margin: 10px 0 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {terms_id} in the T&amp;C. Each amount gets its own ID.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" onclick="closeTermsIDModal()">Cancel</button>
+      <button class="btn-edit-tc" onclick="saveTermsIDModal()">Save</button>
     </div>
   </div>
 </div>
@@ -912,13 +968,13 @@ See below for full Terms & Conditions.`;
 const DEFAULT_HIW = DEFAULT_HIW_RTC;
 
 const DEFAULT_TC = `PROMOTIONAL TERMS AND CONDITIONS
-FANATICS CASINO - CASINO CREDIT {amount_fmt} SURPRISE DROP - 12.1.25 (ID: CAS_5963) 
+FANATICS CASINO - CASINO CREDIT {amount_fmt} SURPRISE DROP - {start_date_short} (ID: {terms_id})
 
 1. Description of Promotion
 This promotion is offered by FBG Enterprises Opco, LLC ("Fanatics Casino"). Fanatics Casino is giving eligible customers {amount_fmt} in Casino Credit ("Rewards") to use on any games in the Fanatics Casino.  See below for more details. 
 
 2. Promotional Period
-This "Promotion" begins at 12:00am ET on December 1, 2025, and ends at 11:59pm ET on May 31, 2026 ("Promotional Period").
+This "Promotion" begins at 12:00am ET on {start_date_long}, and ends at 11:59pm ET on {end_date_long} ("Promotional Period").
 
 3. Eligibility
 This Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Sportsbook and Casino Account ("Account"). To participate in this Promotion, (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states; and (iii) you must receive the invitation to participate in this Promotion directly from Fanatics Casino. Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on a daily basis during the Promotional Period. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.   
@@ -1127,6 +1183,8 @@ function openModal(type) {
     document.getElementById('tc-textarea').value = '';
     document.getElementById('tc-textarea').value = getTC();
     renderFieldBar('tc');
+    const isRTC = getOfferType() === 'RTC';
+    document.getElementById('tc-terms-ids-bar').style.display = isRTC ? 'flex' : 'none';
     document.getElementById('modal-tc').classList.add('open');
   } else if (type === 'images') {
     const lt = getOfferType();
@@ -1160,9 +1218,86 @@ function saveModal(type) {
   closeModal(type);
 }
 
+const DEFAULT_RTC_TERMS_IDS = {
+  2: 'CAS_9461', 4: 'CAS_9462', 5: 'CAS_9463', 10: 'CAS_9464',
+  20: 'CAS_9465', 40: 'CAS_9466', 50: 'CAS_9467', 100: 'CAS_9468',
+  200: 'CAS_9469', 400: 'CAS_9470', 800: 'CAS_9471'
+};
+const DEFAULT_RTC_START_DATE = '06/01/26';
+const DEFAULT_RTC_END_DATE = '12/01/26';
+
+function getRTCTermsIDs() {
+  try { return JSON.parse(localStorage.getItem('rtc_terms_ids')) || DEFAULT_RTC_TERMS_IDS; }
+  catch(e) { return DEFAULT_RTC_TERMS_IDS; }
+}
+function getRTCStartDate() { return localStorage.getItem('rtc_terms_start_date') || DEFAULT_RTC_START_DATE; }
+function getRTCEndDate() { return localStorage.getItem('rtc_terms_end_date') || DEFAULT_RTC_END_DATE; }
+
+function parseDateShort(mmddyy) {
+  const clean = mmddyy.replace(/[^0-9]/g, '');
+  if (clean.length !== 6) return mmddyy;
+  return clean.slice(0,2) + '.' + clean.slice(2,4) + '.' + clean.slice(4,6);
+}
+function parseDateLong(mmddyy) {
+  const clean = mmddyy.replace(/[^0-9]/g, '');
+  if (clean.length !== 6) return mmddyy;
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const mm = parseInt(clean.slice(0,2), 10);
+  const dd = parseInt(clean.slice(2,4), 10);
+  const yy = parseInt('20' + clean.slice(4,6), 10);
+  return months[mm-1] + ' ' + dd + ', ' + yy;
+}
+function getTermsIDForAmount(amount) {
+  const ids = getRTCTermsIDs();
+  return ids[parseFloat(amount)] || ids[parseInt(amount)] || '';
+}
+
+function openTermsIDModal() {
+  const ids = getRTCTermsIDs();
+  document.getElementById('terms-start-date-input').value = getRTCStartDate();
+  document.getElementById('terms-end-date-input').value = getRTCEndDate();
+  updateTermsDatePreviews();
+  const amts = [2,4,5,10,20,40,50,100,200,400,800];
+  amts.forEach(amt => {
+    const el = document.getElementById('terms-id-' + amt);
+    if (el) el.value = ids[amt] || '';
+  });
+  document.getElementById('modal-terms-ids').classList.add('open');
+}
+function closeTermsIDModal() {
+  document.getElementById('modal-terms-ids').classList.remove('open');
+}
+function saveTermsIDModal() {
+  const startVal = document.getElementById('terms-start-date-input').value.trim();
+  const endVal = document.getElementById('terms-end-date-input').value.trim();
+  localStorage.setItem('rtc_terms_start_date', startVal);
+  localStorage.setItem('rtc_terms_end_date', endVal);
+  const amts = [2,4,5,10,20,40,50,100,200,400,800];
+  const ids = {};
+  amts.forEach(amt => {
+    const el = document.getElementById('terms-id-' + amt);
+    if (el) ids[amt] = el.value.trim();
+  });
+  localStorage.setItem('rtc_terms_ids', JSON.stringify(ids));
+  closeTermsIDModal();
+}
+function updateTermsDatePreviews() {
+  const sv = document.getElementById('terms-start-date-input').value.trim();
+  const ev = document.getElementById('terms-end-date-input').value.trim();
+  document.getElementById('terms-start-preview').innerHTML =
+    '{start_date_short} = <span style="color:#4e8ff0;">' + parseDateShort(sv) + '</span> &nbsp;&nbsp; {start_date_long} = <span style="color:#4e8ff0;">' + parseDateLong(sv) + '</span>';
+  document.getElementById('terms-end-preview').innerHTML =
+    '{end_date_short} = <span style="color:#4e8ff0;">' + parseDateShort(ev) + '</span> &nbsp;&nbsp; {end_date_long} = <span style="color:#4e8ff0;">' + parseDateLong(ev) + '</span>';
+}
+
 const DYNAMIC_FIELDS = {
   RTC: [
-    { code: '{amount_fmt}', hint: 'e.g. $50' },
+    { code: '{amount_fmt}',       hint: 'e.g. $50' },
+    { code: '{terms_id}',         hint: 'e.g. CAS_9461' },
+    { code: '{start_date_short}', hint: 'e.g. 06.01.26' },
+    { code: '{start_date_long}',  hint: 'e.g. June 1, 2026' },
+    { code: '{end_date_short}',   hint: 'e.g. 12.01.26' },
+    { code: '{end_date_long}',    hint: 'e.g. December 1, 2026' },
   ],
   FS: [
     { code: '{spins}',      hint: 'e.g. 10' },
@@ -1906,7 +2041,7 @@ function selectAllOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -3565,6 +3700,11 @@ function generateScript() {
   const hiwText = getHIW().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const tcText = getTC().replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const imagePath = getImagePath();
+  const rtcTermsIDs = getRTCTermsIDs();
+  const rtcStartDateShort = parseDateShort(getRTCStartDate());
+  const rtcStartDateLong = parseDateLong(getRTCStartDate());
+  const rtcEndDateShort = parseDateShort(getRTCEndDate());
+  const rtcEndDateLong = parseDateLong(getRTCEndDate());
 
   // Build per-code image data map for DM
   const dmImagesStr = isDMScript
@@ -3633,6 +3773,13 @@ HOW_IT_WORKS = """${hiwText}"""
 
 TC_TEXT = """${tcText}"""
 
+TERMS_IDS = ${JSON.stringify(rtcTermsIDs)}
+
+START_DATE_SHORT = "${rtcStartDateShort}"
+START_DATE_LONG = "${rtcStartDateLong}"
+END_DATE_SHORT = "${rtcEndDateShort}"
+END_DATE_LONG = "${rtcEndDateLong}"
+
 def format_hiw(code):
     amount = parse_amount(code)
     amount_fmt = f"\${amount}"
@@ -3641,6 +3788,11 @@ def format_hiw(code):
 def format_tc(code):
     amount = parse_amount(code)
     amount_fmt = f"\${amount}"
+    terms_id = TERMS_IDS.get(str(int(float(amount))), "")
+    start_date_short = START_DATE_SHORT
+    start_date_long = START_DATE_LONG
+    end_date_short = END_DATE_SHORT
+    end_date_long = END_DATE_LONG
     return f"""${tcText}"""
 
 def parse_dates(code):
