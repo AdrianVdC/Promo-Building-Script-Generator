@@ -1284,6 +1284,48 @@ const FS_GAMES = {
       { spinAmount: "400", spinValue: "2.00", active: false },
     ]
   },
+  "7FH": {
+    fullName: "7's Fire Blitz Hotstepper",
+    searchName: "7's Fire Blitz\u2122 Hotstepper",
+    aggregator: "WHG",
+    provider: "WHITEHATSTUDIOS",
+    deeplink: "/casino_game/WHS_7sFireBlitzHotStepper95",
+    spinValues: ["0.10","0.20","0.40","0.60","0.80","1.00","1.20","1.40","1.60","1.80","2.00","3.00","4.00","5.00","10.00","20.00","50.00","75.00","100.00"],
+    presets: [
+      { spinAmount: "20",  spinValue: "0.10", active: false },
+      { spinAmount: "40",  spinValue: "0.10", active: false },
+      { spinAmount: "50",  spinValue: "0.10", active: false },
+      { spinAmount: "100", spinValue: "0.10", active: false },
+      { spinAmount: "100", spinValue: "0.20", active: false },
+      { spinAmount: "100", spinValue: "0.40", active: false },
+      { spinAmount: "125", spinValue: "0.40", active: false },
+      { spinAmount: "100", spinValue: "1.00", active: false },
+      { spinAmount: "200", spinValue: "1.00", active: false },
+      { spinAmount: "200", spinValue: "2.00", active: false },
+      { spinAmount: "200", spinValue: "4.00", active: false },
+    ]
+  },
+  "7P5": {
+    fullName: "7's Fire Blitz\u2122 Power 5 Jackpot Royale\u2122 Express",
+    searchName: "7's Fire Blitz\u2122 Power 5 Jackpot Royale\u2122 Express",
+    aggregator: "WHG",
+    provider: "WHITEHATSTUDIOS",
+    deeplink: "/casino_game/WHS_7sFireBlitzPower5JRE92",
+    spinValues: ["0.10","0.20","0.40","0.60","0.80","1.00","1.20","1.40","1.60","1.80","2.00","3.00","4.00","5.00","10.00","20.00","50.00"],
+    presets: [
+      { spinAmount: "20",  spinValue: "0.10", active: false },
+      { spinAmount: "40",  spinValue: "0.10", active: false },
+      { spinAmount: "50",  spinValue: "0.10", active: false },
+      { spinAmount: "100", spinValue: "0.10", active: false },
+      { spinAmount: "100", spinValue: "0.20", active: false },
+      { spinAmount: "100", spinValue: "0.40", active: false },
+      { spinAmount: "125", spinValue: "0.40", active: false },
+      { spinAmount: "100", spinValue: "1.00", active: false },
+      { spinAmount: "200", spinValue: "1.00", active: false },
+      { spinAmount: "200", spinValue: "2.00", active: false },
+      { spinAmount: "200", spinValue: "4.00", active: false },
+    ]
+  },
   WWE: {
     fullName: "WrestleMania: Road to Gold",
     searchName: "WrestleMania\u2122: Road To Gold",
@@ -1874,7 +1916,7 @@ function resetAll() {
   document.getElementById('script-area').style.display = 'none';
 }
 
-function buildFSScript(allNames, imagePath) {
+function buildFSScript(allNames, imagePath, hiwText, tcText) {
   const gamesUsed = [...new Set(allNames.map(n => n.game))];
   const gamesDict = gamesUsed.map(g => {
     const gd = FS_GAMES[g];
@@ -3536,7 +3578,7 @@ function generateScript() {
 
   let script;
   if (offerType === 'FS') {
-    script = buildFSScript(allNames, imagePath);
+    script = buildFSScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'BG') {
     script = buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, hiwText, tcText, bgImagesStr, doSegmentStr, doPromoStr, doBonusStr);
   } else if (offerType === 'DM') {
