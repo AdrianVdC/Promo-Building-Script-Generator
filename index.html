@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RTC Top Up Script Generator</title>
+  <title>NATS Bonus Creator v2.3</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2074,7 +2074,9 @@ function buildFSScript(allNames, imagePath, hiwText, tcText) {
   const doBonusLines = allNames.map(n => `    ${n.doBonus !== false ? 'True' : 'False'},`).join('\n');
 
   return `import asyncio
+import random
 import re
+import string
 import subprocess
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
@@ -2145,11 +2147,15 @@ def parse_fs_description(code):
     full_name = GAMES[game]["fullName"]
     return f"{spin_amount} {format_spin_value(spin_value_cents)} Bonus Spins to {full_name}"
 
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
 def parse_voucher(code):
     date_part = code.split("_")[0]
-    mmdd = date_part[0:4]
-    spin_amount, spin_value_cents, game = parse_fs(code)
-    return f"CAS_RTC{spin_amount}S{spin_value_cents}V_{mmdd}_{game}"
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CRRCFS{mmddyy}{suffix}"
 
 def parse_casino_game(code):
     parts = code.split("_")
@@ -2501,16 +2507,7 @@ async def create_bonus(page, name):
     await save_btn.scroll_into_view_if_needed()
     await page.wait_for_timeout(1000)
     await save_btn.click()
-    await page.wait_for_timeout(2000)
-    modal = page.locator(".ant-modal-content")
-    try:
-        await modal.wait_for(state="visible", timeout=10000)
-        await modal.locator("button.ant-btn-primary").click()
-        await page.wait_for_load_state("networkidle")
-        print(f"    ✅ Confirmation modal accepted")
-    except Exception as e:
-        print(f"    ⚠️  No confirmation modal detected ({e}) — checking if save completed...")
-        await page.wait_for_load_state("networkidle")
+    await page.wait_for_load_state("networkidle")
     print(f"  ✅ Bonus done: {name}")
 
 async def main():
@@ -2576,7 +2573,9 @@ function buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr
   return `import asyncio
 import base64
 import os
+import random
 import re
+import string
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
@@ -2671,11 +2670,15 @@ def format_long_date(code):
     dt = datetime(int(yy), int(mm), int(dd))
     return f"{dt.strftime('%B')} {ordinal(dt.day)}, {dt.strftime('%Y')}"
 
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
 def parse_voucher(code):
     date_part = code.split("_")[0]
-    mmdd = date_part[0:4]
-    bet, get = parse_bet_get(code)
-    return f"CAS_B{bet}_G{get}_{mmdd}"
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CLBGFC{mmddyy}{suffix}"
 
 def format_hiw(code):
     bet, get = parse_bet_get(code)
@@ -3036,7 +3039,9 @@ function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr
   return `import asyncio
 import base64
 import os
+import random
 import re
+import string
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
@@ -3104,11 +3109,15 @@ def parse_dates(code):
     end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
     return start, end
 
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
 def parse_voucher(code):
     date_part = code.split("_")[0]
-    mmdd = date_part[0:4]
-    pct, max_bonus = parse_dm(code)
-    return f"CAS_{pct}P_{max_bonus}M_{mmdd}_FC"
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CRDMFC{mmddyy}{suffix}"
 
 def parse_dm(code):
     parts = code.split("_")
@@ -3725,7 +3734,9 @@ function generateScript() {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText);
   } else {
     script = `import asyncio
+import random
 import re
+import string
 import subprocess
 from datetime import datetime, timedelta
 from playwright.async_api import async_playwright
@@ -3814,11 +3825,15 @@ def parse_amount(code):
             return digits
     return ""
 
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
 def parse_voucher(code):
     date_part = code.split("_")[0]
-    mmdd = date_part[0:4]
-    amount = parse_amount(code)
-    return f"CAS_RTC{amount}_{mmdd}"
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CRRCCC{mmddyy}{suffix}"
 
 def notify(message):
     subprocess.run([
