@@ -2079,7 +2079,10 @@ import re
 import string
 import subprocess
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
 
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
@@ -2171,19 +2174,19 @@ def parse_discover_image(code):
 def parse_promo_dates(code):
     date_part = code.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=1)
-    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=1)
+    start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return start, end
 
 def parse_activation_dates(code):
     date_part = code.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=30)
-    act_start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    act_end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=30)
+    act_start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return act_start, act_end
 
 def notify(message):
@@ -2579,7 +2582,10 @@ import string
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
 
 URL = "https://trading.1.betfanatics.com/"
 
@@ -2637,10 +2643,10 @@ def get_image_path(name, filename):
 def parse_dates(code):
     date_part = code.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=1)
-    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=1)
+    start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return start, end
 
 def parse_bet_get(code):
@@ -2884,10 +2890,11 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     date_part = name.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_start = dt - timedelta(days=1)
-    act_start = f"{dt_start.strftime('%d')}-{dt_start.strftime('%m')}-{dt_start.strftime('%Y')} 00:00:00"
-    act_end = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 23:59:59"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_start_eastern = dt_eastern - timedelta(days=1)
+    dt_end_eastern = dt_eastern.replace(hour=23, minute=59, second=59)
+    act_start = dt_start_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
     start_input = activation_row.locator("input[placeholder='Start Time']")
     await start_input.click()
@@ -3045,7 +3052,10 @@ import string
 import subprocess
 import tempfile
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
 
 URL = "https://trading.1.betfanatics.com/"
 
@@ -3103,10 +3113,10 @@ def get_image_path(name, filename):
 def parse_dates(code):
     date_part = code.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=1)
-    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=1)
+    start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return start, end
 
 def generate_suffix():
@@ -3416,10 +3426,11 @@ async def create_bonus(page, name):
     # Step 21 — Activation Dates
     date_part = name.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_start = dt - timedelta(days=1)
-    act_start = f"{dt_start.strftime('%d')}-{dt_start.strftime('%m')}-{dt_start.strftime('%Y')} 00:00:00"
-    act_end = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 23:59:59"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_start_eastern = dt_eastern - timedelta(days=1)
+    dt_end_eastern = dt_eastern.replace(hour=23, minute=59, second=59)
+    act_start = dt_start_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
     start_input = activation_row.locator("input[placeholder='Start Time']")
     await start_input.click()
@@ -3739,7 +3750,10 @@ import re
 import string
 import subprocess
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
 
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
@@ -3811,10 +3825,10 @@ def parse_dates(code):
     mm = date_part[0:2]
     dd = date_part[2:4]
     yy = "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=1)
-    start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=1)
+    start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return start, end
 
 def parse_amount(code):
@@ -4021,10 +4035,10 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     date_part = name.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt = datetime(int(yy), int(mm), int(dd))
-    dt_end = dt + timedelta(days=30)
-    act_start = f"{dt.strftime('%d')}-{dt.strftime('%m')}-{dt.strftime('%Y')} 00:00:00"
-    act_end = f"{dt_end.strftime('%d')}-{dt_end.strftime('%m')}-{dt_end.strftime('%Y')} 00:00:00"
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(days=30)
+    act_start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
     start_input = activation_row.locator("input[placeholder='Start Time']")
     await start_input.click()
