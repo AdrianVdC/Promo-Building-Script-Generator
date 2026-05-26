@@ -765,20 +765,7 @@
 
   <div class="header-info" id="header-info-panel">
     <div id="info-shared">
-      <ul>
-        <li><strong>Getting Python:</strong>
-          <ul>
-            <li><strong>Mac:</strong> Install from <a href="https://www.python.org/downloads/" target="_blank" style="color:var(--accent2);">python.org</a>, then run <code>pip3 install playwright --break-system-packages</code> and <code>playwright install chromium</code> in Terminal.</li>
-            <li><strong>Windows:</strong> Install from <a href="https://www.python.org/downloads/" target="_blank" style="color:var(--accent2);">python.org</a> — check <strong>"Add Python to PATH"</strong> during install. Then run <code>pip install playwright</code> and <code>playwright install chromium</code> in Command Prompt.</li>
-          </ul>
-        </li>
-        <li id="info-shared-gdrive"><strong>Adding Google Drive to Finder / File Explorer:</strong>
-          <ul>
-            <li><strong>Mac:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once installed and signed in, Google Drive appears in the Finder sidebar under Locations. You can then browse Shared Drives directly from Finder and use those paths in the script.</li>
-            <li><strong>Windows:</strong> Install <a href="https://www.google.com/drive/download/" target="_blank" style="color:var(--accent2);">Google Drive for Desktop</a>. Once signed in it mounts as a drive (e.g. <code>G:\</code>) in File Explorer. Shared Drives will appear under <strong>Google Drive &gt; Shared drives</strong> and can be used as the image path.</li>
-          </ul>
-        </li>
-      </ul>
+      <p style="font-size:12px; color:#ffffff; line-height:1.7;">In order to use this tool please make sure you've completed all the steps in <a href="https://adrianvdc.github.io/Promo-Building-Script-Generator/setup-guide" target="_blank" style="color:var(--accent2);">this setup guide</a>.</p>
     </div>
     <div id="info-offer-type"></div>
     <div id="info-run-cards">
@@ -788,9 +775,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor" style="color:#9090a0;width:18px;height:18px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
             <span class="run-card-title">Mac — Terminal</span>
           </div>
-          <div class="run-step"><span class="run-step-num">1.</span><span>Navigate to Downloads</span></div>
-          <div class="run-cmd-row"><code>cd ~/Downloads</code><button class="run-copy-btn" id="mac-cd-btn" disabled onclick="copyRunCmd(this,'cd ~/Downloads')">Copy</button></div>
-          <div class="run-step"><span class="run-step-num">2.</span><span>Run the script</span></div>
+          <div class="run-step"><span class="run-step-num">1.</span><span>Run the script</span></div>
           <div class="run-cmd-row"><code id="mac-run-cmd">Generate a script first</code><button class="run-copy-btn" id="mac-run-btn" disabled onclick="copyRunCmd(this,document.getElementById('mac-run-cmd').textContent)">Copy</button></div>
         </div>
         <div class="run-card">
@@ -798,9 +783,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor" style="color:#9090a0;width:18px;height:18px;"><path d="M3 12V6.75l6-1.32v6.57H3zm17 0V3l-8 1.43v7.57h8zm-17 .75H9v6.57l-6-1.32V12.75zm17 0h-8v7.57L20 21V12.75z"/></svg>
             <span class="run-card-title">Windows — Command Prompt</span>
           </div>
-          <div class="run-step"><span class="run-step-num">1.</span><span>Navigate to Downloads</span></div>
-          <div class="run-cmd-row"><code>cd %USERPROFILE%\Downloads</code><button class="run-copy-btn" id="win-cd-btn" disabled onclick="copyRunCmd(this,'cd %USERPROFILE%\\Downloads')">Copy</button></div>
-          <div class="run-step"><span class="run-step-num">2.</span><span>Run the script</span></div>
+          <div class="run-step"><span class="run-step-num">1.</span><span>Run the script</span></div>
           <div class="run-cmd-row"><code id="win-run-cmd">Generate a script first</code><button class="run-copy-btn" id="win-run-btn" disabled onclick="copyRunCmd(this,document.getElementById('win-run-cmd').textContent)">Copy</button></div>
         </div>
       </div>
@@ -1584,7 +1567,6 @@ const INFO_FS = `<ul>
   const type = getOfferType();
   document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG') ? 'none' : '';
-  document.getElementById('info-shared-gdrive').style.display = (type === 'RTC' || type === 'FS') ? '' : 'none';
   document.getElementById('global-region-row').style.display = type === 'FS' ? 'none' : '';
   // Restrict jurisdiction options for FS (state-only, no US/ON/AB/CA)
   updateJurisdictionOptions(type);
@@ -4165,9 +4147,9 @@ if __name__ == "__main__":
   const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
-  document.getElementById('mac-run-cmd').textContent = `python3 ${filename}`;
-  document.getElementById('win-run-cmd').textContent = `python ${filename}`;
-  ['mac-cd-btn','mac-run-btn','win-cd-btn','win-run-btn'].forEach(id => {
+  document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
+  document.getElementById('win-run-cmd').textContent = `cd %USERPROFILE%\\Downloads && python ${filename}`;
+  ['mac-run-btn','win-run-btn'].forEach(id => {
     document.getElementById(id).disabled = false;
   });
   document.querySelectorAll('.run-cmd-row').forEach(el => el.classList.add('ready'));
@@ -4214,7 +4196,6 @@ function copyScript() {
 
 document.getElementById('info-offer-type').innerHTML = INFO_RTC;
 document.getElementById('btn-edit-images').style.display = '';
-document.getElementById('info-shared-gdrive').style.display = '';
 document.getElementById('global-region-row').style.display = '';
 updateJurisdictionOptions('RTC');
 initDays();
