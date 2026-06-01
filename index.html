@@ -745,6 +745,7 @@
           <option value="FS">RTC Top Up - Free Spins</option>
           <option value="BG">Bet &amp; Get</option>
           <option value="DM">Deposit Match</option>
+          <option value="RAF">Refer a Friend</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -1084,6 +1085,7 @@ function getImagePath() {
   if (t === 'BG') return localStorage.getItem('bg_image_path') || DEFAULT_BG_IMAGE_PATH;
   if (t === 'DM') return localStorage.getItem('dm_image_path') || DEFAULT_DM_IMAGE_PATH;
   if (t === 'FS') return localStorage.getItem('rtc_fs_image_path') || DEFAULT_FS_IMAGE_PATH;
+if (t === 'RAF') return localStorage.getItem('raf_image_path') || DEFAULT_RAF_IMAGE_PATH;
   return localStorage.getItem('rtc_image_path') || DEFAULT_IMAGE_PATH;
 }
 function getHIW() {
@@ -1196,7 +1198,7 @@ function saveModal(type) {
   } else if (type === 'tc') {
     localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1340,7 +1342,24 @@ function getTodayMMDDYY() {
 }
 
 function initDays() {
-  const numDays = (getOfferType() === 'BG' || getOfferType() === 'DM') ? 4 : getOfferType() === 'FS' ? 8 : NUM_DAYS;
+  const t = getOfferType();
+  if (t === 'RAF') {
+    days = [{
+      date: '',
+      rafJurisdiction: 'MI',
+      rafGame: '7FH',
+      rafSpinAmount: '',
+      rafSpinValue: '0.10',
+      rafBetAmount: '',
+      rafNumDays: 10,
+      rafDoDay2: true,
+      rafDoReferee: true,
+      rafDoReferrer: true,
+    }];
+    updateGenerateButton();
+    return;
+  }
+  const numDays = (t === 'BG' || t === 'DM') ? 4 : t === 'FS' ? 8 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -1473,6 +1492,7 @@ function getFSPresets(game) {
   return g.presets.map(p => ({ ...p }));
 }
 const DEFAULT_FS_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RTC Top Up - Free Spins";
+const DEFAULT_RAF_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RAF Creative";
 
 function updateJurisdictionOptions(type) {
   const sel = document.getElementById('jurisdiction-select');
@@ -1532,6 +1552,15 @@ const INFO_BG = `<ul>
   </li>
 </ul>`;
 
+const INFO_RAF = `<ul>
+  <li><strong>Single Campaign:</strong> RAF generates a complete campaign in one run — RFRE promo, RFER promo &amp; segment, and all Day 2–N segments and bonuses.</li>
+  <li><strong>Num Days:</strong> Must be <strong>5 or 10</strong> only. 5 days = DAY2–DAY5 (6 codes total). 10 days = DAY2–DAY10 (11 codes total).</li>
+  <li><strong>Jurisdiction:</strong> MI, NJ, WV, or PA only. No US-wide option for RAF.</li>
+  <li><strong>Game:</strong> Select the game from the dropdown. Same games available as RTC Free Spins.</li>
+  <li><strong>Images:</strong> Images are pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, <code>Discover_RFRE.png</code>, <code>Discover_RFER.png</code>, <code>Link Preview.png</code>.</li>
+  <li><strong>Script runs in 5 phases:</strong> (1) All segments, (2) Both promos, (3) RFRE bonus + edit, (4) RFER bonus + edit, (5) All Day 2+ bonuses. All voucher codes are printed before login — record them.</li>
+</ul>`;
+
 function onOfferTypeChange() {
 const INFO_DM = `<ul>
   <li><strong>How it Works:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. There is also a dynamic field for the promotion run dates.</li>
@@ -1565,10 +1594,11 @@ const INFO_FS = `<ul>
 </ul>`;
 
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG') ? 'none' : '';
-  document.getElementById('global-region-row').style.display = type === 'FS' ? 'none' : '';
-  // Restrict jurisdiction options for FS (state-only, no US/ON/AB/CA)
+  document.querySelector('.btn-edit-hiw').style.display = type === 'RAF' ? 'none' : '';
+  document.querySelector('.btn-edit-tc').style.display = type === 'RAF' ? 'none' : '';
+  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF') ? 'none' : '';
   updateJurisdictionOptions(type);
   initDays();
   renderAll();
@@ -1597,11 +1627,123 @@ function renderAll() {
   const isBG = getOfferType() === 'BG';
   const isDM = getOfferType() === 'DM';
   const isFS = getOfferType() === 'FS';
+  const isRAF = getOfferType() === 'RAF';
   if (isBG || isDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
+  else if (isRAF) { container.style.gridTemplateColumns = '1fr'; }
   else if (isBG || isDM) { container.style.gridTemplateColumns = ''; }
   else { container.style.gridTemplateColumns = ''; }
+
+  if (isRAF) {
+    const day = days[0];
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.style.maxWidth = '100%';
+    const game = day.rafGame || '7FH';
+    const gameData = FS_GAMES[game];
+    const spinValuesOptions = gameData
+      ? gameData.spinValues.map(v => `<option value="${v}" ${(day.rafSpinValue || '0.10') === v ? 'selected' : ''}>${v}</option>`).join('')
+      : '';
+    card.innerHTML = `
+      <div class="day-header">
+        <span class="day-number">Campaign Configuration</span>
+        <button class="reset-btn" onclick="initDays(); renderAll();">Reset</button>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; align-items: start;">
+        <div>
+          <span class="field-label">Date (MMDDYY)</span>
+          <input type="text" id="raf-date-input" maxlength="6" placeholder="e.g. 100126" value="${day.date || ''}"
+            oninput="days[0].date = this.value; updateGenerateButton()" style="width: 160px; margin-bottom: 14px;" />
+
+          <span class="field-label">Jurisdiction</span>
+          <select style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; cursor: pointer; width: 180px; margin-bottom: 14px;"
+            onchange="days[0].rafJurisdiction = this.value;">
+            <option value="MI" ${(day.rafJurisdiction || 'MI') === 'MI' ? 'selected' : ''}>MI — Michigan</option>
+            <option value="NJ" ${(day.rafJurisdiction || 'MI') === 'NJ' ? 'selected' : ''}>NJ — New Jersey</option>
+            <option value="WV" ${(day.rafJurisdiction || 'MI') === 'WV' ? 'selected' : ''}>WV — West Virginia</option>
+            <option value="PA" ${(day.rafJurisdiction || 'MI') === 'PA' ? 'selected' : ''}>PA — Pennsylvania</option>
+          </select>
+
+          <span class="field-label">Game</span>
+          <select style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; cursor: pointer; width: 100%; margin-bottom: 14px;"
+            onchange="days[0].rafGame = this.value; days[0].rafSpinValue = FS_GAMES[this.value].spinValues[0]; renderAll();">
+            ${Object.keys(FS_GAMES).map(k => `<option value="${k}" ${game === k ? 'selected' : ''}>${FS_GAMES[k].fullName}</option>`).join('')}
+          </select>
+
+          <div style="display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+            <div>
+              <span class="field-label">Spins / Day</span>
+              <input type="number" min="1" placeholder="e.g. 50" value="${day.rafSpinAmount || ''}"
+                style="width: 90px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[0].rafSpinAmount = this.value; updateGenerateButton();" />
+            </div>
+            <div>
+              <span class="field-label">Spin Value ($)</span>
+              <select style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px; background:var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:7px 10px; cursor:pointer; width:90px;"
+                onchange="days[0].rafSpinValue = this.value; updateGenerateButton();">
+                ${spinValuesOptions}
+              </select>
+            </div>
+            <div>
+              <span class="field-label">Bet Amount ($)</span>
+              <input type="number" min="1" placeholder="e.g. 10" value="${day.rafBetAmount || ''}"
+                style="width: 90px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[0].rafBetAmount = this.value; updateGenerateButton();" />
+            </div>
+          </div>
+
+          <span class="field-label">Number of Days</span>
+          <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button type="button" class="amt-btn ${(day.rafNumDays || 10) === 5 ? 'on' : 'off'}" style="width:60px;"
+              onclick="days[0].rafNumDays = 5; renderAll(); updateGenerateButton();">5</button>
+            <button type="button" class="amt-btn ${(day.rafNumDays || 10) === 10 ? 'on' : 'off'}" style="width:60px;"
+              onclick="days[0].rafNumDays = 10; renderAll(); updateGenerateButton();">10</button>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+            <div onclick="days[0].rafDoDay2 = !days[0].rafDoDay2; renderAll(); updateGenerateButton();"
+              style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer;
+                background:${day.rafDoDay2 !== false ? '#185FA5' : 'transparent'};
+                color:${day.rafDoDay2 !== false ? '#E6F1FB' : 'var(--muted)'};
+                border:0.5px solid ${day.rafDoDay2 !== false ? '#185FA5' : 'var(--border)'};">
+              ${day.rafDoDay2 !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#E6F1FB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+              Day 2+
+            </div>
+            <div onclick="days[0].rafDoReferee = !days[0].rafDoReferee; renderAll(); updateGenerateButton();"
+              style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer;
+                background:${day.rafDoReferee !== false ? '#185FA5' : 'transparent'};
+                color:${day.rafDoReferee !== false ? '#E6F1FB' : 'var(--muted)'};
+                border:0.5px solid ${day.rafDoReferee !== false ? '#185FA5' : 'var(--border)'};">
+              ${day.rafDoReferee !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#E6F1FB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+              Referee
+            </div>
+            <div onclick="days[0].rafDoReferrer = !days[0].rafDoReferrer; renderAll(); updateGenerateButton();"
+              style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer;
+                background:${day.rafDoReferrer !== false ? '#185FA5' : 'transparent'};
+                color:${day.rafDoReferrer !== false ? '#E6F1FB' : 'var(--muted)'};
+                border:0.5px solid ${day.rafDoReferrer !== false ? '#185FA5' : 'var(--border)'};">
+              ${day.rafDoReferrer !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#E6F1FB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+              Referrer
+            </div>
+          </div>
+          <div style="font-size:11px; color:var(--muted); line-height:1.7;">
+            <span style="color:var(--text);">Day 2+</span> — segments + bonuses &nbsp;|&nbsp;
+            <span style="color:var(--text);">Referee</span> — promo + bonus + edit &nbsp;|&nbsp;
+            <span style="color:var(--text);">Referrer</span> — segment + promo + bonus + edit
+          </div>
+        </div>
+
+        <div style="padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0; line-height: 2;" id="raf-preview">
+          ${getRafPreview(day)}
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+    updateGenerateButton();
+    return;
+  }
+
   days.forEach((day, i) => {
     const card = document.createElement('div');
     card.className = 'day-card';
@@ -1808,6 +1950,7 @@ function addAmount(i) {
 }
 
 function addDay() {
+  if (getOfferType() === 'RAF') return;
   const maxDays = (getOfferType() === 'BG' || getOfferType() === 'DM') ? 8 : 99;
   if (days.length >= maxDays) return;
   days.push({ date: '', amounts: new Set(), offers: new Set() });
@@ -2023,7 +2166,7 @@ function selectAllOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -2506,6 +2649,8 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
+        await page.wait_for_timeout(2000)
+
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
@@ -2956,6 +3101,8 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
+        await page.wait_for_timeout(2000)
+
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
@@ -3014,9 +3161,35 @@ if __name__ == "__main__":
 }
 
 
+function getRafPreview(day) {
+  const d = day.date || '——————';
+  const jur = day.rafJurisdiction || 'MI';
+  const sa = day.rafSpinAmount || '—';
+  const sv = day.rafSpinValue || '—';
+  const ba = day.rafBetAmount || '—';
+  const nd = day.rafNumDays || 10;
+  const total = (parseFloat(sa) && parseFloat(sa) > 0) ? parseInt(sa) * nd : '—';
+  const game = day.rafGame || '7FH';
+  const gameName = FS_GAMES[game] ? FS_GAMES[game].fullName : game;
+  return [
+    `<span style="color:#ffffff;">RFRE:</span> ${d}_CAS_ACQ_SUO_RAF_RFRE_${jur}_FS_${sa}`,
+    `<span style="color:#ffffff;">RFER:</span> ${d}_CAS_ACQ_SUO_RAF_RFER_${jur}_FS_${sa}`,
+    `<span style="color:#ffffff;">DAY2–DAY${nd}:</span> ${d}_CAS_ACQ_SUO_RAF_DAY2_${jur}_FS_${sa} … DAY${nd}`,
+    `<span style="color:#ffffff;">Total spins:</span> ${total} (${sa}/day × ${nd} days)`,
+    `<span style="color:#ffffff;">Spin value:</span> $${sv} &nbsp;|&nbsp; <span style="color:#ffffff;">Bet:</span> $${ba}`,
+    `<span style="color:#ffffff;">Game:</span> ${gameName}`,
+  ].join('<br>');
+}
+
 function updateGenerateButton() {
   const offerType = getOfferType();
   let ready = false;
+  if (offerType === 'RAF') {
+    const d = days[0];
+    const dateEl = document.getElementById('raf-date-input');
+    const date = dateEl ? dateEl.value.trim() : d.date;
+    ready = !!(date && date.length === 6 && d.rafSpinAmount && parseFloat(d.rafSpinAmount) > 0 && d.rafBetAmount && parseFloat(d.rafBetAmount) > 0 && d.rafSpinValue);
+  } else {
   for (let i = 0; i < days.length; i++) {
     const d = days[i];
     const dateEl = document.getElementById('date-input-' + i);
@@ -3034,6 +3207,7 @@ function updateGenerateButton() {
     } else {
       if (d.amounts && d.amounts.size > 0) { ready = true; break; }
     }
+  }
   }
   const btn = document.querySelector('.btn-generate');
   if (btn) {
@@ -3576,6 +3750,881 @@ if __name__ == "__main__":
 `;
 }
 
+function buildRAFScript(cfg) {
+  const { date, jurisdiction, spinAmount, spinValue, betAmount, numDays, imagePath, doDay2, doReferee, doReferrer } = cfg;
+  const gameKey = cfg.gameKey;
+  const gd = FS_GAMES[gameKey];
+  const searchName = gd.searchName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return `import asyncio
+import random
+import re
+import string
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+URL = "https://trading.1.betfanatics.com/"
+
+# ── Configure these before each run ──────────────────────────────────────────
+DATE         = "${date}"
+JURISDICTION = "${jurisdiction}"
+SPIN_AMOUNT  = ${spinAmount}
+NUM_DAYS     = ${numDays}
+BET_AMOUNT   = ${betAmount}
+SPIN_VALUE   = "${spinValue}"
+GAME_KEY     = "${gameKey}"
+# ─────────────────────────────────────────────────────────────────────────────
+
+IMAGE_FOLDER = "${imagePath}"
+
+GAMES = {
+    "TCE": {
+        "searchName": "Triple Cash Eruption",
+        "aggregator": "IGT",
+        "provider": "IGT_Rgs",
+        "deeplink": "/casino_game/200-1700-081",
+    },
+    "7FH": {
+        "searchName": "7's Fire Blitz\\u2122 Hotstepper",
+        "aggregator": "WHG",
+        "provider": "WHITEHATSTUDIOS",
+        "deeplink": "/casino_game/WHS_7sFireBlitzHotStepper95",
+    },
+    "7P5": {
+        "searchName": "7's Fire Blitz\\u2122 Power 5 Jackpot Royale\\u2122 Express",
+        "aggregator": "WHG",
+        "provider": "WHITEHATSTUDIOS",
+        "deeplink": "/casino_game/WHS_7sFireBlitzPower5JRE92",
+    },
+    "WWE": {
+        "searchName": "WrestleMania\\u2122: Road To Gold",
+        "aggregator": "WHG",
+        "provider": "WHITEHATSTUDIOS",
+        "deeplink": "/casino_game/WHS_WrestlemaniaRoadToGoldUS94",
+    },
+}
+
+# ── Startup validation ────────────────────────────────────────────────────────
+
+assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
+
+# ── Derived names ─────────────────────────────────────────────────────────────
+
+def rfre_name():
+    return f"{DATE}_CAS_ACQ_SUO_RAF_RFRE_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+
+def rfer_name():
+    return f"{DATE}_CAS_ACQ_SUO_RAF_RFER_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+
+def day_name(n):
+    return f"{DATE}_CAS_ACQ_SUO_RAF_DAY{n}_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+
+def day_names():
+    return [day_name(n) for n in range(2, NUM_DAYS + 1)]
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def total_spins():
+    return SPIN_AMOUNT * NUM_DAYS
+
+def parse_description():
+    return f"Refer a Friend: Bet \${BET_AMOUNT}, Get {total_spins()} Spins"
+
+def parse_fs_description_day(n):
+    return f"Refer a Friend: Bet \${BET_AMOUNT} Get {total_spins()} Day {n}"
+
+def parse_casino_game():
+    return f"{GAMES[GAME_KEY]['searchName']} ({JURISDICTION})"
+
+def parse_title():
+    return f"Refer a Friend: Get {total_spins()} Bonus Spins"
+
+def parse_no_referee_message():
+    return f"Bet \${BET_AMOUNT}, Get {total_spins()} Bonus Spins"
+
+def parse_referral_history_message():
+    return f"Refer a Friend: Get {total_spins()} Bonus Spins, Give {total_spins()} Bonus Spins"
+
+def parse_link_preview_description():
+    return f"Hey, come join me on Fanatics Casino! You'll get {total_spins()} Bonus Spins if you sign up & Wager \${BET_AMOUNT}. Tap the link below and use my code to sign up."
+
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
+def parse_voucher(group):
+    suffix = generate_suffix()
+    return f"{JURISDICTION}AQ{total_spins():04d}{group}{suffix}"
+
+def parse_promo_dates():
+    mm, dd, yy = DATE[0:2], DATE[2:4], "20" + DATE[4:6]
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern.replace(year=2041)
+    start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return start, end
+
+def parse_activation_dates():
+    mm, dd, yy = DATE[0:2], DATE[2:4], "20" + DATE[4:6]
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_start = dt_eastern - timedelta(days=1)
+    dt_end = dt_eastern.replace(year=2041)
+    act_start = dt_start.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    act_end = dt_end.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return act_start, act_end
+
+def expected_start_date_display():
+    mm, dd, yy = DATE[0:2], DATE[2:4], "20" + DATE[4:6]
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_start = dt_eastern - timedelta(days=1)
+    return dt_start.strftime("%d/%m/%Y, 12:00 AM")
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+
+async def nav_to_segments(page):
+    print("  Navigating to Account Segments...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$=\'-segments\']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Account Segments", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Account Segments page")
+            return
+        print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$=\'-cms\']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Promos page")
+            return
+        print(f"  ⚠️ Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$=\'-bonuses\']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Bonus Manager page")
+            return
+        print(f"  ⚠️ Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
+# ── Image / text helpers ──────────────────────────────────────────────────────
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(5000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    ✅ Image uploaded: {display_name or filepath.split('/')[-1]}")
+
+async def fill_textarea(page, label_title, value):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.locator("input.ant-input").fill(value)
+    print(f"  ✅ {label_title}: {value}")
+
+# ── Segment ───────────────────────────────────────────────────────────────────
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).click()
+    await page.locator("#forBonus").check()
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Segment created: {name}")
+
+# ── Promo (shared for RFRE and RFER) ─────────────────────────────────────────
+
+async def create_promo(page, name, discover_image):
+    print(f"\\n  Creating promotion: {name}")
+    await page.get_by_text("Create Promotion", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    print("  ✅ Internal name filled")
+    start_date, end_date = parse_promo_dates()
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    print(f"  ✅ Start Time: {start_date}")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    print(f"  ✅ End Time: {end_date}")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    print("  ✅ Type: Image only CTA")
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    print("  ✅ Layout Type: Overlay")
+    raf_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Refer A Friend']"))
+    await raf_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Refer A Friend: ON")
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print("  ✅ First Save complete")
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_image}", discover_image)
+    title = parse_title()
+    await page.locator("input[placeholder='Title']").fill(title)
+    print(f"  ✅ Title: {title}")
+    await fill_textarea(page, "No Referee Title", "Who's in it to win it?")
+    await fill_textarea(page, "No Referee Message", parse_no_referee_message())
+    await fill_textarea(page, "Referral History Message", parse_referral_history_message())
+    await fill_textarea(page, "Link Preview Title", "Tap here to get started!")
+    await fill_textarea(page, "Link Preview Description", parse_link_preview_description())
+    await upload_image(page, "Link Preview Image Upload", f"{IMAGE_FOLDER}/Link Preview.png", "Link Preview.png")
+    await page.locator("input[placeholder='Promo Header Text']").fill(title)
+    print(f"  ✅ Promo Header: {title}")
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Promotion done: {name}")
+
+# ── Shared Free Spin bonus fields ─────────────────────────────────────────────
+
+async def fill_free_spin_fields(page, num_spins):
+    game_data = GAMES[GAME_KEY]
+    aggregator_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Aggregator"))
+    await aggregator_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=game_data["aggregator"]).first.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Aggregator: {game_data['aggregator']}")
+    provider_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Provider"))
+    await provider_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=game_data["provider"]).first.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Provider: {game_data['provider']}")
+    casino_game = parse_casino_game()
+    casino_game_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Casino Game"))
+    await casino_game_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(casino_game)
+    casino_game_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+        has_text=re.compile(r"^" + re.escape(casino_game) + r"$")
+    ).first
+    await casino_game_option.wait_for(state="visible", timeout=15000)
+    await casino_game_option.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Casino Game: {casino_game}")
+    bet_level_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bet Level"))
+    await bet_level_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="default").first.click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Bet Level: default")
+    deeplink_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's Deeplink\\"]"))
+    await deeplink_row.locator("input[placeholder=\\"Free Spin's Deeplink\\"]").fill(game_data["deeplink"])
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Deeplink: {game_data['deeplink']}")
+    spins_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Number of Spins"))
+    spins_input = spins_row.locator("input[role='spinbutton']")
+    await spins_input.click(click_count=3)
+    await spins_input.fill(str(num_spins))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Number of Spins: {num_spins}")
+    stakes_card = page.locator(".ant-card").filter(has=page.locator(".ant-card-head-title", has_text="Free Spin Stakes"))
+    await stakes_card.locator("td.ant-table-cell", has_text="USD").locator("..").locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+        has_text=re.compile(r"^" + re.escape(SPIN_VALUE) + r"$")
+    ).first.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Spin Value (USD): {SPIN_VALUE}")
+
+async def fill_days_and_activation(page, optin, entitlement, settlement):
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill(str(optin))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Days to Opt In: {optin}")
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(entitlement))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Days to Meet Entitlement: {entitlement}")
+    settlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Freespin Settlement"))
+    await settlement_row.locator("input.ant-input-number-input").click()
+    await settlement_row.locator("input.ant-input-number-input").fill(str(settlement))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Days to Meet Freespin Settlement: {settlement}")
+    print("  ✅ Status Active: left unchecked")
+    act_start, act_end = parse_activation_dates()
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"  ✅ Activation Dates: {act_start} → {act_end}")
+
+async def fill_reporting_fields(page):
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Reporting Platform: CAS (Casino)")
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Bet Settlement Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Bonus Origin: Bet Settlement Bonus")
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("Refer")
+    await page.wait_for_timeout(1000)
+    series_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="Refer a Friend").first
+    await series_option.wait_for(state="visible", timeout=15000)
+    await series_option.click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Series: Refer a Friend")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Acquisition", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Type: Acquisition")
+
+async def poll_and_click_create_bonus(page):
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(3000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(120):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+
+async def save_with_voucher_modal(page, voucher_code):
+    save_btn = page.locator("button.ant-btn-primary.save")
+    await save_btn.scroll_into_view_if_needed()
+    await page.wait_for_timeout(500)
+    await save_btn.click()
+    await page.wait_for_timeout(2000)
+    print("  ✅ Save clicked")
+    modal = page.locator(".ant-modal-content")
+    await modal.wait_for(state="visible", timeout=10000)
+    await modal.locator("input[placeholder='Password']").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Voucher modal: filled with {voucher_code}")
+    await modal.locator("button.ant-btn.ant-btn-primary").click()
+    print("  ✅ Apply clicked")
+    try:
+        await page.wait_for_load_state("networkidle", timeout=5000)
+    except Exception:
+        pass
+    yes_btn = page.locator("button.ant-btn.ant-btn-primary").filter(has=page.locator("span", has_text="Yes"))
+    await yes_btn.wait_for(state="visible", timeout=10000)
+    await yes_btn.click()
+    print("  ✅ Yes clicked")
+    try:
+        await page.wait_for_load_state("networkidle", timeout=5000)
+    except Exception:
+        pass
+
+# ── RFRE Bonus ────────────────────────────────────────────────────────────────
+
+async def create_bonus_rfre(page, voucher_code):
+    name = rfre_name()
+    description = parse_description()
+    print(f"\\n  Creating RFRE bonus: {name}")
+    await poll_and_click_create_bonus(page)
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Trigger: Opt In")
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(description)
+    print(f"  ✅ Internal name: {description}")
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(description)
+    print(f"  ✅ Description: {description}")
+    await page.get_by_role("checkbox", name="Refer A Friend Bonus").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Refer A Friend Bonus: checked")
+    await page.locator("input.ant-radio-input[value='REFEREE']").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Referee radio: selected")
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Voucher Code: {voucher_code}")
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"FREESPIN\\"]').click()")
+    await page.wait_for_timeout(1000)
+    print("  ✅ Bonus type: Free Spin")
+    fs_desc_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's Description\\"]"))
+    await fs_desc_row.locator("input[placeholder=\\"Free Spin's Description\\"]").fill(parse_fs_description_day(1))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Free Spin's Description: {parse_fs_description_day(1)}")
+    fs_cta_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's CTA\\"]"))
+    await fs_cta_row.locator("input[placeholder=\\"Free Spin's CTA\\"]").fill("Play!")
+    await page.wait_for_timeout(500)
+    print("  ✅ Free Spin's CTA: Play!")
+    await fill_free_spin_fields(page, SPIN_AMOUNT)
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"DEPOSIT_AND_WAGERING\\"]').click()")
+    await page.wait_for_timeout(500)
+    print("  ✅ Entitlement Type: Deposit and Wagering")
+    min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
+    min_deposit_input = min_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await min_deposit_input.click()
+    await min_deposit_input.fill("10")
+    await page.wait_for_timeout(500)
+    print("  ✅ Minimum Deposit: 10")
+    max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
+    max_deposit_input = max_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await max_deposit_input.click()
+    await max_deposit_input.fill("1000000")
+    await page.wait_for_timeout(500)
+    print("  ✅ Maximum Deposit: 1000000")
+    bonus_pct_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bonus %"))
+    bonus_pct_input = bonus_pct_row.locator("input.ant-input-number-input[step='1']").first
+    await bonus_pct_input.click()
+    await bonus_pct_input.fill("100")
+    await page.wait_for_timeout(500)
+    print("  ✅ Bonus %: 100")
+    matched_deposit_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Matched Deposit"))
+    await matched_deposit_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Matched Deposit: unchecked")
+    qualifying_stake_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Qualifying Stake"))
+    qualifying_stake_input = qualifying_stake_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await qualifying_stake_input.click()
+    await qualifying_stake_input.fill(str(BET_AMOUNT))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Qualifying Stake: {BET_AMOUNT}")
+    await fill_days_and_activation(page, optin=0, entitlement=0, settlement=1)
+    status_active_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_active_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Status Active: checked")
+    await fill_reporting_fields(page)
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+        has_text=re.compile(r"^" + re.escape(name) + r"$")
+    ).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Promotion Tile: {name}")
+    await save_with_voucher_modal(page, voucher_code)
+    print(f"  ✅ RFRE bonus created: {name}")
+
+# ── RFRE Post-Save Edit ───────────────────────────────────────────────────────
+
+async def edit_bonus_rfre(page, voucher_code):
+    name = rfre_name()
+    description = parse_description()
+    print(f"\\n  Editing RFRE bonus: {name}")
+    # Step 1 — Navigate to Bonus Manager
+    await nav_to_bonus(page)
+    # Step 2 — Wait 30 seconds for page to load
+    print("  ✅ Waiting 30 seconds for Bonus Manager to load...")
+    await page.wait_for_timeout(30000)
+    # Step 3 — Uncheck Active Only if still checked
+    active_only_checkbox = page.locator("span", has_text="Active Only").locator("..").locator("input.ant-checkbox-input")
+    if await active_only_checkbox.is_checked():
+        await active_only_checkbox.click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Active Only: unchecked")
+    else:
+        print("  ✅ Active Only: already unchecked")
+    # Step 4 — Press Reload and wait 20 seconds
+    reload_btn = page.locator("button.ant-btn.ant-btn-primary").filter(has=page.locator("span", has_text="Reload"))
+    await reload_btn.click()
+    print("  ✅ Reload clicked — waiting 20 seconds...")
+    await page.wait_for_timeout(20000)
+    print("  ✅ Wait complete")
+    search_input = page.locator("input[placeholder='Filter by Bonus Name, Bonus Code or Bonus ID']")
+    await search_input.fill(description)
+    await page.wait_for_timeout(1500)
+    print(f"  ✅ Search filled: {description}")
+    expected = expected_start_date_display()
+    headers = page.locator("thead tr th")
+    header_count = await headers.count()
+    start_date_col_idx = None
+    for i in range(header_count):
+        if "Start Date" in await headers.nth(i).inner_text():
+            start_date_col_idx = i
+            break
+    if start_date_col_idx is None:
+        print("  ⚠️  Could not find Start Date column header")
+    else:
+        first_row_cells = page.locator("tbody tr").first.locator("td")
+        actual = (await first_row_cells.nth(start_date_col_idx).inner_text()).strip()
+        if actual == expected:
+            print(f"  ✅ Start date verified: {actual}")
+        else:
+            print(f"  ⚠️  Start date mismatch — expected: {expected} | found: {actual}")
+    edit_btn = page.locator("tbody tr").first.locator("span[aria-label='edit']")
+    await edit_btn.wait_for(state="visible", timeout=10000)
+    await edit_btn.click()
+    await page.wait_for_load_state("networkidle")
+    print("  ✅ Edit clicked")
+    referee_radio = page.locator("input.ant-radio-input[value='REFEREE']")
+    if not await referee_radio.is_checked():
+        await referee_radio.click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Referee radio: re-selected")
+    else:
+        print("  ✅ Referee radio: already selected")
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    current_title = await reporting_row.locator(".ant-select-selection-item").get_attribute("title")
+    if not current_title or current_title.strip() == "":
+        await reporting_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.get_by_text("CAS (Casino)", exact=True).click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Reporting Platform: re-selected CAS (Casino)")
+    else:
+        print(f"  ✅ Reporting Platform: already set ({current_title})")
+    await save_with_voucher_modal(page, voucher_code)
+    print(f"  ✅ RFRE bonus edit complete: {name}")
+
+# ── RFER Bonus ────────────────────────────────────────────────────────────────
+
+async def create_bonus_rfer(page, voucher_code):
+    name = rfer_name()
+    description = parse_description()
+    print(f"\\n  Creating RFER bonus: {name}")
+    await poll_and_click_create_bonus(page)
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Trigger: Opt In")
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(description)
+    print(f"  ✅ Internal name: {description}")
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(description)
+    print(f"  ✅ Description: {description}")
+    await page.get_by_role("checkbox", name="Refer A Friend Bonus").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Refer A Friend Bonus: checked")
+    await page.locator("input.ant-radio-input[value='REFERRER']").click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Referrer radio: selected")
+    send_to_xp_checkbox = page.locator("label.ant-checkbox-wrapper").filter(
+        has=page.locator("span", has_text="Send To XP")
+    ).locator("input.ant-checkbox-input")
+    await send_to_xp_checkbox.wait_for(state="visible", timeout=10000)
+    await send_to_xp_checkbox.click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Send To XP: checked")
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Voucher Code: {voucher_code}")
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"FREESPIN\\"]').click()")
+    await page.wait_for_timeout(1000)
+    print("  ✅ Bonus type: Free Spin")
+    fs_desc_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's Description\\"]"))
+    await fs_desc_row.locator("input[placeholder=\\"Free Spin's Description\\"]").fill(parse_fs_description_day(1))
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Free Spin's Description: {parse_fs_description_day(1)}")
+    fs_cta_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's CTA\\"]"))
+    await fs_cta_row.locator("input[placeholder=\\"Free Spin's CTA\\"]").fill("Play!")
+    await page.wait_for_timeout(500)
+    print("  ✅ Free Spin's CTA: Play!")
+    await fill_free_spin_fields(page, total_spins())
+    await fill_days_and_activation(page, optin=0, entitlement=0, settlement=7)
+    await fill_reporting_fields(page)
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+        has_text=re.compile(r"^" + re.escape(name) + r"$")
+    ).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Promotion Tile: {name}")
+    referee_bonus_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Referee Bonus"))
+    await referee_bonus_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(description)
+    await page.wait_for_timeout(1000)
+    referee_bonus_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").first
+    await referee_bonus_option.wait_for(state="visible", timeout=15000)
+    await referee_bonus_option.click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Referee Bonus: {description} (top result)")
+    await save_with_voucher_modal(page, voucher_code)
+    print(f"  ✅ RFER bonus created: {name}")
+
+# ── RFER Post-Save Edit ───────────────────────────────────────────────────────
+
+async def edit_bonus_rfer(page, voucher_code):
+    name = rfer_name()
+    description = parse_description()
+    print(f"\\n  Editing RFER bonus: {name}")
+    # Step 1 — Navigate to Bonus Manager
+    await nav_to_bonus(page)
+    # Step 2 — Wait 30 seconds for page to load
+    print("  ✅ Waiting 30 seconds for Bonus Manager to load...")
+    await page.wait_for_timeout(30000)
+    # Step 3 — Uncheck Active Only if still checked
+    active_only_checkbox = page.locator("span", has_text="Active Only").locator("..").locator("input.ant-checkbox-input")
+    if await active_only_checkbox.is_checked():
+        await active_only_checkbox.click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Active Only: unchecked")
+    else:
+        print("  ✅ Active Only: already unchecked")
+    # Step 4 — Press Reload and wait 120 seconds
+    reload_btn = page.locator("button.ant-btn.ant-btn-primary").filter(has=page.locator("span", has_text="Reload"))
+    await reload_btn.click()
+    print("  ✅ Reload clicked — waiting 120 seconds...")
+    await page.wait_for_timeout(120000)
+    print("  ✅ Wait complete")
+    # Step 6 — Search by description
+    search_input = page.locator("input[placeholder='Filter by Bonus Name, Bonus Code or Bonus ID']")
+    await search_input.fill(description)
+    await page.wait_for_timeout(1500)
+    print(f"  ✅ Search filled: {description}")
+    expected = expected_start_date_display()
+    headers = page.locator("thead tr th")
+    header_count = await headers.count()
+    start_date_col_idx = None
+    for i in range(header_count):
+        if "Start Date" in await headers.nth(i).inner_text():
+            start_date_col_idx = i
+            break
+    if start_date_col_idx is None:
+        print("  ⚠️  Could not find Start Date column header")
+    else:
+        first_row_cells = page.locator("tbody tr").first.locator("td")
+        actual = (await first_row_cells.nth(start_date_col_idx).inner_text()).strip()
+        if actual == expected:
+            print(f"  ✅ Start date verified: {actual}")
+        else:
+            print(f"  ⚠️  Start date mismatch — expected: {expected} | found: {actual}")
+    edit_btn = page.locator("tbody tr").first.locator("span[aria-label='edit']")
+    await edit_btn.wait_for(state="visible", timeout=10000)
+    await edit_btn.click()
+    await page.wait_for_load_state("networkidle")
+    print("  ✅ Edit clicked")
+    referrer_radio = page.locator("input.ant-radio-input[value='REFERRER']")
+    if not await referrer_radio.is_checked():
+        await referrer_radio.click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Referrer radio: re-selected")
+    else:
+        print("  ✅ Referrer radio: already selected")
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    current_title = await reporting_row.locator(".ant-select-selection-item").get_attribute("title")
+    if not current_title or current_title.strip() == "":
+        await reporting_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.get_by_text("CAS (Casino)", exact=True).click()
+        await page.wait_for_timeout(500)
+        print("  ✅ Reporting Platform: re-selected CAS (Casino)")
+    else:
+        print(f"  ✅ Reporting Platform: already set ({current_title})")
+    save_btn = page.locator("button.ant-btn-primary.save")
+    await save_btn.scroll_into_view_if_needed()
+    await page.wait_for_timeout(500)
+    await save_btn.click()
+    await page.wait_for_timeout(2000)
+    print("  ✅ Save clicked")
+    modal = page.locator(".ant-modal-content")
+    await modal.wait_for(state="visible", timeout=10000)
+    await modal.locator("input[placeholder='Password']").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Voucher modal: filled with {voucher_code}")
+    await modal.locator("button.ant-btn.ant-btn-primary").click()
+    print("  ✅ Apply clicked")
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ RFER bonus edit complete: {name}")
+
+
+async def create_bonus_day(page, n, voucher_code):
+    name = day_name(n)
+    print(f"\\n  Creating Day {n} bonus: {name}")
+    await poll_and_click_create_bonus(page)
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Trigger: Opt In")
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+    print(f"  ✅ Internal name: {name}")
+    print("  ✅ Refer A Friend Bonus: left unchecked")
+    send_to_xp_checkbox = page.locator("label.ant-checkbox-wrapper").filter(
+        has=page.locator("span", has_text="Send To XP")
+    ).locator("input.ant-checkbox-input")
+    await send_to_xp_checkbox.wait_for(state="visible", timeout=10000)
+    await send_to_xp_checkbox.click()
+    await page.wait_for_timeout(500)
+    print("  ✅ Send To XP: checked")
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Voucher Code: {voucher_code}")
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"FREESPIN\\"]').click()")
+    await page.wait_for_timeout(1000)
+    print("  ✅ Bonus type: Free Spin")
+    fs_desc = parse_fs_description_day(n)
+    fs_desc_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's Description\\"]"))
+    await fs_desc_row.locator("input[placeholder=\\"Free Spin's Description\\"]").fill(fs_desc)
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Free Spin's Description: {fs_desc}")
+    fs_cta_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's CTA\\"]"))
+    await fs_cta_row.locator("input[placeholder=\\"Free Spin's CTA\\"]").fill("Play!")
+    await page.wait_for_timeout(500)
+    print("  ✅ Free Spin's CTA: Play!")
+    await fill_free_spin_fields(page, SPIN_AMOUNT)
+    await fill_days_and_activation(page, optin=0, entitlement=0, settlement=1)
+    await fill_reporting_fields(page)
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    await page.get_by_text(name, exact=True).nth(1).click()
+    await page.wait_for_timeout(500)
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+    print(f"  ✅ Segment: {name}")
+    save_btn = page.locator("button.ant-btn-primary.save")
+    await save_btn.scroll_into_view_if_needed()
+    await page.wait_for_timeout(500)
+    await save_btn.click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ Day {n} bonus saved: {name}")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+async def main():
+    rfre_voucher = parse_voucher("RFRE") if ${doReferee ? 'True' : 'False'} else None
+    rfer_voucher = parse_voucher("RFER") if ${doReferrer ? 'True' : 'False'} else None
+    day_vouchers = {n: parse_voucher(f"DAY{n}") for n in range(2, NUM_DAYS + 1)} if ${doDay2 ? 'True' : 'False'} else {}
+
+    print("\\n" + "=" * 60)
+    print("  RAF Full Campaign")
+    if ${doReferee ? 'True' : 'False'}: print(f"  RFRE: {rfre_name()}")
+    if ${doReferrer ? 'True' : 'False'}: print(f"  RFER: {rfer_name()}")
+    if ${doDay2 ? 'True' : 'False'}:
+        for n in range(2, NUM_DAYS + 1):
+            print(f"  DAY{n}: {day_name(n)}")
+    print(f"\\n  Voucher codes (record these):")
+    if ${doReferee ? 'True' : 'False'}: print(f"    RFRE: {rfre_voucher}")
+    if ${doReferrer ? 'True' : 'False'}: print(f"    RFER: {rfer_voucher}")
+    if ${doDay2 ? 'True' : 'False'}:
+        for n, vc in day_vouchers.items():
+            print(f"    DAY{n}: {vc}")
+    print(f"\\n  Spin Amount:  {SPIN_AMOUNT}/day  |  Total: {total_spins()}  |  Days: {NUM_DAYS}")
+    print("=" * 60)
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+
+        print("\\n👉 Please log in, then press Enter here.\\n")
+        input("Press Enter when ready...")
+
+        await page.wait_for_timeout(2000)
+
+        ${(doDay2 || doReferrer) ? `print("\\n" + "=" * 60)
+        print("  PHASE 1 — Segments")
+        print("=" * 60)
+        await nav_to_segments(page)
+        ${doReferrer ? `await create_segment(page, rfer_name())` : ''}
+        ${doDay2 ? `for n in range(2, NUM_DAYS + 1):
+            await create_segment(page, day_name(n))` : ''}` : `print("  ⏭  Skipping Phase 1 — Segments")`}
+
+        ${(doReferee || doReferrer) ? `print("\\n" + "=" * 60)
+        print("  PHASE 2 — Promotions")
+        print("=" * 60)
+        await nav_to_promos(page)
+        ${doReferee ? `await create_promo(page, rfre_name(), "Discover_RFRE.png")` : ''}
+        ${doReferrer ? `await create_promo(page, rfer_name(), "Discover_RFER.png")` : ''}` : `print("  ⏭  Skipping Phase 2 — Promotions")`}
+
+        ${doDay2 ? `print("\\n" + "=" * 60)
+        print("  PHASE 3 — Day 2+ Bonuses")
+        print("=" * 60)
+        await nav_to_bonus(page)
+        for n in range(2, NUM_DAYS + 1):
+            await create_bonus_day(page, n, day_vouchers[n])` : `print("  ⏭  Skipping Phase 3 — Day 2+ Bonuses")`}
+
+        ${doReferee ? `print("\\n" + "=" * 60)
+        print("  PHASE 4 — RFRE Bonus")
+        print("=" * 60)
+        await nav_to_bonus(page)
+        await create_bonus_rfre(page, rfre_voucher)
+        await edit_bonus_rfre(page, rfre_voucher)` : `print("  ⏭  Skipping Phase 4 — RFRE Bonus")`}
+
+        ${doReferrer ? `print("\\n" + "=" * 60)
+        print("  PHASE 5 — RFER Bonus")
+        print("=" * 60)
+        await nav_to_bonus(page)
+        await create_bonus_rfer(page, rfer_voucher)
+        await edit_bonus_rfer(page, rfer_voucher)` : `print("  ⏭  Skipping Phase 5 — RFER Bonus")`}
+
+        print("\\n" + "=" * 60)
+        print("  🎉 RAF campaign complete!")
+        print("=" * 60)
+        await browser.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+`;
+}
+
 function generateScript() {
   try {
   // Sync all date inputs to days array first
@@ -3583,9 +4632,56 @@ function generateScript() {
     const input = document.getElementById(`date-input-${i}`);
     if (input) days[i].date = input.value.trim();
   }
+  // Sync RAF date input
+  const rafDateEl = document.getElementById('raf-date-input');
+  if (rafDateEl) days[0].date = rafDateEl.value.trim();
 
   const jurisdiction = document.getElementById('jurisdiction-select').value;
   const offerType = getOfferType();
+
+  // ── RAF: bypass allNames loop entirely ───────────────────────────────────
+  if (offerType === 'RAF') {
+    const d = days[0];
+    if (!d.date || d.date.length !== 6) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
+    if (!d.rafSpinAmount || parseFloat(d.rafSpinAmount) <= 0) { alert('Please enter Spins / Day.'); return; }
+    if (!d.rafBetAmount || parseFloat(d.rafBetAmount) <= 0) { alert('Please enter Bet Amount.'); return; }
+    if (!d.rafSpinValue) { alert('Please select Spin Value.'); return; }
+    const rafCfg = {
+      date: d.date,
+      jurisdiction: d.rafJurisdiction || 'MI',
+      spinAmount: parseInt(d.rafSpinAmount),
+      spinValue: d.rafSpinValue,
+      betAmount: parseInt(d.rafBetAmount),
+      numDays: d.rafNumDays || 10,
+      gameKey: d.rafGame || '7FH',
+      imagePath: getImagePath(),
+      doDay2: d.rafDoDay2 !== false,
+      doReferee: d.rafDoReferee !== false,
+      doReferrer: d.rafDoReferrer !== false,
+    };
+    const script = buildRAFScript(rafCfg);
+    document.getElementById('script-output').value = script;
+    document.getElementById('script-area').style.display = 'block';
+    const today = new Date();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const yy = String(today.getFullYear()).slice(-2);
+    const hh = String(today.getHours()).padStart(2, '0');
+    const min = String(today.getMinutes()).padStart(2, '0');
+    const filename = `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py`;
+    document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
+    document.getElementById('win-run-cmd').textContent = `cd %USERPROFILE%\\Downloads && python ${filename}`;
+    ['mac-run-btn','win-run-btn'].forEach(id => { document.getElementById(id).disabled = false; });
+    document.querySelectorAll('.run-cmd-row').forEach(el => el.classList.add('ready'));
+    document.querySelectorAll('.run-cmd-row code').forEach(el => el.classList.add('ready'));
+    const blob = new Blob([script], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+    return;
+  }
+
   const allNames = [];
   for (let i = 0; i < days.length; i++) {
     const date = days[i].date;
@@ -3901,12 +4997,29 @@ async def fill_rich_text(page, label_title, content):
     await page.wait_for_timeout(500)
     print(f"    ✅ Rich text filled: {label_title}")
 
+async def nav_to_segments(page):
+    print("  Navigating to Account Segments...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$=\'-segments\']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Account Segments", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  ✅ On Account Segments page")
+            return
+        print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+
 async def nav_to_promos(page):
     print("  Navigating to Promos...")
     for attempt in range(1, 6):
         await page.mouse.move(600, 400)
         await page.wait_for_timeout(300)
-        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.locator("[data-menu-id$=\'-cms\']").hover()
         await page.wait_for_timeout(500)
         link = page.get_by_text("Promos", exact=True)
         if await link.is_visible():
@@ -3923,7 +5036,7 @@ async def nav_to_bonus(page):
     for attempt in range(1, 6):
         await page.mouse.move(600, 400)
         await page.wait_for_timeout(300)
-        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.locator("[data-menu-id$=\'-bonuses\']").hover()
         await page.wait_for_timeout(500)
         link = page.get_by_text("Bonus Manager", exact=True)
         if await link.is_visible():
@@ -4113,6 +5226,8 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
+        await page.wait_for_timeout(2000)
+
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
@@ -4180,7 +5295,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
