@@ -2231,35 +2231,37 @@ async def fill_rich_text(page, label_title, content):
 
 async def nav_to_promos(page):
     print("  Navigating to Promos...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Cms").click()
-        await page.wait_for_timeout(1000)
-        promos = page.get_by_text("Promos", exact=True)
-        if await promos.is_visible():
-            await promos.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Promos page")
             return
-    raise Exception("Could not find Promos button")
+        print(f"  ⚠️ Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
 
 async def nav_to_bonus(page):
     print("  Navigating to Bonus Manager...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Bonuses").click()
-        await page.wait_for_timeout(1000)
-        bonus = page.get_by_text("Bonus Manager", exact=True)
-        if await bonus.is_visible():
-            await bonus.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Bonus Manager page")
             return
-    raise Exception("Could not find Bonus Manager button")
+        print(f"  ⚠️ Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
 
 async def create_segment(page, name):
     print(f"\\n  Creating segment: {name}")
@@ -2504,19 +2506,26 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
-        await page.wait_for_timeout(2000)
-        await page.locator("span", has_text="Expand All").click()
-        await page.wait_for_load_state("networkidle")
-        print("✅ Menu expanded")
-
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
 
         if segment_names:
             print("\\n─── Creating Segments ───")
-            await page.get_by_text("Account Segments", exact=True).click()
-            await page.wait_for_load_state("networkidle")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
             for name in segment_names:
                 await create_segment(page, name)
                 await page.wait_for_timeout(1000)
@@ -2724,35 +2733,37 @@ async def fill_rich_text(page, label_title, content):
 
 async def nav_to_promos(page):
     print("  Navigating to Promos...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Cms").click()
-        await page.wait_for_timeout(1000)
-        promos = page.get_by_text("Promos", exact=True)
-        if await promos.is_visible():
-            await promos.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Promos page")
             return
-    raise Exception("Could not find Promos button")
+        print(f"  ⚠️ Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
 
 async def nav_to_bonus(page):
     print("  Navigating to Bonus Manager...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Bonuses").click()
-        await page.wait_for_timeout(1000)
-        bonus = page.get_by_text("Bonus Manager", exact=True)
-        if await bonus.is_visible():
-            await bonus.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Bonus Manager page")
             return
-    raise Exception("Could not find Bonus Manager button")
+        print(f"  ⚠️ Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
 
 async def create_segment(page, name):
     print(f"\\n  Creating segment: {name}")
@@ -2945,19 +2956,26 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
-        await page.wait_for_timeout(2000)
-        await page.locator("span", has_text="Expand All").click()
-        await page.wait_for_load_state("networkidle")
-        print("✅ Menu expanded")
-
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
 
         if segment_names:
             print("\\n─── Creating Segments ───")
-            await page.get_by_text("Account Segments", exact=True).click()
-            await page.wait_for_load_state("networkidle")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
             for name in segment_names:
                 await create_segment(page, name)
                 await page.wait_for_timeout(1000)
@@ -3193,19 +3211,20 @@ async def fill_rich_text(page, label_title, content):
 
 async def nav_to_promos(page):
     print("  Navigating to Promos...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Cms").click()
-        await page.wait_for_timeout(1000)
-        promos = page.get_by_text("Promos", exact=True)
-        if await promos.is_visible():
-            await promos.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Promos page")
             return
-    raise Exception("Could not find Promos button")
+        print(f"  ⚠️ Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
 
 async def create_segment(page, name):
     print(f"\\n  Creating segment: {name}")
@@ -3269,19 +3288,20 @@ async def create_promo(page, name):
 
 async def nav_to_bonus(page):
     print("  Navigating to Bonus Manager...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Bonuses").click()
-        await page.wait_for_timeout(1000)
-        bonus = page.get_by_text("Bonus Manager", exact=True)
-        if await bonus.is_visible():
-            await bonus.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Bonus Manager page")
             return
-    raise Exception("Could not find Bonus Manager button")
+        print(f"  ⚠️ Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
 
 
 async def create_bonus(page, name):
@@ -3499,19 +3519,26 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
-        await page.wait_for_timeout(2000)
-        await page.locator("span", has_text="Expand All").click()
-        await page.wait_for_load_state("networkidle")
-        print("✅ Menu expanded")
-
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
 
         if segment_names:
             print("\\n─── Creating Segments ───")
-            await page.get_by_text("Account Segments", exact=True).click()
-            await page.wait_for_load_state("networkidle")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
             for name in segment_names:
                 await create_segment(page, name)
                 await page.wait_for_timeout(1000)
@@ -3876,35 +3903,37 @@ async def fill_rich_text(page, label_title, content):
 
 async def nav_to_promos(page):
     print("  Navigating to Promos...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Cms").click()
-        await page.wait_for_timeout(1000)
-        promos = page.get_by_text("Promos", exact=True)
-        if await promos.is_visible():
-            await promos.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Promos page")
             return
-    raise Exception("Could not find Promos button")
+        print(f"  ⚠️ Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
 
 async def nav_to_bonus(page):
     print("  Navigating to Bonus Manager...")
-    await page.locator("img[alt='FBG logo']").click()
-    await page.wait_for_load_state("networkidle")
-    await page.wait_for_timeout(2000)
-    for _ in range(5):
-        await page.locator("span.h3", has_text="Bonuses").click()
-        await page.wait_for_timeout(1000)
-        bonus = page.get_by_text("Bonus Manager", exact=True)
-        if await bonus.is_visible():
-            await bonus.click()
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
             await page.wait_for_load_state("networkidle")
             print("  ✅ On Bonus Manager page")
             return
-    raise Exception("Could not find Bonus Manager button")
+        print(f"  ⚠️ Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
 
 async def create_segment(page, name):
     print(f"\\n  Creating segment: {name}")
@@ -4084,19 +4113,26 @@ async def main():
         print("\\n👉 Please log in to the site in the browser window.")
         print("   Once logged in, come back here and press Enter.\\n")
         input("Press Enter when ready...")
-        await page.wait_for_timeout(2000)
-        await page.locator("span", has_text="Expand All").click()
-        await page.wait_for_load_state("networkidle")
-        print("✅ Menu expanded")
-
         segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
         promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
         bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
 
         if segment_names:
             print("\\n─── Creating Segments ───")
-            await page.get_by_text("Account Segments", exact=True).click()
-            await page.wait_for_load_state("networkidle")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  ⚠️ Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
             for name in segment_names:
                 await create_segment(page, name)
                 await page.wait_for_timeout(1000)
