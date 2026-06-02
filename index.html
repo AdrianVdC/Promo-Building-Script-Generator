@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.3</title>
+  <title>NATS Bonus Creator v2.9</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2414,7 +2414,7 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).click()
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
@@ -2918,7 +2918,7 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).click()
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
@@ -3408,7 +3408,7 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).click()
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
@@ -3964,7 +3964,7 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).click()
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
@@ -5056,7 +5056,7 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).click()
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
@@ -5160,7 +5160,7 @@ async def create_bonus(page, name):
     date_part = name.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
     dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
-    dt_end_eastern = dt_eastern + timedelta(days=30)
+    dt_end_eastern = dt_eastern + timedelta(days=1)
     act_start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
