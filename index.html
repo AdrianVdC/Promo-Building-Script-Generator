@@ -2422,7 +2422,15 @@ async def create_segment(page, name):
 
 async def create_promo(page, name):
     print(f"\\n  Creating promotion: {name}")
-    await page.get_by_text("Create Promotion", exact=True).click()
+    # Poll until Create Promotion button is enabled (up to 60s)
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
     await page.wait_for_load_state("networkidle")
     await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
     start_date, end_date = parse_promo_dates(name)
@@ -2926,7 +2934,15 @@ async def create_segment(page, name):
 
 async def create_promo(page, name):
     print(f"\\n  Creating promotion: {name}")
-    await page.get_by_text("Create Promotion", exact=True).click()
+    # Poll until Create Promotion button is enabled (up to 60s)
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
     await page.wait_for_load_state("networkidle")
     await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
     start_date, end_date = parse_dates(name)
@@ -3416,7 +3432,15 @@ async def create_segment(page, name):
 
 async def create_promo(page, name):
     print(f"\\n  Creating promotion: {name}")
-    await page.get_by_text("Create Promotion", exact=True).click()
+    # Poll until Create Promotion button is enabled (up to 60s)
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
     await page.wait_for_load_state("networkidle")
     await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
     start_date, end_date = parse_dates(name)
@@ -3974,7 +3998,15 @@ async def create_segment(page, name):
 
 async def create_promo(page, name, discover_image):
     print(f"\\n  Creating promotion: {name}")
-    await page.get_by_text("Create Promotion", exact=True).click()
+    # Poll until Create Promotion button is enabled (up to 60s)
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
     await page.wait_for_load_state("networkidle")
     await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
     print("  ✅ Internal name filled")
@@ -5064,7 +5096,15 @@ async def create_segment(page, name):
 
 async def create_promo(page, name):
     print(f"\\n  Creating promotion: {name}")
-    await page.get_by_text("Create Promotion", exact=True).click()
+    # Poll until Create Promotion button is enabled (up to 60s)
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
     await page.wait_for_load_state("networkidle")
     await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
     start_date, end_date = parse_dates(name)
