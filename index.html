@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.9</title>
+  <title>NATS Bonus Creator v2.10</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2499,7 +2499,7 @@ async def create_bonus(page, name):
     if SEND_TO_XP[idx]:
         await page.get_by_text("Send To XP", exact=True).click()
         await page.wait_for_timeout(500)
-    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
@@ -3012,7 +3012,7 @@ async def create_bonus(page, name):
     if EXTERNAL_BONUS[idx]:
         await page.get_by_text("External Bonus", exact=True).click()
         await page.wait_for_timeout(500)
-    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
@@ -3535,8 +3535,8 @@ async def create_bonus(page, name):
         await page.get_by_text("External Bonus", exact=True).click()
         await page.wait_for_timeout(500)
 
-    # Steps 7-8 — Remove COMBO tags
-    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+    # Steps 7-8 — Remove COMBO: Sportsbook and COMBO: Sportsbook and Casino tags
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
@@ -5164,7 +5164,7 @@ async def create_bonus(page, name):
     if SEND_TO_XP[idx]:
         await page.get_by_text("Send To XP", exact=True).click()
         await page.wait_for_timeout(500)
-    for value in ["COMBO: Casino", "COMBO: Sportsbook"]:
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
