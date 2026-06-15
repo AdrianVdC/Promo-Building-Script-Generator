@@ -4962,8 +4962,8 @@ def parse_dates(code):
     mm = date_part[0:2]
     dd = date_part[2:4]
     yy = "20" + date_part[4:6]
-    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
-    dt_end_eastern = dt_eastern + timedelta(days=1)
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 4, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(hours=24)
     start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     return start, end
@@ -5199,8 +5199,8 @@ async def create_bonus(page, name):
     await page.wait_for_timeout(500)
     date_part = name.split("_")[0]
     mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
-    dt_eastern = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
-    dt_end_eastern = dt_eastern + timedelta(days=1)
+    dt_eastern = datetime(int(yy), int(mm), int(dd), 4, 0, 0, tzinfo=EASTERN)
+    dt_end_eastern = dt_eastern + timedelta(hours=24)
     act_start = dt_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     act_end = dt_end_eastern.astimezone().strftime('%d-%m-%Y %H:%M:%S')
     activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
