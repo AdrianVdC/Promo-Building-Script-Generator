@@ -2345,7 +2345,7 @@ async def upload_image(page, label_title, filepath):
         await page.get_by_role("button", name="plus Upload").click()
     file_chooser = await fc_info.value
     await file_chooser.set_files(filepath)
-    await page.wait_for_timeout(5000)
+    await page.wait_for_timeout(8000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
     print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
@@ -2857,7 +2857,7 @@ async def upload_image(page, label_title, filepath, display_name=None):
         await page.get_by_role("button", name="plus Upload").click()
     file_chooser = await fc_info.value
     await file_chooser.set_files(filepath)
-    await page.wait_for_timeout(5000)
+    await page.wait_for_timeout(8000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
     print(f"    ✅ Image uploaded: {display_name or os.path.basename(filepath)}")
@@ -3371,7 +3371,7 @@ async def upload_image(page, label_title, filepath, display_name=None):
         await page.get_by_role("button", name="plus Upload").click()
     file_chooser = await fc_info.value
     await file_chooser.set_files(filepath)
-    await page.wait_for_timeout(5000)
+    await page.wait_for_timeout(8000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
     print(f"    ✅ Image uploaded: {display_name or os.path.basename(filepath)}")
@@ -3968,7 +3968,7 @@ async def upload_image(page, label_title, filepath, display_name=None):
         await page.get_by_role("button", name="plus Upload").click()
     file_chooser = await fc_info.value
     await file_chooser.set_files(filepath)
-    await page.wait_for_timeout(5000)
+    await page.wait_for_timeout(8000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
     print(f"    ✅ Image uploaded: {display_name or filepath.split('/')[-1]}")
@@ -5002,7 +5002,7 @@ async def upload_image(page, label_title, filepath):
         await page.get_by_role("button", name="plus Upload").click()
     file_chooser = await fc_info.value
     await file_chooser.set_files(filepath)
-    await page.wait_for_timeout(5000)
+    await page.wait_for_timeout(8000)
     await page.get_by_role("button", name="OK").click()
     await page.wait_for_timeout(2000)
     print(f"    ✅ Image uploaded: {filepath.split('/')[-1]}")
