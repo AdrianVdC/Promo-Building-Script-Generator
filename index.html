@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.10</title>
+  <title>NATS Bonus Creator v2.13</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2416,6 +2416,7 @@ async def create_segment(page, name):
     await page.wait_for_timeout(500)
     await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
     print(f"  ✅ Segment done: {name}")
@@ -2928,6 +2929,7 @@ async def create_segment(page, name):
     await page.wait_for_timeout(500)
     await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
     print(f"  ✅ Segment done: {name}")
@@ -3426,6 +3428,7 @@ async def create_segment(page, name):
     await page.wait_for_timeout(500)
     await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
     print(f"  ✅ Segment done: {name}")
@@ -3990,6 +3993,7 @@ async def create_segment(page, name):
     await page.wait_for_timeout(500)
     await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
     print(f"  ✅ Segment created: {name}")
@@ -5090,6 +5094,7 @@ async def create_segment(page, name):
     await page.wait_for_timeout(500)
     await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
     await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
     await page.wait_for_load_state("networkidle")
     print(f"  ✅ Segment done: {name}")
