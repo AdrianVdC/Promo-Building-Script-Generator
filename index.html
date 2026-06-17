@@ -2414,7 +2414,22 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    for attempt in range(1, 4):
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content").filter(has_text=re.compile(r"^AMELCO$")).first.dispatch_event("click")
+        confirmed = False
+        for _ in range(10):
+            await page.wait_for_timeout(500)
+            selection = page.locator("#parentId").locator("xpath=../../span[@class='ant-select-selection-item']")
+            if await selection.count() > 0 and await selection.first.inner_text() == "AMELCO":
+                confirmed = True
+                break
+        if confirmed:
+            break
+        print(f"  ⚠️ AMELCO not confirmed after click (attempt {attempt}/3), retrying...")
+        await page.locator("#parentId").click()
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Could not confirm AMELCO selection after 3 attempts")
     await page.locator("#forBonus").check()
     await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
@@ -2927,7 +2942,22 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    for attempt in range(1, 4):
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content").filter(has_text=re.compile(r"^AMELCO$")).first.dispatch_event("click")
+        confirmed = False
+        for _ in range(10):
+            await page.wait_for_timeout(500)
+            selection = page.locator("#parentId").locator("xpath=../../span[@class='ant-select-selection-item']")
+            if await selection.count() > 0 and await selection.first.inner_text() == "AMELCO":
+                confirmed = True
+                break
+        if confirmed:
+            break
+        print(f"  ⚠️ AMELCO not confirmed after click (attempt {attempt}/3), retrying...")
+        await page.locator("#parentId").click()
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Could not confirm AMELCO selection after 3 attempts")
     await page.locator("#forBonus").check()
     await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
@@ -3426,7 +3456,22 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    for attempt in range(1, 4):
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content").filter(has_text=re.compile(r"^AMELCO$")).first.dispatch_event("click")
+        confirmed = False
+        for _ in range(10):
+            await page.wait_for_timeout(500)
+            selection = page.locator("#parentId").locator("xpath=../../span[@class='ant-select-selection-item']")
+            if await selection.count() > 0 and await selection.first.inner_text() == "AMELCO":
+                confirmed = True
+                break
+        if confirmed:
+            break
+        print(f"  ⚠️ AMELCO not confirmed after click (attempt {attempt}/3), retrying...")
+        await page.locator("#parentId").click()
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Could not confirm AMELCO selection after 3 attempts")
     await page.locator("#forBonus").check()
     await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
@@ -3991,7 +4036,22 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    for attempt in range(1, 4):
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content").filter(has_text=re.compile(r"^AMELCO$")).first.dispatch_event("click")
+        confirmed = False
+        for _ in range(10):
+            await page.wait_for_timeout(500)
+            selection = page.locator("#parentId").locator("xpath=../../span[@class='ant-select-selection-item']")
+            if await selection.count() > 0 and await selection.first.inner_text() == "AMELCO":
+                confirmed = True
+                break
+        if confirmed:
+            break
+        print(f"  ⚠️ AMELCO not confirmed after click (attempt {attempt}/3), retrying...")
+        await page.locator("#parentId").click()
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Could not confirm AMELCO selection after 3 attempts")
     await page.locator("#forBonus").check()
     await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
@@ -5092,7 +5152,22 @@ async def create_segment(page, name):
     await page.locator("#code").fill(name)
     await page.locator("#parentId").click()
     await page.wait_for_timeout(500)
-    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    for attempt in range(1, 4):
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-content").filter(has_text=re.compile(r"^AMELCO$")).first.dispatch_event("click")
+        confirmed = False
+        for _ in range(10):
+            await page.wait_for_timeout(500)
+            selection = page.locator("#parentId").locator("xpath=../../span[@class='ant-select-selection-item']")
+            if await selection.count() > 0 and await selection.first.inner_text() == "AMELCO":
+                confirmed = True
+                break
+        if confirmed:
+            break
+        print(f"  ⚠️ AMELCO not confirmed after click (attempt {attempt}/3), retrying...")
+        await page.locator("#parentId").click()
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Could not confirm AMELCO selection after 3 attempts")
     await page.locator("#forBonus").check()
     await page.wait_for_timeout(2000)
     await page.locator("span", has_text="OK").click()
