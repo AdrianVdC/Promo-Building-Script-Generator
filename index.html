@@ -747,6 +747,7 @@
           <option value="DM">Deposit Match</option>
           <option value="RAF">Refer a Friend</option>
           <option value="SUO">SUO Day 2+ Spins</option>
+          <option value="BGRE">Bet &amp; Get - Rules Engine</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -1360,7 +1361,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM') ? 4 : t === 'FS' ? 8 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE') ? 4 : t === 'FS' ? 8 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -1394,6 +1395,22 @@ const DEFAULT_BG_OFFERS = [
   { bet: 200, get: 5 },
   { bet: 2000, get: 50 },
   { bet: 20000, get: 500 }
+];
+
+const DEFAULT_BGRE_OFFERS = [
+  { bet: 100, get: 2, active: false },
+  { bet: 200, get: 5, active: false },
+  { bet: 2000, get: 50, active: false },
+  { bet: 20000, get: 500, active: false },
+];
+
+const BGRE_JURISDICTIONS = [
+  { value: 'US',  label: 'USA — MI, WV, NJ, PA',    pm: 'USA' },
+  { value: 'ON',  label: 'Canada — ON',               pm: 'Canada' },
+  { value: 'MI',  label: 'MI — Michigan only',        pm: 'Michigan' },
+  { value: 'NJ',  label: 'NJ — New Jersey only',      pm: 'New Jersey' },
+  { value: 'WV',  label: 'WV — West Virginia only',   pm: 'West Virginia' },
+  { value: 'PA',  label: 'PA — Pennsylvania only',    pm: 'Pennsylvania' },
 ];
 
 function getOfferType() {
@@ -1606,10 +1623,10 @@ const INFO_FS = `<ul>
 
   const type = getOfferType();
   document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : INFO_RTC;
-  document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO') ? 'none' : '';
-  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO') ? 'none' : '';
-  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO') ? 'none' : '';
-  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO') ? 'none' : '';
+  document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
+  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
+  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
+  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
   updateJurisdictionOptions(type);
   initDays();
   renderAll();
@@ -1625,6 +1642,12 @@ function stepBadgesHTML(i) {
     `<button type="button" class="step-badge ${active ? 'on' : ''}" onclick="days[${i}].${field} = !days[${i}].${field}; renderAll();">
       <span class="step-dot"></span>${label}
     </button>`;
+  if (getOfferType() === 'BGRE') {
+    return `<div class="step-badges">
+      ${badge('Promo', 'doPromo', pro)}
+      ${badge('Bonus', 'doBonus', bon)}
+    </div>`;
+  }
   return `<div class="step-badges">
     ${badge('Segment', 'doSegment', seg)}
     ${badge('Promo', 'doPromo', pro)}
@@ -1640,11 +1663,12 @@ function renderAll() {
   const isFS = getOfferType() === 'FS';
   const isRAF = getOfferType() === 'RAF';
   const isSUO = getOfferType() === 'SUO';
-  if (isBG || isDM) { container.classList.add('bg-layout'); }
+  const isBGRE = getOfferType() === 'BGRE';
+  if (isBG || isDM || isBGRE) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
   else if (isRAF || isSUO) { container.style.gridTemplateColumns = '1fr'; }
-  else if (isBG || isDM) { container.style.gridTemplateColumns = ''; }
+  else if (isBG || isDM || isBGRE) { container.style.gridTemplateColumns = ''; }
   else { container.style.gridTemplateColumns = ''; }
 
   if (isSUO) {
@@ -1897,6 +1921,83 @@ function renderAll() {
           </div>
         </div>
       `;
+    } else if (isBGRE) {
+      if (!days[i].bgreOfferData) days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
+      if (days[i].bgreRewardType === undefined) days[i].bgreRewardType = 'FC';
+      if (days[i].bgreJurisdiction === undefined) days[i].bgreJurisdiction = 'US';
+      if (days[i].bgreDaysToUseReward === undefined) days[i].bgreDaysToUseReward = 7;
+      if (days[i].bgreShowToast === undefined) days[i].bgreShowToast = true;
+      const bgreJurisdOpts = BGRE_JURISDICTIONS.map(j =>
+        `<option value="${j.value}" ${days[i].bgreJurisdiction === j.value ? 'selected' : ''}>${j.label}</option>`
+      ).join('');
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY)</span>
+        <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 101926" value="${day.date}"
+          oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
+        <span class="field-label">Images</span>
+        <div style="margin-bottom: 14px;">
+          <input type="file" id="bgre-zip-input-${i}" accept=".zip" style="display:none;" onchange="handleZipUpload(${i}, this)" />
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button class="reset-btn" style="padding:5px 12px; color:${day.dmZipImages ? '#a0d070' : '#7070a0'}; border-color:${day.dmZipImages ? '#a0d070' : 'var(--border)'};" onclick="document.getElementById('bgre-zip-input-${i}').click()">
+              ${day.dmZipImages ? '✓ ZIP Attached' : '📎 Attach ZIP'}
+            </button>
+            ${day.dmZipName ? `<span style="font-family:'SF Mono',ui-monospace,monospace; font-size:10px; color:var(--muted);">${day.dmZipName}</span>` : ''}
+          </div>
+          ${day.dmZipStatus ? `<div style="margin-top:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:10px; line-height:1.8;">${day.dmZipStatus}</div>` : ''}
+        </div>
+        <span class="field-label">Offers</span>
+        <div id="bgre-offers-${i}"></div>
+        <div class="add-row" style="margin-top: 8px;">
+          <button class="reset-btn" onclick="addBGREOffer(${i})">+ Add</button>
+          <button class="reset-btn" onclick="selectAllBGREOffers(${i})">Select All</button>
+        </div>
+        <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <span class="field-label">Reward type</span>
+            <select style="font-family:system-ui,-apple-system,sans-serif; font-size:13px; background:var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:7px 10px; cursor:pointer; width:100%;"
+              onchange="days[${i}].bgreRewardType = this.value; renderAll();">
+              <option value="FC" ${days[i].bgreRewardType === 'FC' ? 'selected' : ''}>FanCash</option>
+              <option value="CC" ${days[i].bgreRewardType === 'CC' ? 'selected' : ''}>Casino Credit</option>
+            </select>
+          </div>
+          <div>
+            <span class="field-label">Jurisdiction</span>
+            <select style="font-family:system-ui,-apple-system,sans-serif; font-size:13px; background:var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:7px 10px; cursor:pointer; width:100%;"
+              onchange="days[${i}].bgreJurisdiction = this.value; renderAll();">
+              ${bgreJurisdOpts}
+            </select>
+          </div>
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div>
+              <span class="field-label">Days to use reward</span>
+              <input type="number" min="1" value="${days[i].bgreDaysToUseReward}" style="width:70px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[${i}].bgreDaysToUseReward = parseInt(this.value) || 7;" />
+            </div>
+            <div>
+              <span class="field-label">Show toast</span>
+              <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; margin-top:6px;" onclick="days[${i}].bgreShowToast = !days[${i}].bgreShowToast; renderAll();">
+                <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${days[i].bgreShowToast ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+                  ${days[i].bgreShowToast ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+                </span>
+                Enabled
+              </label>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].sendToXP = !days[${i}].sendToXP; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.sendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.sendToXP !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            Send to XP
+          </label>
+        </div>
+      `;
     } else if (isBG || isDM) {
       card.innerHTML = `
         <div class="day-header">
@@ -2008,6 +2109,7 @@ function renderAll() {
     if (isBG) renderOffers(i);
     else if (isDM) renderDMOffers(i);
     else if (isFS) renderFSOffers(i);
+    else if (isBGRE) renderBGREOffers(i);
     else renderAmounts(i);
   });
 }
@@ -2069,6 +2171,11 @@ function resetDay(i) {
   days[i].offers = new Set();
   days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: false }));
   days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: false }));
+  days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
+  days[i].bgreRewardType = 'FC';
+  days[i].bgreJurisdiction = 'US';
+  days[i].bgreDaysToUseReward = 7;
+  days[i].bgreShowToast = true;
   days[i].sendToXP = true;
   days[i].externalBonus = false;
   days[i].daysToOptin = 1;
@@ -2090,6 +2197,7 @@ function resetDay(i) {
   days[i].rtcDaysToSettlement = 1;
   if (getOfferType() === 'BG') renderOffers(i);
   else if (getOfferType() === 'DM') renderDMOffers(i);
+  else if (getOfferType() === 'BGRE') renderBGREOffers(i);
   else renderAmounts(i);
   updateGenerateButton();
 }
@@ -2255,6 +2363,44 @@ function selectAllOffers(i) {
   if (!days[i].offerData) days[i].offerData = DEFAULT_BG_OFFERS.map(o => ({ ...o, active: true }));
   else days[i].offerData.forEach(o => o.active = true);
   renderOffers(i);
+}
+
+function renderBGREOffers(i) {
+  const container = document.getElementById(`bgre-offers-${i}`);
+  if (!container) return;
+  if (!days[i].bgreOfferData) {
+    days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
+  }
+  container.innerHTML = '';
+  days[i].bgreOfferData.forEach((offer, j) => {
+    const row = document.createElement('div');
+    row.style.cssText = `border: ${offer.active ? '1.5px solid #ffffff' : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
+    row.innerHTML = `
+      <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Bet</span>
+      <input type="number" value="${offer.bet || ''}" placeholder="e.g. 100" style="width:90px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+        oninput="days[${i}].bgreOfferData[${j}].bet = parseFloat(this.value) || 0;" />
+      <span style="font-size:12px; color:var(--muted);">→</span>
+      <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Get</span>
+      <input type="number" value="${offer.get || ''}" placeholder="e.g. 2" style="width:90px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+        oninput="days[${i}].bgreOfferData[${j}].get = parseFloat(this.value) || 0;" />
+      <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
+        onchange="days[${i}].bgreOfferData[${j}].active = this.checked; renderBGREOffers(${i});" />
+    `;
+    container.appendChild(row);
+  });
+  updateGenerateButton();
+}
+
+function addBGREOffer(i) {
+  if (!days[i].bgreOfferData) days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
+  days[i].bgreOfferData.push({ bet: 0, get: 0, active: false });
+  renderBGREOffers(i);
+}
+
+function selectAllBGREOffers(i) {
+  if (!days[i].bgreOfferData) days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o, active: true }));
+  else days[i].bgreOfferData.forEach(o => o.active = true);
+  renderBGREOffers(i);
 }
 
 function clearSettings() {
@@ -3335,6 +3481,9 @@ function updateGenerateButton() {
     if (offerType === 'BG') {
       const offers = (d.offerData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'BGRE') {
+      const offers = (d.bgreOfferData || []).filter(o => o.active);
+      if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'DM') {
       const offers = (d.dmOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
@@ -3351,6 +3500,450 @@ function updateGenerateButton() {
     if (ready) { btn.classList.remove('faded'); }
     else { btn.classList.add('faded'); }
   }
+}
+
+function buildBGREScript(allNames, bgreImagesStr) {
+  const codesStr = allNames.map(n => `    {
+        "code_name":       "${n.code}",
+        "jurisdiction_pm": "${n.jurisdictionPM}",
+        "days_to_fulfill": "${n.daysToUseReward}",
+        "show_toast":      ${n.showToast ? 'True' : 'False'},
+    },`).join('\n');
+
+  const hiwPlaceholder = "1. Opt in to the promotion\\n2. Place your bet\\n3. Get your reward";
+  const tcPlaceholder  = "Terms and conditions apply.";
+
+  return `"""
+BG-RE Auto-Generated Script
+Generated by NATS Bonus Creator
+"""
+
+import asyncio
+import base64
+import os
+import re
+import string
+import random
+import subprocess
+import tempfile
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+NATS_URL      = "https://trading.test1.fanatics.bet/login"
+PLAYMAKER_URL = "https://playmaker-internal.test1.fanatics.bet/"
+
+CODES = [
+${codesStr}
+]
+
+HIW_TEXT = "${hiwPlaceholder}"
+TC_TEXT  = "${tcPlaceholder}"
+
+IMAGES = {
+${bgreImagesStr}
+}
+
+def get_image_path(name, filename):
+    b64 = IMAGES[name][filename]
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
+    tmp.write(base64.b64decode(b64))
+    tmp.close()
+    return tmp.name
+
+def parse_bet_get(code):
+    bet = re.search(r'_B(\\d+)_', code)
+    get = re.search(r'_G(\\d+)$', code)
+    return (bet.group(1) if bet else '0'), (get.group(1) if get else '0')
+
+def parse_reward_type(code):
+    m = re.search(r'_BG_\\w+_(CC|FC)_', code)
+    return m.group(1) if m else 'FC'
+
+def parse_code_date(mmddyy):
+    return datetime.strptime(mmddyy, "%m%d%y")
+
+def parse_nats_dates(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    start = dt.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end   = (dt + timedelta(days=1)).astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return start, end
+
+def format_currency(amount_str):
+    amount = int(amount_str)
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def generate_suffix():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=3))
+
+def ordinal(n):
+    suffix = "th" if 11 <= n % 100 <= 13 else {1:"st",2:"nd",3:"rd"}.get(n%10,"th")
+    return f"{n}{suffix}"
+
+def format_long_date(code):
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt = datetime(int(yy), int(mm), int(dd))
+    return f"{dt.strftime('%B')} {ordinal(dt.day)}, {dt.strftime('%Y')}"
+
+def build_hiw(code):
+    return HIW_TEXT
+
+def build_tc(code):
+    return TC_TEXT
+
+def notify(message):
+    subprocess.run(["osascript", "-e",
+        f'display notification "{message}" with title "BG-RE Script" sound name "Glass"'])
+
+JURISDICTION_IDS = {
+    "USA":           ["jurisdiction-michigan", "jurisdiction-west_virginia", "jurisdiction-new_jersey", "jurisdiction-pennsylvania"],
+    "Canada":        ["jurisdiction-ontario"],
+    "Michigan":      ["jurisdiction-michigan"],
+    "West Virginia": ["jurisdiction-west_virginia"],
+    "New Jersey":    ["jurisdiction-new_jersey"],
+    "Pennsylvania":  ["jurisdiction-pennsylvania"],
+    "Ontario":       ["jurisdiction-ontario"],
+}
+
+async def set_jurisdictions(page, jurisdiction):
+    all_cb = await page.wait_for_selector("#jurisdiction-all", timeout=15000)
+    if await all_cb.is_checked():
+        await all_cb.click()
+        await page.wait_for_timeout(500)
+    for jid in JURISDICTION_IDS.get(jurisdiction, []):
+        cb = await page.wait_for_selector(f"#{jid}", timeout=15000)
+        if not await cb.is_checked():
+            await cb.click()
+            await page.wait_for_timeout(300)
+    print(f"    ✅ Jurisdictions: {jurisdiction}")
+
+async def set_calendar_date(page, picker_index, target_date):
+    pickers = await page.query_selector_all("button.dc-w-\\\\[280px\\\\]")
+    await pickers[picker_index].click()
+    await page.wait_for_timeout(1000)
+    for _ in range(24):
+        header = await page.query_selector("div[aria-live='polite']")
+        header_text = await header.inner_text() if header else ""
+        target_str = target_date.strftime("%B %Y")
+        if target_str in header_text:
+            break
+        next_btn = await page.query_selector("button[name='next-month']")
+        if next_btn:
+            await next_btn.click()
+            await page.wait_for_timeout(500)
+    day_btns = await page.query_selector_all("button[name='day']")
+    for btn in day_btns:
+        cls = await btn.get_attribute("class") or ""
+        if "dc-day-outside" in cls:
+            continue
+        txt = (await btn.inner_text()).strip()
+        if txt == str(target_date.day):
+            await btn.click()
+            await page.wait_for_timeout(300)
+            break
+
+async def select_reward_type(page, reward_type):
+    value_map = {"FC": "fan_cash", "CC": "casino_credit"}
+    value = value_map.get(reward_type, "fan_cash")
+    btn = await page.wait_for_selector(f"button[role='radio'][value='{value}']", timeout=15000)
+    is_checked = await btn.get_attribute("aria-checked")
+    if is_checked != "true":
+        await btn.click()
+        await page.wait_for_timeout(500)
+    print(f"    ✅ Reward Type: {reward_type} ({value})")
+
+async def clear_and_fill(element, value):
+    await element.click(click_count=3)
+    await element.fill(value)
+
+async def select_promotion(page, promo_name):
+    combobox = await page.wait_for_selector("button[role='combobox']", timeout=15000)
+    await combobox.click()
+    await page.wait_for_timeout(500)
+    search_input = await page.wait_for_selector("input[placeholder*='Search']", timeout=15000)
+    await search_input.fill(promo_name)
+    await page.wait_for_timeout(1000)
+    await page.get_by_label(promo_name).get_by_text(promo_name).click()
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Promotion: {promo_name}")
+
+async def set_toast(page, get, reward_type):
+    toast_cb = await page.wait_for_selector("#toastEnabled", timeout=15000)
+    if not await toast_cb.is_checked():
+        await toast_cb.click()
+        await page.wait_for_timeout(500)
+    title_input = await page.wait_for_selector("input[name='toastTitle']", timeout=15000)
+    await clear_and_fill(title_input, "Promotion Complete!")
+    desc_map = {"FC": f"You have been awarded \${get} FanCash", "CC": f"You have been awarded \${get} Casino Credit"}
+    desc_input = await page.wait_for_selector("input[name='toastDescription']", timeout=15000)
+    await clear_and_fill(desc_input, desc_map.get(reward_type, desc_map["FC"]))
+    print(f"    ✅ Toast set")
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    if filepath and os.path.exists(filepath):
+        os.unlink(filepath)
+    print(f"    ✅ Image uploaded: {display_name or os.path.basename(filepath)}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Rich text filled: {label_title}")
+
+async def nav_to_promos(page):
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id\$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            return
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def create_promo(page, name):
+    print(f"  Creating NATS promotion: {name}")
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
+    await page.wait_for_load_state("networkidle")
+
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_nats, end_nats = parse_nats_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_nats)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_nats)
+    await page.keyboard.press("Enter")
+
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+
+    bet, get = parse_bet_get(name)
+    discover_filename = f"B{bet}_G{get}.png"
+    await upload_image(page, "Promo Detail Image Upload", get_image_path(name, "Promo Detail.png"), "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload",     get_image_path(name, "Masthead.png"),     "Masthead.png")
+    await upload_image(page, "Discover Image Upload",     get_image_path(name, discover_filename),   discover_filename)
+
+    reward_type = parse_reward_type(name)
+    get_fmt = format_currency(get)
+    header_text = f"Bet & Get {get_fmt} {'FanCash' if reward_type == 'FC' else 'Casino Credit'}"
+    await page.locator("input[placeholder='Promo Header Text']").fill(header_text)
+    await page.locator("input[placeholder='Title']").fill(header_text)
+
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill("Play Now!")
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill("/docs/usered/casgenericgamelist")
+
+    await fill_rich_text(page, "How it works", build_hiw(name))
+    await fill_rich_text(page, "T&C", build_tc(name))
+
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  ✅ NATS promotion done: {name}")
+
+async def create_pm_bonus(page, code):
+    name            = code["code_name"]
+    jurisdiction_pm = code["jurisdiction_pm"]
+    days_to_fulfill = code["days_to_fulfill"]
+    show_toast      = code["show_toast"]
+
+    print(f"\\n  Creating Playmaker bonus: {name}")
+    code_date = name.split("_")[0]
+
+    create_btn = await page.wait_for_selector("[data-testid='create-bonus-button']", timeout=15000)
+    await create_btn.click()
+    await page.wait_for_timeout(2000)
+
+    print(f"  ─── Step 1: Details")
+    bonus_name_input = await page.wait_for_selector("input[name='name']", timeout=15000)
+    await bonus_name_input.fill(name)
+    print(f"    ✅ Bonus Name: {name}")
+
+    await set_jurisdictions(page, jurisdiction_pm)
+
+    start_date = parse_code_date(code_date)
+    end_date   = start_date + timedelta(days=1)
+    await set_calendar_date(page, 0, start_date)
+    print("    ✅ Start Date set")
+    await set_calendar_date(page, 1, end_date)
+    print("    ✅ End Date set")
+
+    for _nth, _label in [(0, "Start"), (1, "End")]:
+        _field = page.get_by_role("textbox", name="Time").nth(_nth)
+        _el = await _field.element_handle()
+        await page.evaluate("""el => {
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype, 'value').set;
+            nativeInputValueSetter.call(el, '00:00');
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }""", _el)
+        await page.wait_for_timeout(300)
+        print(f"    ✅ {_label} Time: 12:00 AM")
+
+    print(f"  ─── Step 2: Eligibility")
+    step2 = await page.wait_for_selector("button:has-text('Step 2: Eligibility')", timeout=15000)
+    await step2.click()
+    await page.wait_for_timeout(2000)
+    segment_input = await page.wait_for_selector("input[cmdk-input]", timeout=15000)
+    await segment_input.fill(name)
+    await page.wait_for_timeout(500)
+    await segment_input.press("Enter")
+    await page.wait_for_timeout(500)
+    print(f"    ✅ Segment chip: {name}")
+
+    print(f"  ─── Step 3: Entitlement")
+    step3 = await page.wait_for_selector("button:has-text('Step 3: Entitlement')", timeout=15000)
+    await step3.click()
+    await page.wait_for_timeout(2000)
+    bet, get = parse_bet_get(name)
+    wagering_input = await page.wait_for_selector("input[name='wageringAmount']", timeout=15000)
+    await wagering_input.fill(bet)
+    print(f"    ✅ Wagering Amount: {bet}")
+
+    print(f"  ─── Step 4: Settlement")
+    step4 = await page.wait_for_selector("button:has-text('Step 4: Settlement')", timeout=15000)
+    await step4.click()
+    await page.wait_for_timeout(2000)
+    reward_type = parse_reward_type(name)
+    await select_reward_type(page, reward_type)
+    settlement_input = await page.wait_for_selector("input[name='settlementAmount']", timeout=15000)
+    await settlement_input.fill(get)
+    print(f"    ✅ Settlement Amount: {get}")
+    days_input = await page.wait_for_selector("input[name='daysToFulfill']", timeout=15000)
+    if await days_input.input_value() != str(days_to_fulfill):
+        await clear_and_fill(days_input, str(days_to_fulfill))
+    print(f"    ✅ Days to Use Reward: {days_to_fulfill}")
+
+    print(f"  ─── Step 5: Display")
+    step5 = await page.wait_for_selector("button:has-text('Step 5: Display')", timeout=15000)
+    await step5.click()
+    await page.wait_for_timeout(2000)
+    await select_promotion(page, name)
+    if show_toast:
+        await set_toast(page, get, reward_type)
+
+    print(f"  ─── Step 6: Review")
+    step6 = await page.wait_for_selector("button:has-text('Step 6: Review')", timeout=15000)
+    await step6.click()
+    await page.wait_for_timeout(2000)
+    save_btn = await page.wait_for_selector("button:has-text('Save Bonus')", timeout=15000)
+    await save_btn.click()
+    await page.wait_for_timeout(3000)
+    print(f"  ✅ Playmaker bonus done: {name}")
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+
+        print("\\n" + "=" * 60)
+        print("  PHASE 1 — NATS: Build Promotions")
+        print("=" * 60)
+        nats_page = await context.new_page()
+        await nats_page.goto(NATS_URL, wait_until="domcontentloaded")
+        print("\\n👉 Please log in to NATS in the browser window.")
+        input("   Once logged in and on the dashboard, press ENTER here...\\n")
+        await nats_page.wait_for_timeout(2000)
+
+        await nav_to_promos(nats_page)
+        print(f"\\n─── Creating {len(CODES)} Promotion(s) ───")
+        for code in CODES:
+            await create_promo(nats_page, code["code_name"])
+            await nats_page.wait_for_timeout(1000)
+        print("\\n✅ Phase 1 complete — all NATS promotions created.")
+
+        print("\\n" + "=" * 60)
+        print("  PHASE 2 — Playmaker: Build Bonuses")
+        print("=" * 60)
+        pm_page = await context.new_page()
+        await pm_page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+        print("\\n👉 Please log in to Playmaker via SSO in the browser window.")
+        input("   Once on the Playmaker dashboard, press ENTER here...\\n")
+        await pm_page.wait_for_timeout(2000)
+
+        icasino = await pm_page.wait_for_selector("h3:has-text('iCasino')", timeout=15000)
+        await icasino.click()
+        await pm_page.wait_for_timeout(2000)
+        bonus_setup = await pm_page.wait_for_selector("[data-testid='bonus-setup-navItem']", timeout=15000)
+        await bonus_setup.click()
+        await pm_page.wait_for_timeout(2000)
+
+        print(f"\\n─── Creating {len(CODES)} Playmaker Bonus(es) ───")
+        for code in CODES:
+            await create_pm_bonus(pm_page, code)
+            await pm_page.wait_for_timeout(1000)
+
+        notify(f"✅ BG-RE complete! {len(CODES)} code(s) done.")
+        print("\\n🎉 All done! Both phases complete.")
+        print(f"   Codes: {[c['code_name'] for c in CODES]}")
+        input("\\nPress ENTER to close the browser...")
+        await browser.close()
+
+asyncio.run(main())
+`;
 }
 
 function buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText) {
@@ -5246,11 +5839,45 @@ function generateScript() {
     URL.revokeObjectURL(url);
     return;
   }
+  const allNames = [];
   for (let i = 0; i < days.length; i++) {
     const date = days[i].date;
     if (!date) continue;
     if (date.length !== 6) { alert(`Day ${i + 1}: please enter a valid 6-digit date (MMDDYY).`); return; }
-    if (offerType === 'BG') {
+    if (offerType === 'BGRE') {
+      const offers = (days[i].bgreOfferData || []).filter(o => o.active);
+      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      if (!days[i].dmZipImages) { alert(`Day ${i + 1} has no ZIP attached. Please attach an images ZIP for this day.`); return; }
+      const zip = days[i].dmZipImages;
+      const missingShared = ['Promo Detail.png', 'Masthead.png'].filter(f => !zip[f]);
+      if (missingShared.length) { alert(`Day ${i + 1} ZIP is missing: ${missingShared.join(', ')}`); return; }
+      const bgreRewardType = days[i].bgreRewardType || 'FC';
+      const bgreJurisd = days[i].bgreJurisdiction || 'US';
+      const bgreJurisdPM = (BGRE_JURISDICTIONS.find(j => j.value === bgreJurisd) || {}).pm || 'USA';
+      const bgreDaysToUseReward = days[i].bgreDaysToUseReward !== undefined ? days[i].bgreDaysToUseReward : 7;
+      const bgreShowToast = days[i].bgreShowToast !== false;
+      const bgreSendToXP = days[i].sendToXP !== false;
+      const bgreDoPromo = days[i].doPromo !== false;
+      const bgreDoBonus = days[i].doBonus !== false;
+      offers.forEach(o => {
+        const discoverFile = `B${o.bet}_G${o.get}.png`;
+        if (!zip[discoverFile]) { alert(`Day ${i + 1} ZIP is missing discover image: ${discoverFile}`); return; }
+        allNames.push({
+          code: `${date}_CAS_RET_BG_${bgreJurisd}_${bgreRewardType}_B${o.bet}_G${o.get}`,
+          jurisdictionPM: bgreJurisdPM,
+          rewardType: bgreRewardType,
+          daysToUseReward: bgreDaysToUseReward,
+          showToast: bgreShowToast,
+          sendToXP: bgreSendToXP,
+          doPromo: bgreDoPromo,
+          doBonus: bgreDoBonus,
+          imgPromoDetail: zip['Promo Detail.png'],
+          imgMasthead: zip['Masthead.png'],
+          imgDiscover: zip[discoverFile],
+          discoverFile,
+        });
+      });
+    } else if (offerType === 'BG') {
       const offers = (days[i].offerData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
       if (!days[i].dmZipImages) { alert(`Day ${i + 1} has no ZIP attached. Please attach an images ZIP for this day.`); return; }
@@ -5368,6 +5995,7 @@ function generateScript() {
   const isFSScript = offerType === 'FS';
   const isDMScript = offerType === 'DM';
   const isBGScript = offerType === 'BG';
+  const isBGREScript = offerType === 'BGRE';
   const isRTCScript = offerType === 'RTC';
   const namesStr = allNames.map(n => `    "${typeof n === 'object' ? n.code : n}",`).join('\n');
   const campaignNamesStr = isDMScript
@@ -5404,11 +6032,18 @@ function generateScript() {
     ? allNames.map(n => `    "${n.code}": {\n        "Promo Detail.png": "${n.imgPromoDetail}",\n        "Masthead.png": "${n.imgMasthead}",\n        "${n.discoverFile}": "${n.imgDiscover}"\n    },`).join('\n')
     : '';
 
+  // Build per-code image data map for BGRE
+  const bgreImagesStr = isBGREScript
+    ? allNames.map(n => `    "${n.code}": {\n        "Promo Detail.png": "${n.imgPromoDetail}",\n        "Masthead.png": "${n.imgMasthead}",\n        "${n.discoverFile}": "${n.imgDiscover}"\n    },`).join('\n')
+    : '';
+
   let script;
   if (offerType === 'FS') {
     script = buildFSScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'BG') {
     script = buildBGScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, hiwText, tcText, bgImagesStr, doSegmentStr, doPromoStr, doBonusStr);
+  } else if (offerType === 'BGRE') {
+    script = buildBGREScript(allNames, bgreImagesStr);
   } else if (offerType === 'DM') {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText);
   } else {
@@ -5867,7 +6502,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
