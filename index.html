@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.16</title>
+  <title>NATS Bonus Creator v2.17</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -749,6 +749,7 @@
           <option value="SUO">SUO Day 2+ Spins</option>
           <option value="BGRE">Bet &amp; Get - Rules Engine</option>
           <option value="LCREACT">Lifecycle - REACT CC Drop</option>
+          <option value="CHURNDM">Lifecycle - Churn DM</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -1090,8 +1091,10 @@ function getImagePath() {
   if (t === 'FS') return localStorage.getItem('rtc_fs_image_path') || DEFAULT_FS_IMAGE_PATH;
   if (t === 'RAF') return localStorage.getItem('raf_image_path') || DEFAULT_RAF_IMAGE_PATH;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_image_path') || DEFAULT_LCREACT_IMAGE_PATH;
+  if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH;
   return localStorage.getItem('rtc_image_path') || DEFAULT_IMAGE_PATH;
 }
+const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_HIW_LCREACT = `1. Opt-in to the promotion
 2. We'll instantly drop Casino Credit into your account
 3. Play the Casino Credit on any of your favorite games
@@ -1182,6 +1185,81 @@ function getLCREACTTC(amount) {
     .replace(/This "Promotion" begins at 12:00am ET on April 16, 2026, and ends at 11:59pm ET on October 16, 2026 \("Promotional Period"\)\./, d.promo_period);
 }
 
+const DEFAULT_HIW_CHURNDM = `1. Opt in to this promotion 
+2. Make a Qualifying Deposit within 3 days of being presented this offer
+3. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit (up to {max_fmt} in Casino Credit)
+
+See below for more details.`;
+
+const DEFAULT_TC_CHURNDM = `PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO - DEPOSIT {min_fmt}+, GET {pct}% DEPOSIT MATCH UP TO {max_fmt} IN CC - {terms_id}
+
+1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC (“Fanatics Casino”). Select Fanatics Casino customers who opt in and deposit {min_fmt}+ (“Qualifying Deposit”) are eligible for a {pct}% match in Casino Credit (up to {max_fmt} in Casino Credit) (“Rewards”). See below for more details.
+
+2. Promotional Period
+This “Promotion” begins at 12:00am ET on June 1, 2026, and ends at 11:59pm ET on December 1, 2026 (“Promotional Period”).
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Fanatics Casino account in MI, NJ, PA, or WV (“Account”). To participate in this Promotion:  (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states to use your Account; and (iii) you must receive the invite to participate in this Promotion directly from Fanatics Casino (offer cannot be shared or forwarded). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.  
+
+4. Action Required
+To participate in this Promotion and qualify for the Rewards, each time you are eligible to participate, you must (i) opt in to this Promotion via the Promos page in the Fanatics Sportsbook and Casino App (“App”); and (ii) make a Qualifying Deposit within 3 days of being presented this offer. Only your first Qualifying Deposit after opting-in will be eligible for the Rewards. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit (up to {max_fmt} in Casino Credit) and will be added to your Account within 72 hours of making a Qualifying Deposit.
+
+5. Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+Casino Credit Rewards expire at 11:59 p.m. ET on the seventh day following the date of issuance and can be used on any games in the Fanatics Casino. 
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available to use, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).  
+As an example, if you have $20 in deposited funds (cash) and $10 in Casino Credit in your Account and you place a $10 wager that wins $8, the entire $10 Casino Credit will be applied to your wager (making your Casino Credit balance $0), and the $8 in winnings will be added to your cash balance (making it $28). Using the same example but with a $5 wager instead of $10, your Casino Credit balance will be $5, and your cash balance will be $28. 
+Casino Credit can be combined with deposited funds (cash) to place a wager. 
+As an example, if you have $20 in cash and $10 in Casino Credit in your Account and you wager $15 on a blackjack hand, $10 in Casino Credit and $5 in cash will be applied to that wager.
+Casino Credit must be played through one time. 
+Any payouts from bets placed with Casino Credit will be added to your cash balance. 
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $10 in Casino Credit and place a $2 wager, $2 of Casino Credit will be applied to that wager). 
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you have and wager $5 in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $5 stake will be added to your cash balance).
+Casino Credit closest to expiration will be applied first.
+Casino Credit can be transferred between Fanatics Casino jurisdictions.
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Bets placed using Casino Credit will not earn FanCash.
+Casino Credit may not be exchanged, substituted, or transferred.
+
+6. Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees’, officers’ and directors’ immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+Does not apply. Issuance of Rewards depends on making a Qualifying Deposit.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Bonus Spin, select “Bonus Spin” in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash). 
+
+10. Eligible Games/Markets/Events
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire at 11:59 p.m. ET on the seventh day following  issuance.
+
+11. Restrictions on Withdrawal
+Casino Credit, Bonus Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Bonus Spins.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+Participation in this Promotion is subject to Fanatics Sportsbook and Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino’s Privacy Policy. 
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino’s Terms of Service, these Promotional Terms and Conditions will prevail. 
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law. 
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+
 function getHIW() {
   const t = getOfferType();
   if (t === 'BG') return localStorage.getItem('bg_hiw') || DEFAULT_HIW_BG;
@@ -1193,10 +1271,12 @@ function getHIW() {
 3. Rewards will equal {pct}% of your Qualifying Deposit amount in FanCash, up to {max_fmt} in FanCash
 This Promotion begins at 12:00 a.m. ET on {date_fmt} and ends at 11:59 p.m. ET on {date_fmt} (the "Promotional Period").  See below for more details.`;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_hiw') || DEFAULT_HIW_LCREACT;
+  if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_hiw') || DEFAULT_HIW_CHURNDM;
   return localStorage.getItem('rtc_hiw') || DEFAULT_HIW_RTC;
 }
 function getTC() {
   const t = getOfferType();
+  if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_tc') || DEFAULT_TC_CHURNDM;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_tc') || DEFAULT_TC_LCREACT_10;
   if (t === 'BG') return localStorage.getItem('bg_tc') || DEFAULT_TC_BG;
   if (t === 'FS') return localStorage.getItem('rtc_fs_tc') || `T&C copy for Free Spins — to be updated.`;
@@ -1275,6 +1355,8 @@ function openModal(type) {
       ? 'https://drive.google.com/drive/folders/1DXkrR-eb2YJAfXKqwSvvekW-fZJe3pN3'
       : lt === 'LCREACT'
       ? 'https://drive.google.com/drive/folders/1Xhk-3fKF3goNS_lL7M0bn2DrACKyFRds'
+      : lt === 'CHURNDM'
+      ? 'https://drive.google.com/drive/folders/1KJfVtJVwBbGkJJTr8T-PGeWHm5c8qc-2'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
     const path = getImagePath();
     const el = document.getElementById('images-path');
@@ -1292,11 +1374,11 @@ function closeModal(type) {
 function saveModal(type) {
   const t2 = getOfferType();
   if (type === 'hiw') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1397,6 +1479,12 @@ const DYNAMIC_FIELDS = {
     { code: '{max_fmt}',  hint: 'e.g. $500' },
     { code: '{date_fmt}', hint: 'e.g. November 1st, 2026' },
   ],
+  CHURNDM: [
+    { code: '{min_fmt}',  hint: 'e.g. $10' },
+    { code: '{pct}',      hint: 'e.g. 50' },
+    { code: '{max_fmt}',  hint: 'e.g. $10' },
+    { code: '{terms_id}', hint: 'e.g. CAS_10620' },
+  ],
 };
 
 function renderFieldBar(modalType) {
@@ -1457,7 +1545,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE') ? 4 : t === 'FS' ? 8 : t === 'LCREACT' ? 3 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : t === 'LCREACT' ? 3 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -1476,6 +1564,11 @@ function initDays() {
     lcreactDaysToEntitlement: 3,
     lcreactDaysToSettlement: 3,
     lcreactSendToXP: true,
+    churndmSendToXP: true,
+    churndmExternalBonus: false,
+    churndmDaysToOptin: 3,
+    churndmDaysToEntitlement: 3,
+    churndmDaysToSettlement: 7,
     doSegment: true,
     doPromo: true,
     doBonus: true,
@@ -1489,6 +1582,22 @@ const DEFAULT_DM_OFFERS = [
   { pct: 20, max: 50, active: false },
   { pct: 20, max: 500, active: false },
 ];
+
+const DEFAULT_CHURNDM_OFFERS = [
+  { min: 10, pct: 50, max: 10,  active: false },
+  { min: 20, pct: 50, max: 25,  active: false },
+  { min: 20, pct: 50, max: 50,  active: false },
+  { min: 50, pct: 50, max: 100, active: false },
+  { min: 50, pct: 50, max: 200, active: false },
+];
+
+const CHURNDM_TERMS_IDS = {
+  'M10_50M10':  'CAS_10620',
+  'M20_50M25':  'CAS_9457',
+  'M20_50M50':  'CAS_9458',
+  'M50_50M100': 'CAS_9459',
+  'M50_50M200': 'CAS_9460',
+};
 
 const DEFAULT_BG_OFFERS = [
   { bet: 100, get: 2 },
@@ -1701,6 +1810,17 @@ const INFO_LCREACT = `<ul>
   <li><strong>No confirmation modal</strong> after Bonus Save.</li>
 </ul>`;
 
+const INFO_CHURNDM = `<ul>
+  <li><strong>Offer Type:</strong> Lifecycle - Churn DM. Builds Segment, Promotion, and Bonus for each selected offer on each day card. Reward is paid in <span style="color:#ffffff;">Casino Credit</span>.</li>
+  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in Terms ID. <span style="color:#ffffff;">Offers that don't match a configured Terms ID will block script generation.</span></li>
+  <li><strong>Promo &amp; Activation Window:</strong> 00:00:00 ET on the card date &rarr; exactly 10 days later at 00:00:00 ET.</li>
+  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Deposit and Get Casino Credit" for all offer sizes.</li>
+  <li><strong>Voucher Code format:</strong> <code>CRLCDM{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>50M10.png</code>).</li>
+  <li><strong>Series:</strong> Other &nbsp;|&nbsp; <strong>Origin:</strong> Retention &nbsp;|&nbsp; <strong>Type:</strong> Lifecycle</li>
+  <li><strong>No confirmation modal</strong> after Bonus Save.</li>
+</ul>`;
+
 function onOfferTypeChange() {
 const INFO_DM = `<ul>
   <li><strong>How it Works:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. There is also a dynamic field for the promotion run dates.</li>
@@ -1734,7 +1854,7 @@ const INFO_FS = `<ul>
 </ul>`;
 
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
   document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
   document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
@@ -1777,11 +1897,12 @@ function renderAll() {
   const isSUO = getOfferType() === 'SUO';
   const isBGRE = getOfferType() === 'BGRE';
   const isLCREACT = getOfferType() === 'LCREACT';
-  if (isBG || isDM || isBGRE) { container.classList.add('bg-layout'); }
+  const isCHURNDM = getOfferType() === 'CHURNDM';
+  if (isBG || isDM || isBGRE || isCHURNDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
   else if (isRAF || isSUO) { container.style.gridTemplateColumns = '1fr'; }
-  else if (isBG || isDM || isBGRE) { container.style.gridTemplateColumns = ''; }
+  else if (isBG || isDM || isBGRE || isCHURNDM) { container.style.gridTemplateColumns = ''; }
   else { container.style.gridTemplateColumns = ''; }
 
   if (isSUO) {
@@ -2111,6 +2232,54 @@ function renderAll() {
           </label>
         </div>
       `;
+    } else if (isCHURNDM) {
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY)</span>
+        <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 121126" value="${day.date}"
+          oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 14px;" />
+        <span class="field-label">Offers</span>
+        <div id="churndm-offers-${i}"></div>
+        <div class="add-row" style="margin-top: 8px;">
+          <button class="reset-btn" onclick="addChurnDMOffer(${i})">+ Add</button>
+          <button class="reset-btn" onclick="selectAllChurnDMOffers(${i})">Select All</button>
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].churndmSendToXP = !days[${i}].churndmSendToXP; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.churndmSendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.churndmSendToXP !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            Send to XP
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].churndmExternalBonus = !days[${i}].churndmExternalBonus; renderAll();">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.churndmExternalBonus === true ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+              ${day.churndmExternalBonus === true ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+            </span>
+            External Bonus
+          </label>
+        </div>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Opt In</span>
+            <input type="number" min="0" value="${day.churndmDaysToOptin !== undefined ? day.churndmDaysToOptin : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].churndmDaysToOptin = parseInt(this.value) || 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Entitlement</span>
+            <input type="number" min="0" value="${day.churndmDaysToEntitlement !== undefined ? day.churndmDaysToEntitlement : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].churndmDaysToEntitlement = parseInt(this.value) || 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Settlement</span>
+            <input type="number" min="0" value="${day.churndmDaysToSettlement !== undefined ? day.churndmDaysToSettlement : 7}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].churndmDaysToSettlement = parseInt(this.value) || 0;" />
+          </div>
+        </div>
+      `;
     } else if (isBG || isDM) {
       card.innerHTML = `
         <div class="day-header">
@@ -2265,6 +2434,7 @@ function renderAll() {
     container.appendChild(card);
     if (isBG) renderOffers(i);
     else if (isDM) renderDMOffers(i);
+    else if (isCHURNDM) renderChurnDMOffers(i);
     else if (isFS) renderFSOffers(i);
     else if (isBGRE) renderBGREOffers(i);
     else renderAmounts(i); // covers both RTC and LCREACT (both use amounts grid)
@@ -2360,6 +2530,12 @@ function resetDay(i) {
   days[i].lcreactDaysToEntitlement = 3;
   days[i].lcreactDaysToSettlement = 3;
   days[i].lcreactSendToXP = true;
+  days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o }));
+  days[i].churndmSendToXP = true;
+  days[i].churndmExternalBonus = false;
+  days[i].churndmDaysToOptin = 3;
+  days[i].churndmDaysToEntitlement = 3;
+  days[i].churndmDaysToSettlement = 7;
   if (getOfferType() === 'BG') renderOffers(i);
   else if (getOfferType() === 'DM') renderDMOffers(i);
   else if (getOfferType() === 'BGRE') renderBGREOffers(i);
@@ -2455,6 +2631,56 @@ function selectAllDMOffers(i) {
   if (!days[i].dmOfferData) days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: true }));
   else days[i].dmOfferData.forEach(o => o.active = true);
   renderDMOffers(i);
+}
+
+function churnDMOfferKey(o) {
+  return `M${o.min}_${o.pct}M${o.max}`;
+}
+
+function renderChurnDMOffers(i) {
+  const container = document.getElementById(`churndm-offers-${i}`);
+  if (!container) return;
+  if (!days[i].churndmOfferData) {
+    days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o }));
+  }
+  container.innerHTML = '';
+  days[i].churndmOfferData.forEach((offer, j) => {
+    const key = churnDMOfferKey(offer);
+    const hasTerms = !!CHURNDM_TERMS_IDS[key];
+    const row = document.createElement('div');
+    row.style.cssText = `border: ${offer.active ? (hasTerms ? '1.5px solid #ffffff' : '1.5px solid #e24b4a') : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
+    row.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Min</span>
+        <input type="number" value="${offer.min || ''}" placeholder="10" style="width:64px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+          oninput="days[${i}].churndmOfferData[${j}].min = parseFloat(this.value) || 0;" onchange="renderChurnDMOffers(${i});" />
+        <span style="font-size:12px; color:var(--muted);">&rarr;</span>
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">%</span>
+        <input type="number" value="${offer.pct || ''}" placeholder="50" style="width:64px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+          oninput="days[${i}].churndmOfferData[${j}].pct = parseFloat(this.value) || 0;" onchange="renderChurnDMOffers(${i});" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Max</span>
+        <input type="number" value="${offer.max || ''}" placeholder="10" style="width:64px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+          oninput="days[${i}].churndmOfferData[${j}].max = parseFloat(this.value) || 0;" onchange="renderChurnDMOffers(${i});" />
+        <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
+          onchange="days[${i}].churndmOfferData[${j}].active = this.checked; renderChurnDMOffers(${i});" />
+      </div>
+      ${offer.active && !hasTerms ? `<div style="margin-top:5px; font-size:11px; color:#e24b4a; font-family:'SF Mono',ui-monospace,monospace;">No Terms ID configured for ${key} — generation blocked</div>` : ''}
+    `;
+    container.appendChild(row);
+  });
+  updateGenerateButton();
+}
+
+function addChurnDMOffer(i) {
+  if (!days[i].churndmOfferData) days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o }));
+  days[i].churndmOfferData.push({ min: 0, pct: 0, max: 0, active: false });
+  renderChurnDMOffers(i);
+}
+
+function selectAllChurnDMOffers(i) {
+  if (!days[i].churndmOfferData) days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o, active: true }));
+  else days[i].churndmOfferData.forEach(o => o.active = true);
+  renderChurnDMOffers(i);
 }
 
 function renderFSOffers(i) {
@@ -2570,7 +2796,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -3651,6 +3877,9 @@ function updateGenerateButton() {
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'DM') {
       const offers = (d.dmOfferData || []).filter(o => o.active);
+      if (offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'CHURNDM') {
+      const offers = (d.churndmOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'FS') {
       const offers = (d.fsOfferData || []).filter(o => o.active && o.spinAmount && o.spinValue);
@@ -5906,6 +6135,533 @@ if __name__ == "__main__":
 `;
 }
 
+function buildChurnDMScript(allNames, imagePath, hiwText, tcText) {
+  const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
+  const sendToXPLines      = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
+  const externalBonusLines = allNames.map(n => `    ${n.externalBonus ? 'True' : 'False'},`).join('\n');
+  const daysOptinLines     = allNames.map(n => `    ${n.daysToOptin},`).join('\n');
+  const daysEntLines       = allNames.map(n => `    ${n.daysToEntitlement},`).join('\n');
+  const daysSettLines      = allNames.map(n => `    ${n.daysToSettlement},`).join('\n');
+  const doSegmentLines     = allNames.map(n => `    ${n.doSegment !== false ? 'True' : 'False'},`).join('\n');
+  const doPromoLines       = allNames.map(n => `    ${n.doPromo  !== false ? 'True' : 'False'},`).join('\n');
+  const doBonusLines       = allNames.map(n => `    ${n.doBonus  !== false ? 'True' : 'False'},`).join('\n');
+
+  return `import asyncio
+import random
+import re
+import string
+import subprocess
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+URL = "https://trading.1.betfanatics.com/"
+IMAGE_FOLDER = "${imagePath}"
+
+TITLE_HEADER_TEXT = "Deposit and Get Casino Credit"
+
+NAMES = [
+${namesLines}
+]
+
+SEND_TO_XP = [
+${sendToXPLines}
+]
+
+EXTERNAL_BONUS = [
+${externalBonusLines}
+]
+
+DAYS_TO_OPTIN = [
+${daysOptinLines}
+]
+
+DAYS_TO_ENTITLEMENT = [
+${daysEntLines}
+]
+
+DAYS_TO_SETTLEMENT = [
+${daysSettLines}
+]
+
+DO_SEGMENT = [
+${doSegmentLines}
+]
+
+DO_PROMO = [
+${doPromoLines}
+]
+
+DO_BONUS = [
+${doBonusLines}
+]
+
+TERMS_IDS = ${JSON.stringify(CHURNDM_TERMS_IDS)}
+
+# ── Parsing ───────────────────────────────────────────────────────────────────
+
+def parse_churn_dm(code):
+    """Returns (min_deposit, pct, max_bonus) from ..._M{min}_{pct}M{max}."""
+    parts = code.split("_")
+    min_deposit, pct, max_bonus = None, None, None
+    for part in parts:
+        if part.startswith("M") and part[1:].isdigit():
+            min_deposit = part[1:]
+        elif "M" in part and not part.startswith("M"):
+            idx = part.index("M")
+            if part[:idx].isdigit() and part[idx+1:].isdigit():
+                pct = part[:idx]
+                max_bonus = part[idx+1:]
+    return min_deposit, pct, max_bonus
+
+def parse_dates(code):
+    """Start = 00:00:00 ET on code date; End = exactly 10 days later at 00:00:00 ET."""
+    date_part = code.split("_")[0]
+    mm, dd, yy = date_part[0:2], date_part[2:4], "20" + date_part[4:6]
+    dt_start = datetime(int(yy), int(mm), int(dd), 0, 0, 0, tzinfo=EASTERN)
+    dt_end = dt_start + timedelta(days=10)
+    start = dt_start.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return start, end
+
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
+def parse_voucher(code):
+    date_part = code.split("_")[0]
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CRLCDM{mmddyy}{suffix}"
+
+def format_currency(amount_str):
+    amount = int(float(amount_str))
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def format_hiw(code):
+    min_deposit, pct, max_bonus = parse_churn_dm(code)
+    min_fmt = format_currency(min_deposit)
+    max_fmt = format_currency(max_bonus)
+    terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    min_deposit, pct, max_bonus = parse_churn_dm(code)
+    min_fmt = format_currency(min_deposit)
+    max_fmt = format_currency(max_bonus)
+    terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
+    return f"""${tcText}"""
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "Churn DM Setup Script" sound name "Glass"'])
+
+# ── Shared helpers ────────────────────────────────────────────────────────────
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    OK Image uploaded: {display_name or filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Rich text filled: {label_title}")
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Promos page")
+            return
+        print(f"  WARN Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Bonus Manager page")
+            return
+        print(f"  WARN Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
+
+# ── Segment ───────────────────────────────────────────────────────────────────
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Segment done: {name}")
+
+# ── Promo ─────────────────────────────────────────────────────────────────────
+
+async def create_promo(page, name):
+    print(f"\\n  Creating promotion: {name}")
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    min_deposit, pct, max_bonus = parse_churn_dm(name)
+    discover_filename = f"{pct}M{max_bonus}.png"
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
+    await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
+    await page.locator("input[placeholder='Title']").fill(TITLE_HEADER_TEXT)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Promotion done: {name}")
+
+# ── Bonus ─────────────────────────────────────────────────────────────────────
+
+async def create_bonus(page, name, idx):
+    print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(120):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(TITLE_HEADER_TEXT)
+
+    if SEND_TO_XP[idx]:
+        await page.get_by_text("Send To XP", exact=True).click()
+        await page.wait_for_timeout(500)
+    if EXTERNAL_BONUS[idx]:
+        await page.get_by_text("External Bonus", exact=True).click()
+        await page.wait_for_timeout(500)
+
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+
+    voucher_code = parse_voucher(name)
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"    OK Voucher Code: {voucher_code}")
+
+    await page.get_by_text("Casino Credit", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("span", has_text="Casino Credit (%)").first.click()
+    await page.wait_for_timeout(500)
+
+    min_deposit, pct, max_bonus = parse_churn_dm(name)
+    pct_input = page.locator("input.ant-input-number-input[aria-valuemin='0'][aria-valuemax='100']")
+    await pct_input.click()
+    await pct_input.fill(pct)
+    await page.wait_for_timeout(500)
+    print(f"    OK Casino Credit %: {pct}%")
+
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Casino_credit Settlement"))
+    await days_row.locator("input.ant-input-number-input").click()
+    await days_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_SETTLEMENT[idx]))
+    await page.wait_for_timeout(500)
+
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_OPTIN[idx]))
+    await page.wait_for_timeout(500)
+
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_ENTITLEMENT[idx]))
+    await page.wait_for_timeout(500)
+    print("    OK Days fields filled")
+
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"DEPOSIT\\"]').click()")
+    await page.wait_for_timeout(500)
+    print("    OK Entitlement Type: Deposit")
+
+    pct_filled = False
+    for label in ["Bonus %", "Casino Credit %"]:
+        row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text=label))
+        if await row.count() > 0:
+            inp = row.locator("input.ant-input-number-input[step='1']").first
+            try:
+                await inp.wait_for(state="visible", timeout=3000)
+                await inp.click()
+                await inp.fill(pct)
+                await page.wait_for_timeout(500)
+                print(f"    OK {label}: {pct}")
+                pct_filled = True
+                break
+            except Exception:
+                continue
+    if not pct_filled:
+        raise Exception("Could not find the summary percentage field (tried 'Bonus %' and 'Casino Credit %')")
+
+    amount_filled = False
+    for card_title in ["Bonus", "Casino Credit"]:
+        card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text=card_title))
+        if await card.count() > 0:
+            inp = card.locator(".ant-table-cell.center .ant-input-number-input").first
+            try:
+                await inp.wait_for(state="visible", timeout=3000)
+                await inp.click()
+                await inp.fill(max_bonus)
+                await page.wait_for_timeout(500)
+                print(f"    OK {card_title} Amount: {max_bonus}")
+                amount_filled = True
+                break
+            except Exception:
+                continue
+    if not amount_filled:
+        raise Exception("Could not find the Bonus/Casino Credit amount summary card")
+
+    min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
+    min_deposit_input = min_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await min_deposit_input.click()
+    await min_deposit_input.fill(min_deposit)
+    await page.wait_for_timeout(500)
+    print(f"    OK Minimum Deposit: {min_deposit}")
+
+    max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
+    max_deposit_input = max_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
+    await max_deposit_input.click()
+    await max_deposit_input.fill("1000000")
+    await page.wait_for_timeout(500)
+    print("    OK Maximum Deposit: 1000000")
+
+    status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+
+    act_start, act_end = parse_dates(name)
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"    OK Activation Dates: {act_start} -> {act_end} (+10 days)")
+
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    seg_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await seg_option.wait_for(state="visible", timeout=15000)
+    await seg_option.click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Promotion Tile: {name}")
+
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Retention", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("Other")
+    await page.wait_for_timeout(500)
+    await page.locator("div.ant-select-item-option-content", has_text="Other").click()
+    await page.wait_for_timeout(500)
+
+    type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row2.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="Lifecycle").first.click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("button.ant-btn-primary.save").click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    print(f"  OK Bonus done: {name}")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+        print("\\nPlease log in to the site in the browser window.")
+        print("   Once logged in, come back here and press Enter.\\n")
+        input("Press Enter when ready...")
+        segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
+        promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
+        bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
+
+        if segment_names:
+            print("\\n--- Creating Segments ---")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  WARN Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+            for name in segment_names:
+                await create_segment(page, name)
+                await page.wait_for_timeout(1000)
+            print("\\nAll segments created!")
+        else:
+            print("\\nSkipping segments (none selected)")
+
+        if promo_names:
+            await nav_to_promos(page)
+            print("\\n--- Creating Promotions ---")
+            for name in promo_names:
+                await create_promo(page, name)
+                await page.wait_for_timeout(1000)
+            print("\\nAll promotions created!")
+        else:
+            print("\\nSkipping promotions (none selected)")
+
+        if bonus_names:
+            await nav_to_bonus(page)
+            print("\\n--- Creating Bonuses ---")
+            for name in bonus_names:
+                idx = NAMES.index(name)
+                await create_bonus(page, name, idx)
+                await page.wait_for_load_state("networkidle")
+                await page.wait_for_timeout(3000)
+            print("\\nAll bonuses created!")
+        else:
+            print("\\nSkipping bonuses (none selected)")
+
+        notify(f"Churn DM complete! {len(NAMES)} codes created.")
+        print("\\nAll done!")
+        await browser.close()
+
+asyncio.run(main())
+`;
+}
+
 function buildLCREACTScript(allNames, imagePath, hiwText) {
   const namesLines       = allNames.map(n => `    "${n.code}",`).join('\n');
   const sendToXPLines    = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
@@ -6561,6 +7317,38 @@ function generateScript() {
           doBonus: fsDoBonus,
         });
       });
+    } else if (offerType === 'CHURNDM') {
+      const offers = (days[i].churndmOfferData || []).filter(o => o.active);
+      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      for (const o of offers) {
+        if (!o.min || !o.pct || !o.max) { alert(`Day ${i + 1}: every selected offer needs a Min, %, and Max value.`); return; }
+        const key = `M${o.min}_${o.pct}M${o.max}`;
+        if (!CHURNDM_TERMS_IDS[key]) {
+          alert(`Day ${i + 1}: no Terms ID is configured for offer ${key} (Min $${o.min}, ${o.pct}% up to $${o.max}).\n\nScript generation is blocked. Please use one of the configured offers, or reach out to Adrian Van de Camp to add a Terms ID for this offer.`);
+          return;
+        }
+      }
+      const cdmSendToXP = days[i].churndmSendToXP !== false;
+      const cdmExternalBonus = days[i].churndmExternalBonus === true;
+      const cdmDaysToOptin = days[i].churndmDaysToOptin !== undefined ? days[i].churndmDaysToOptin : 3;
+      const cdmDaysToEntitlement = days[i].churndmDaysToEntitlement !== undefined ? days[i].churndmDaysToEntitlement : 3;
+      const cdmDaysToSettlement = days[i].churndmDaysToSettlement !== undefined ? days[i].churndmDaysToSettlement : 7;
+      const cdmDoSegment = days[i].doSegment !== false;
+      const cdmDoPromo = days[i].doPromo !== false;
+      const cdmDoBonus = days[i].doBonus !== false;
+      offers.forEach(o => {
+        allNames.push({
+          code: `${date}_CAS_LC_CHURN_DM_${jurisdiction}_CC_M${o.min}_${o.pct}M${o.max}`,
+          sendToXP: cdmSendToXP,
+          externalBonus: cdmExternalBonus,
+          daysToOptin: cdmDaysToOptin,
+          daysToEntitlement: cdmDaysToEntitlement,
+          daysToSettlement: cdmDaysToSettlement,
+          doSegment: cdmDoSegment,
+          doPromo: cdmDoPromo,
+          doBonus: cdmDoBonus,
+        });
+      });
     } else if (offerType === 'LCREACT') {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
@@ -6641,6 +7429,8 @@ function generateScript() {
     script = buildBGREScript(allNames, bgreImagesStr);
   } else if (offerType === 'DM') {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText);
+  } else if (offerType === 'CHURNDM') {
+    script = buildChurnDMScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'LCREACT') {
     script = buildLCREACTScript(allNames, imagePath, hiwText);
   } else {
@@ -7099,7 +7889,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
