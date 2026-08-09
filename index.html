@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.21</title>
+  <title>NATS Bonus Creator v2.22</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -364,6 +364,11 @@
       transition: opacity 0.15s;
     }
     .btn-edit-tc:hover { opacity: 0.85; }
+
+    /* v2.22 — RTC CC Canada theme: edit buttons shift blue → red when Region = CA */
+    body.ca-region .btn-edit-hiw { background: #7C0C0C; }
+    body.ca-region .btn-edit-tc { background: #A51818; }
+    body.ca-region .btn-edit-images { background: #DD3737; }
 
     .modal-overlay {
       display: none;
@@ -800,7 +805,7 @@
 <div class="modal-overlay" id="modal-images">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Edit Images</span>
+      <span class="modal-title" id="modal-images-title">Edit Images</span>
       <button class="modal-close" onclick="closeModal('images')">✕</button>
     </div>
     <div style="display: flex; flex-direction: column; gap: 16px; padding: 4px 0;">
@@ -857,7 +862,7 @@
 <div class="modal-overlay" id="modal-tc">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Edit T&Cs</span>
+      <span class="modal-title" id="modal-tc-title">Edit T&Cs</span>
       <button class="modal-close" onclick="closeModal('tc')">✕</button>
     </div>
     <div id="tc-terms-ids-bar" style="display:none; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;">
@@ -883,7 +888,7 @@
 <div class="modal-overlay" id="modal-terms-ids">
   <div class="modal" style="width: 500px; max-height: 90vh; overflow-y: auto;">
     <div class="modal-header">
-      <span class="modal-title">Edit Terms Expiry &amp; Terms IDs</span>
+      <span class="modal-title" id="modal-terms-ids-title">Edit Terms Expiry &amp; Terms IDs</span>
       <button class="modal-close" onclick="closeTermsIDModal()">✕</button>
     </div>
     <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
@@ -1081,6 +1086,100 @@ Fanatics Casino aims to consistently care for our customers and promote responsi
 ● Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
 const DEFAULT_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RTC Top Up";
 
+// ── v2.22: RTC CC Canada (CA) jurisdiction-scoped settings ─────────────────
+// The tool works as-is for US. When Region = CA is selected on RTC Top Up -
+// Casino Credit, CA-specific settings are read/written under parallel "_ca"
+// localStorage keys. US keys and defaults are untouched. Image filenames
+// follow the same naming convention in both folders.
+const DEFAULT_IMAGE_PATH_CA = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/RTC Top Up - Canada";
+
+function isRTCCanada() {
+  const sel = document.getElementById('jurisdiction-select');
+  return getOfferType() === 'RTC' && sel && sel.value === 'CA';
+}
+function rtcKey(base) { return isRTCCanada() ? base + '_ca' : base; }
+
+// v2.22 — Canadian T&C base copy (Ontario). Same dynamic fields as US:
+// {amount_fmt}, {terms_id}, {start_date_short}, {start_date_long},
+// {end_date_short}, {end_date_long}. HIW is shared with US (no CA variant).
+const DEFAULT_RTC_TERMS_IDS_CA = {
+  2: 'CAS_CA_0001', 4: 'CAS_CA_0002', 5: 'CAS_CA_0003', 10: 'CAS_CA_0004',
+  20: 'CAS_CA_0005', 40: 'CAS_CA_0006', 50: 'CAS_CA_0007', 100: 'CAS_CA_0008',
+  200: 'CAS_CA_0009', 400: 'CAS_CA_0010', 800: 'CAS_CA_0011'
+};
+const DEFAULT_RTC_START_DATE_CA = '08/17/26';
+const DEFAULT_RTC_END_DATE_CA = '12/31/26';
+
+const DEFAULT_TC_CA = `PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) – CASINO CREDIT {amount_fmt} CAD SURPRISE DROP ({terms_id})
+
+1. Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (“Fanatics Casino”). Fanatics Casino is giving eligible customers {amount_fmt} CAD in Casino Credit (“Rewards”) to use on any games in the Fanatics Casino. See below for more details.
+
+2. Promotional Period
+This “Promotion” begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (“Promotional Period”).
+
+3. Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (“Account”). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on a daily basis during the Promotional Period. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+
+4. Action Required
+Each time you are invited to participate in this Promotion, you must opt in via the Discover or Promos page in the App. Casino Credit will be added to your Account automatically after you opt in, and you will be notified when your Rewards have been added. You must opt in within twenty-four (24) hours of receiving the offer to participate in this Promotion to be eligible for the Rewards.
+
+5. Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+For this Promotion, Casino Credit expires 24 hours from issuance.
+For this Promotion, Casino Credit can be used on any games in the Fanatics Casino.
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+Casino Credit can be combined with deposited funds (cash) to place a wager. As an example, if you have $20 CAD in cash and $2 CAD in Casino Credit in your Account and you wager $5 CAD on a blackjack hand, $2 CAD in Casino Credit and $3 CAD in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $2 CAD in Casino Credit and place a $1 CAD wager, $1 CAD of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you wager $2 CAD in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $2 CAD stake will be added to your cash balance).
+Casino Credit closest to expiration will be applied first.
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Casino Credit may not be exchanged, substituted, or transferred.
+
+6. Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are invited to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+
+8. Wagering Requirements/Exclusions
+There are no wagering requirements for this Promotion. Rewards can be used on any games in the Fanatics Casino and expire twenty-four (24) hours from the date and time of issuance.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire 24 hours from issuance.
+
+11. Restrictions on Withdrawal
+Casino Credit or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+
+14. Other
+Participation in this Promotion is subject to Fanatics Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control.`;
+
 const DEFAULT_BG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Wednesday B&G";
 const DEFAULT_DM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Friday Deposit Match";
 
@@ -1092,7 +1191,7 @@ function getImagePath() {
   if (t === 'RAF') return localStorage.getItem('raf_image_path') || DEFAULT_RAF_IMAGE_PATH;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_image_path') || DEFAULT_LCREACT_IMAGE_PATH;
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH;
-  return localStorage.getItem('rtc_image_path') || DEFAULT_IMAGE_PATH;
+  return localStorage.getItem(rtcKey('rtc_image_path')) || (isRTCCanada() ? DEFAULT_IMAGE_PATH_CA : DEFAULT_IMAGE_PATH);
 }
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_HIW_LCREACT = `1. Opt-in to the promotion
@@ -1331,7 +1430,7 @@ Fanatics Casino aims to consistently care for our customers and promote responsi
 ● References to "you" or "your" throughout these Promotional Terms and Conditions are to the participants in this Promotion.
 ● Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards' value may be reported for tax purposes as required by law.
 ● Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
-  return localStorage.getItem('rtc_tc') || DEFAULT_TC;
+  return localStorage.getItem(rtcKey('rtc_tc')) || (isRTCCanada() ? DEFAULT_TC_CA : DEFAULT_TC);
 }
 
 function openModal(type) {
@@ -1345,10 +1444,14 @@ function openModal(type) {
     document.getElementById('tc-textarea').value = getTC();
     renderFieldBar('tc');
     const isRTC = getOfferType() === 'RTC';
+    const tcTitle = document.getElementById('modal-tc-title');
+    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : 'Edit T&Cs';
     document.getElementById('tc-terms-ids-bar').style.display = isRTC ? 'flex' : 'none';
     document.getElementById('modal-tc').classList.add('open');
   } else if (type === 'images') {
     const lt = getOfferType();
+    const imgTitle = document.getElementById('modal-images-title');
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -1357,6 +1460,8 @@ function openModal(type) {
       ? 'https://drive.google.com/drive/folders/1Xhk-3fKF3goNS_lL7M0bn2DrACKyFRds'
       : lt === 'CHURNDM'
       ? 'https://drive.google.com/drive/folders/1KJfVtJVwBbGkJJTr8T-PGeWHm5c8qc-2'
+      : isRTCCanada()
+      ? 'https://drive.google.com/drive/folders/1W6ulHKv3ted9ZLNKzPgEbRoNCK_wFz6O'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
     const path = getImagePath();
     const el = document.getElementById('images-path');
@@ -1376,9 +1481,9 @@ function saveModal(type) {
   if (type === 'hiw') {
     localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : 'rtc_tc', document.getElementById('tc-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : 'rtc_image_path', document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1392,11 +1497,12 @@ const DEFAULT_RTC_START_DATE = '06/01/26';
 const DEFAULT_RTC_END_DATE = '12/01/26';
 
 function getRTCTermsIDs() {
-  try { return JSON.parse(localStorage.getItem('rtc_terms_ids')) || DEFAULT_RTC_TERMS_IDS; }
-  catch(e) { return DEFAULT_RTC_TERMS_IDS; }
+  const def = isRTCCanada() ? DEFAULT_RTC_TERMS_IDS_CA : DEFAULT_RTC_TERMS_IDS;
+  try { return JSON.parse(localStorage.getItem(rtcKey('rtc_terms_ids'))) || def; }
+  catch(e) { return def; }
 }
-function getRTCStartDate() { return localStorage.getItem('rtc_terms_start_date') || DEFAULT_RTC_START_DATE; }
-function getRTCEndDate() { return localStorage.getItem('rtc_terms_end_date') || DEFAULT_RTC_END_DATE; }
+function getRTCStartDate() { return localStorage.getItem(rtcKey('rtc_terms_start_date')) || (isRTCCanada() ? DEFAULT_RTC_START_DATE_CA : DEFAULT_RTC_START_DATE); }
+function getRTCEndDate() { return localStorage.getItem(rtcKey('rtc_terms_end_date')) || (isRTCCanada() ? DEFAULT_RTC_END_DATE_CA : DEFAULT_RTC_END_DATE); }
 
 function parseDateShort(mmddyy) {
   const clean = mmddyy.replace(/[^0-9]/g, '');
@@ -1419,6 +1525,8 @@ function getTermsIDForAmount(amount) {
 
 function openTermsIDModal() {
   const ids = getRTCTermsIDs();
+  const termsTitle = document.getElementById('modal-terms-ids-title');
+  if (termsTitle) termsTitle.textContent = `Edit Terms Expiry & Terms IDs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}`;
   document.getElementById('terms-start-date-input').value = getRTCStartDate();
   document.getElementById('terms-end-date-input').value = getRTCEndDate();
   updateTermsDatePreviews();
@@ -1435,15 +1543,15 @@ function closeTermsIDModal() {
 function saveTermsIDModal() {
   const startVal = document.getElementById('terms-start-date-input').value.trim();
   const endVal = document.getElementById('terms-end-date-input').value.trim();
-  localStorage.setItem('rtc_terms_start_date', startVal);
-  localStorage.setItem('rtc_terms_end_date', endVal);
+  localStorage.setItem(rtcKey('rtc_terms_start_date'), startVal);
+  localStorage.setItem(rtcKey('rtc_terms_end_date'), endVal);
   const amts = [2,4,5,10,20,40,50,100,200,400,800];
   const ids = {};
   amts.forEach(amt => {
     const el = document.getElementById('terms-id-' + amt);
     if (el) ids[amt] = el.value.trim();
   });
-  localStorage.setItem('rtc_terms_ids', JSON.stringify(ids));
+  localStorage.setItem(rtcKey('rtc_terms_ids'), JSON.stringify(ids));
   closeTermsIDModal();
 }
 function updateTermsDatePreviews() {
@@ -1737,7 +1845,10 @@ function updateJurisdictionOptions(type) {
   ];
   const current = sel.value;
   sel.innerHTML = '';
-  const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value)) : allOptions;
+  const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
+  const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
+    : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
+    : allOptions;
   filtered.forEach(o => {
     const opt = document.createElement('option');
     opt.value = o.value;
@@ -1746,13 +1857,24 @@ function updateJurisdictionOptions(type) {
   });
   if (type === 'FS' || type === 'SUO') {
     sel.value = fsOnly.includes(current) ? current : 'MI';
+  } else if (type === 'RTC') {
+    sel.value = rtcOnly.includes(current) ? current : 'US';
   } else {
     sel.value = 'US';
   }
+  updateRegionTheme();
+}
+
+function updateRegionTheme() {
+  // v2.22 — RTC CC: red edit-button theme when Region = CA — Canada
+  document.body.classList.toggle('ca-region', isRTCCanada());
 }
 
 function onJurisdictionChange() {
-  // No action needed beyond native select behaviour — value read at generation time
+  updateRegionTheme();
+  // v2.22 — RTC CC: switching region resets all day-card values (dates,
+  // selected amounts, toggles) so US and CA inputs never mix
+  if (getOfferType() === 'RTC') resetAll();
 }
 
 
@@ -2796,7 +2918,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_image_path','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','rtc_terms_ids','rtc_terms_start_date','rtc_terms_end_date'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
