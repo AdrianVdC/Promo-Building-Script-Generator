@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.17</title>
+  <title>NATS Bonus Creator v2.21</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2839,6 +2839,34 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
+
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
 
@@ -2915,12 +2943,22 @@ def parse_voucher(code):
     suffix = generate_suffix()
     return f"CRRCFS{mmddyy}{suffix}"
 
-def parse_casino_game(code):
+def parse_casino_game_search(code):
+    """Text typed into the Casino Game search box. NATS game names may now
+    include a trademark symbol (e.g. 'Triple Cash Eruption™ (WV)'), so type
+    only the portion before any ™ to surface every variant."""
+    _, _, game = parse_fs(code)
+    return GAMES[game]["searchName"].split("™")[0].strip()
+
+def parse_casino_game_pattern(code):
+    """Anchored regex for the dropdown option: ™ optional everywhere,
+    jurisdiction suffix required — the right state's game is always chosen
+    whether or not NATS includes ™ in the name."""
     parts = code.split("_")
     jurisdiction = parts[4]
     _, _, game = parse_fs(code)
-    search_name = GAMES[game]["searchName"]
-    return f"{search_name} ({jurisdiction})"
+    base = re.escape(GAMES[game]["searchName"]).replace("™", "™?")
+    return re.compile(r"^" + base + r"™?\\s*\\(" + re.escape(jurisdiction) + r"\\)$")
 
 def parse_discover_image(code):
     spin_amount, spin_value_cents, game = parse_fs(code)
@@ -3163,16 +3201,17 @@ async def create_bonus(page, name):
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=game_data["provider"]).first.click()
     await page.wait_for_timeout(500)
     print(f"    ✅ Provider: {game_data['provider']}")
-    casino_game = parse_casino_game(name)
+    casino_game_search = parse_casino_game_search(name)
     casino_game_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Casino Game"))
     await casino_game_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
-    await page.keyboard.type(casino_game)
-    casino_game_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(casino_game) + r"$")).first
+    await page.keyboard.type(casino_game_search)
+    casino_game_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=parse_casino_game_pattern(name)).first
     await casino_game_option.wait_for(state="visible", timeout=15000)
+    selected_game = (await casino_game_option.inner_text()).strip()
     await casino_game_option.click()
     await page.wait_for_timeout(500)
-    print(f"    ✅ Casino Game: {casino_game}")
+    print(f"    ✅ Casino Game: {selected_game}")
     bet_level_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bet Level"))
     await bet_level_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
@@ -3189,12 +3228,13 @@ async def create_bonus(page, name):
     await spins_input.fill(spin_amount)
     await page.wait_for_timeout(500)
     print(f"    ✅ Number of Spins: {spin_amount}")
+    spin_currency = currency_for(name)
     stakes_card = page.locator(".ant-card").filter(has=page.locator(".ant-card-head-title", has_text="Free Spin Stakes"))
-    await stakes_card.locator("td.ant-table-cell", has_text="USD").locator("..").locator(".ant-select-selector").click()
+    await stakes_card.locator("td.ant-table-cell", has_text=spin_currency).locator("..").locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(spin_value_display) + r"$")).first.click()
     await page.wait_for_timeout(500)
-    print(f"    ✅ Spin Value (USD): {spin_value_display}")
+    print(f"    ✅ Spin Value ({spin_currency}): {spin_value_display}")
     optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
     await optin_row.locator("input.ant-input-number-input").click()
     await optin_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_OPTIN[idx]))
@@ -3361,6 +3401,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 
 URL = "https://trading.1.betfanatics.com/"
 
@@ -3655,9 +3723,7 @@ async def create_bonus(page, name):
     print(f"    ✅ Voucher Code: {voucher_code}")
     await page.get_by_text("FanCash", exact=True).click()
     await page.wait_for_timeout(500)
-    amount_input = page.locator("td.ant-table-cell.center").locator("input.ant-input-number-input[aria-valuemin='0']")
-    await amount_input.click()
-    await amount_input.fill(get)
+    await fill_currency_amount(page, name, get, label="FanCash Amount")
     await page.wait_for_timeout(500)
     days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Fancash Settlement"))
     await days_row.locator("input.ant-input-number-input").click()
@@ -3925,6 +3991,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 
 NATS_URL      = "https://trading.test1.fanatics.bet/login"
 PLAYMAKER_URL = "https://playmaker-internal.test1.fanatics.bet/"
@@ -4355,6 +4449,34 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
+
 URL = "https://trading.1.betfanatics.com/"
 
 NAMES = [
@@ -4705,27 +4827,15 @@ async def create_bonus(page, name):
 
     # Step 17b — Bonus card Amount / Maximum (max bonus from code)
     bonus_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Bonus"))
-    bonus_amount_input = bonus_card.locator(".ant-table-cell.center .ant-input-number-input").first
-    await bonus_amount_input.click()
-    await bonus_amount_input.fill(max_bonus)
-    await page.wait_for_timeout(500)
-    print(f"    ✅ Bonus Amount: {max_bonus}")
+    await fill_currency_amount(page, name, max_bonus, scope=bonus_card, label="Bonus Amount")
 
     # Step 18 — Minimum Deposit (always 10)
     min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
-    min_deposit_input = min_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
-    await min_deposit_input.click()
-    await min_deposit_input.fill("10")
-    await page.wait_for_timeout(500)
-    print("    ✅ Minimum Deposit: 10")
+    await fill_currency_amount(page, name, "10", scope=min_deposit_card, label="Minimum Deposit")
 
     # Step 19 — Maximum Deposit (always 1000000)
     max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
-    max_deposit_input = max_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
-    await max_deposit_input.click()
-    await max_deposit_input.fill("1000000")
-    await page.wait_for_timeout(500)
-    print("    ✅ Maximum Deposit: 1000000")
+    await fill_currency_amount(page, name, "1000000", scope=max_deposit_card, label="Maximum Deposit")
 
     # Step 20 — Check Status Active
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
@@ -4897,6 +5007,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 URL = "https://trading.1.betfanatics.com/"
 
 # ── Configure these before each run ──────────────────────────────────────────
@@ -4967,8 +5105,15 @@ def parse_description():
 def parse_fs_description_day(n):
     return f"Refer a Friend: Bet \${BET_AMOUNT} Get {total_spins()} Day {n}"
 
-def parse_casino_game():
-    return f"{GAMES[GAME_KEY]['searchName']} ({JURISDICTION})"
+def parse_casino_game_search():
+    """Type only the portion before any ™ — NATS game names may now
+    include a trademark symbol."""
+    return GAMES[GAME_KEY]["searchName"].split("™")[0].strip()
+
+def parse_casino_game_pattern():
+    """™ optional everywhere, jurisdiction suffix required."""
+    base = re.escape(GAMES[GAME_KEY]["searchName"]).replace("™", "™?")
+    return re.compile(r"^" + base + r"™?\\s*\\(" + re.escape(JURISDICTION) + r"\\)$")
 
 def parse_title():
     return f"Refer a Friend: Get {total_spins()} Bonus Spins"
@@ -5184,18 +5329,19 @@ async def fill_free_spin_fields(page, num_spins):
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=game_data["provider"]).first.click()
     await page.wait_for_timeout(500)
     print(f"  ✅ Provider: {game_data['provider']}")
-    casino_game = parse_casino_game()
+    casino_game_search = parse_casino_game_search()
     casino_game_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Casino Game"))
     await casino_game_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
-    await page.keyboard.type(casino_game)
+    await page.keyboard.type(casino_game_search)
     casino_game_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
-        has_text=re.compile(r"^" + re.escape(casino_game) + r"$")
+        has_text=parse_casino_game_pattern()
     ).first
     await casino_game_option.wait_for(state="visible", timeout=15000)
+    selected_game = (await casino_game_option.inner_text()).strip()
     await casino_game_option.click()
     await page.wait_for_timeout(500)
-    print(f"  ✅ Casino Game: {casino_game}")
+    print(f"  ✅ Casino Game: {selected_game}")
     bet_level_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bet Level"))
     await bet_level_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
@@ -5212,14 +5358,15 @@ async def fill_free_spin_fields(page, num_spins):
     await spins_input.fill(str(num_spins))
     await page.wait_for_timeout(500)
     print(f"  ✅ Number of Spins: {num_spins}")
+    spin_currency = currency_for(JURISDICTION)
     stakes_card = page.locator(".ant-card").filter(has=page.locator(".ant-card-head-title", has_text="Free Spin Stakes"))
-    await stakes_card.locator("td.ant-table-cell", has_text="USD").locator("..").locator(".ant-select-selector").click()
+    await stakes_card.locator("td.ant-table-cell", has_text=spin_currency).locator("..").locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
         has_text=re.compile(r"^" + re.escape(SPIN_VALUE) + r"$")
     ).first.click()
     await page.wait_for_timeout(500)
-    print(f"  ✅ Spin Value (USD): {SPIN_VALUE}")
+    print(f"  ✅ Spin Value ({spin_currency}): {SPIN_VALUE}")
 
 async def fill_days_and_activation(page, optin, entitlement, settlement):
     optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
@@ -5778,6 +5925,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 URL = "https://trading.1.betfanatics.com/"
 
 # ── Configure these before each run ──────────────────────────────────────────
@@ -5832,8 +6007,15 @@ def day_names():
 def parse_fs_description_day(n):
     return f"Sign Up Offer Bonus Spins Day {n}"
 
-def parse_casino_game():
-    return f"{GAMES[GAME_KEY]['searchName']} ({JURISDICTION})"
+def parse_casino_game_search():
+    """Type only the portion before any ™ — NATS game names may now
+    include a trademark symbol."""
+    return GAMES[GAME_KEY]["searchName"].split("™")[0].strip()
+
+def parse_casino_game_pattern():
+    """™ optional everywhere, jurisdiction suffix required."""
+    base = re.escape(GAMES[GAME_KEY]["searchName"]).replace("™", "™?")
+    return re.compile(r"^" + base + r"™?\\s*\\(" + re.escape(JURISDICTION) + r"\\)$")
 
 # ── Date helpers ──────────────────────────────────────────────────────────────
 
@@ -5915,18 +6097,19 @@ async def fill_free_spin_fields(page, num_spins):
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text=game_data["provider"]).first.click()
     await page.wait_for_timeout(500)
     print(f"  \\u2705 Provider: {game_data['provider']}")
-    casino_game = parse_casino_game()
+    casino_game_search = parse_casino_game_search()
     casino_game_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Casino Game"))
     await casino_game_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
-    await page.keyboard.type(casino_game)
+    await page.keyboard.type(casino_game_search)
     casino_game_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
-        has_text=re.compile(r"^" + re.escape(casino_game) + r"$")
+        has_text=parse_casino_game_pattern()
     ).first
     await casino_game_option.wait_for(state="visible", timeout=15000)
+    selected_game = (await casino_game_option.inner_text()).strip()
     await casino_game_option.click()
     await page.wait_for_timeout(500)
-    print(f"  \\u2705 Casino Game: {casino_game}")
+    print(f"  \\u2705 Casino Game: {selected_game}")
     bet_level_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bet Level"))
     await bet_level_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
@@ -5943,14 +6126,15 @@ async def fill_free_spin_fields(page, num_spins):
     await spins_input.fill(str(num_spins))
     await page.wait_for_timeout(500)
     print(f"  \\u2705 Number of Spins: {num_spins}")
+    spin_currency = currency_for(JURISDICTION)
     stakes_card = page.locator(".ant-card").filter(has=page.locator(".ant-card-head-title", has_text="Free Spin Stakes"))
-    await stakes_card.locator("td.ant-table-cell", has_text="USD").locator("..").locator(".ant-select-selector").click()
+    await stakes_card.locator("td.ant-table-cell", has_text=spin_currency).locator("..").locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
     await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
         has_text=re.compile(r"^" + re.escape(SPIN_VALUE) + r"$")
     ).first.click()
     await page.wait_for_timeout(500)
-    print(f"  \\u2705 Spin Value (USD): {SPIN_VALUE}")
+    print(f"  \\u2705 Spin Value ({spin_currency}): {SPIN_VALUE}")
 
 async def fill_days_and_activation(page, optin, entitlement, settlement):
     optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
@@ -6156,6 +6340,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
@@ -6494,13 +6706,8 @@ async def create_bonus(page, name, idx):
     for card_title in ["Bonus", "Casino Credit"]:
         card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text=card_title))
         if await card.count() > 0:
-            inp = card.locator(".ant-table-cell.center .ant-input-number-input").first
             try:
-                await inp.wait_for(state="visible", timeout=3000)
-                await inp.click()
-                await inp.fill(max_bonus)
-                await page.wait_for_timeout(500)
-                print(f"    OK {card_title} Amount: {max_bonus}")
+                await fill_currency_amount(page, name, max_bonus, scope=card, label=f"{card_title} Amount")
                 amount_filled = True
                 break
             except Exception:
@@ -6509,18 +6716,10 @@ async def create_bonus(page, name, idx):
         raise Exception("Could not find the Bonus/Casino Credit amount summary card")
 
     min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
-    min_deposit_input = min_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
-    await min_deposit_input.click()
-    await min_deposit_input.fill(min_deposit)
-    await page.wait_for_timeout(500)
-    print(f"    OK Minimum Deposit: {min_deposit}")
+    await fill_currency_amount(page, name, min_deposit, scope=min_deposit_card, label="Minimum Deposit")
 
     max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
-    max_deposit_input = max_deposit_card.locator(".ant-table-cell.center .ant-input-number-input").first
-    await max_deposit_input.click()
-    await max_deposit_input.fill("1000000")
-    await page.wait_for_timeout(500)
-    print("    OK Maximum Deposit: 1000000")
+    await fill_currency_amount(page, name, "1000000", scope=max_deposit_card, label="Maximum Deposit")
 
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
     await status_row.locator("input.ant-checkbox-input").click()
@@ -6690,6 +6889,34 @@ from zoneinfo import ZoneInfo
 from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
 
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
@@ -6963,9 +7190,7 @@ async def create_bonus(page, name, idx):
     await page.wait_for_timeout(500)
     stake_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Stake Chunk Sizes"))
     await stake_row.locator("input.ant-input-number-input").fill("1")
-    amount_input = page.locator("td.ant-table-cell.center").locator("input.ant-input-number-input[aria-valuemin='0']")
-    await amount_input.click()
-    await amount_input.fill(amount)
+    await fill_currency_amount(page, name, amount, label="Casino Credit Amount")
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
     await status_row.locator("input.ant-checkbox-input").click()
     await page.wait_for_timeout(500)
@@ -7445,6 +7670,34 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
+
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
 
@@ -7745,9 +7998,7 @@ async def create_bonus(page, name):
     print(f"    ✅ Days to Meet Entitlement: {DAYS_TO_ENTITLEMENT[idx]}")
     stake_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Stake Chunk Sizes"))
     await stake_row.locator("input.ant-input-number-input").fill("1")
-    amount_input = page.locator("td.ant-table-cell.center").locator("input.ant-input-number-input[aria-valuemin='0']")
-    await amount_input.click()
-    await amount_input.fill(amount)
+    await fill_currency_amount(page, name, amount, label="Casino Credit Amount")
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
     await status_row.locator("input.ant-checkbox-input").click()
     await page.wait_for_timeout(500)
