@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.24</title>
+  <title>NATS Bonus Creator v2.25</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -973,7 +973,7 @@
 <div class="modal-overlay" id="modal-vipbg-terms">
   <div class="modal" style="width: 560px; max-height: 90vh; overflow-y: auto;">
     <div class="modal-header">
-      <span class="modal-title">Edit Terms Expiry &amp; Terms IDs — VIP Offer Library B&amp;G (CA — Canada)</span>
+      <span class="modal-title" id="modal-vipbg-terms-title">Edit Terms Expiry &amp; Terms IDs — VIP Offer Library B&amp;G</span>
       <button class="modal-close" onclick="closeVIPBGTermsModal()">✕</button>
     </div>
     <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
@@ -995,7 +995,7 @@
     <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
       <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">TERMS IDS — PER OFFER (CATEGORY / BET / GET)</p>
       <div id="vipbg-terms-grid" style="display: grid; grid-template-columns: 190px 1fr; gap: 8px 12px; align-items: center;"></div>
-      <p style="font-size: 11px; color: var(--muted); margin: 10px 0 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {terms_id} in the T&amp;C. Each offer key {SBG|TBG}_B{bet}_G{get} gets its own ID. Active offers without an ID block script generation.</p>
+      <p style="font-size: 11px; color: var(--muted); margin: 10px 0 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {terms_id} in the T&amp;C. Each offer key gets its own ID — CA: {SBG|TBG}_B{bet}_G{get}; US: B{bet}_G{get}. Active offers without an ID block script generation.</p>
     </div>
     <div class="modal-footer">
       <button class="btn-reset" onclick="closeVIPBGTermsModal()">Cancel</button>
@@ -1170,6 +1170,14 @@ function isRTCCanada() {
 }
 function rtcKey(base) { return isRTCCanada() ? base + '_ca' : base; }
 
+// v2.25 — VIPBG US region scoping: CA (original) uses the base keys,
+// US uses parallel '_us' keys (mirror of the RTC CC rtcKey pattern).
+function isVIPBGUS() {
+  const sel = document.getElementById('jurisdiction-select');
+  return getOfferType() === 'VIPBG' && sel && sel.value === 'US';
+}
+function vipbgKey(base) { return isVIPBGUS() ? base + '_us' : base; }
+
 // v2.22 — Canadian T&C base copy (Ontario). Same dynamic fields as US:
 // {amount_fmt}, {terms_id}, {start_date_short}, {start_date_long},
 // {end_date_short}, {end_date_long}. HIW is shared with US (no CA variant).
@@ -1263,12 +1271,13 @@ function getImagePath() {
   if (t === 'LCREACT') return localStorage.getItem('lc_react_image_path') || DEFAULT_LCREACT_IMAGE_PATH;
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_image_path') || DEFAULT_VIPDM_IMAGE_PATH;
-  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_image_path') || DEFAULT_VIPBG_IMAGE_PATH;
+  if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_image_path')) || (isVIPBGUS() ? DEFAULT_VIPBG_IMAGE_PATH_US : DEFAULT_VIPBG_IMAGE_PATH);
   return localStorage.getItem(rtcKey('rtc_image_path')) || (isRTCCanada() ? DEFAULT_IMAGE_PATH_CA : DEFAULT_IMAGE_PATH);
 }
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_VIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Deposit Matches";
 const DEFAULT_VIPBG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Bet & Gets";
+const DEFAULT_VIPBG_IMAGE_PATH_US = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Bet & Gets";
 const DEFAULT_HIW_LCREACT = `1. Opt-in to the promotion
 2. We'll instantly drop Casino Credit into your account
 3. Play the Casino Credit on any of your favorite games
@@ -1442,6 +1451,12 @@ const DEFAULT_HIW_VIPBG = `1. Opt-in to the promotion
 2. Wager {bet_fmt}+ on any of your favourite {game_category} games
 3. I'll instantly give you {get_fmt} in Casino Credit`;
 
+// v2.25 — VIPBG US HIW. All US tiers are slots wagering; "Slot games" is
+// static copy by design (no {game_category} field). US spelling "favorite".
+const DEFAULT_HIW_VIPBG_US = `1. Opt-in to the promotion
+2. Wager {bet_fmt}+ on any of your favorite Slot games
+3. I'll instantly give you {get_fmt} in FanCash`;
+
 const DEFAULT_TC_VIPBG = `PROMOTIONAL TERMS AND CONDITIONS
 FANATICS CASINO (CANADA) – {game_category_upper} BET {bet_fmt} CAD, GET {get_fmt} CAD IN CASINO CREDIT ({terms_id})
 
@@ -1496,6 +1511,74 @@ Personal Information: Sponsor and its authorized agents will collect, use, and d
 This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
 Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
 In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control.`;
+
+// v2.25 — VIPBG US T&C. Canonical wording chosen across the CAS_10687/CAS_10688
+// legal filings (which differ by four copy-edit inconsistencies): "Casino App"
+// spacing fixed, "wagering requirements" (plural), single period in Limitations,
+// and "consistently care for our customers" in Responsible Gaming. Everything
+// else is verbatim legal copy. Dynamic fields: {bet_fmt}, {get_fmt}, {terms_id},
+// {start_date_long}, {end_date_long}.
+const DEFAULT_TC_VIPBG_US = `PROMOTIONAL TERMS AND CONDITIONS 
+FANATICS CASINO - VIP BET {bet_fmt} GET {get_fmt} FANCASH (ID: {terms_id})
+
+
+Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC (“Fanatics Casino”). Select Fanatics Casino customers who opt in and place {bet_fmt}+ in cumulative cash wagers within 3 days of being presented this offer on any slots games available in the Fanatics Casino can earn {get_fmt} in FanCash (“Rewards”). See below for details.
+
+
+Promotional Period 
+This “Promotion” begins at 12:00am ET on {start_date_long}, and ends at 11:59pm ET on {end_date_long} (“Promotional Period”).
+
+Eligibility
+This Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Casino account (“Account”). To participate in this Promotion: (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states during the Promotional Period; and (iii) you must receive an invitation to participate in this Promotion directly from Fanatics Casino (offer cannot be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.  
+
+Action Required
+To participate in this Promotion and be eligible for the Rewards, each time you are eligible to participate, you must opt in via the Promos page in the Fanatics Sportsbook and Casino App, the Fanatics Casino standalone app, or the Fanatics Casino website, where available (“App”); and (ii) place {bet_fmt}+ in cumulative cash wagers within 3 days of being presented this offer on any slots games in the Fanatics Casino. You must satisfy the cumulative wager requirement within 72 hours of opting in to this offer. To count towards the wager requirement, bets must be placed with cash and not Bonus Spins, Casino Credit, or any other promotional credit. 
+
+Claiming Promotional Offer
+Rewards will be added to eligible Accounts within 72 hours of satisfying the cumulative wager requirement.
+
+Rewards (FanCash) Terms:
+Your Rewards in the form of FanCash will be credited within seventy-two (72) hours after satisfying the wagering requirements for this Promotion.
+FanCash issued in connection with this Promotion expires at 11:59 p.m. ET seven (7) days from the date of issuance. Promotional FanCash expiring first will automatically be applied first.
+FanCash can only be used in accordance with our FanCash Program Terms and Conditions, available here (“FanCash Terms”):  https://fanatics-one.com/fancashterms 
+FanCash is available for Fanatics ONE Loyalty members. It is also subject to the Notice of Financial Incentives.  Users can opt-out of the loyalty program at any time.
+Rewards can be converted to Casino Credit and/or Bonus Bets, or can be redeemed towards merchandise purchases on Fanatics.com (some purchase exclusions apply- see fanatics.com for details).
+Rewards are non-withdrawable and are not redeemable for cash or cash equivalent.
+Rewards are not transferable and cannot be substituted, except in Fanatics Sportsbook’s sole discretion.
+
+Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees’, officers’ and directors’ immediate family members and/or those living in the same household (whether legally related or not).
+
+Wagering Requirements/Exclusions
+Bets must be placed with cash. Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement.
+
+Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Bonus Spin, select “Bonus Spin” in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash).
+
+Eligible Games
+Cash wagers placed on any slots games available in the Fanatics Casino will count towards the cumulative wager requirement. 
+
+Restrictions on Withdrawal
+Casino Credit, Bonus Spins, Bonus Bets, FanCash or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with Casino Credit, Bonus Spins, or Bonus Bets can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Bonus Spins.
+
+Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+Other
+Participation in this Promotion is subject to Fanatics Sportsbook and Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook & Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino’s Privacy Policy. 
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino’s Terms of Service, these Promotional Terms and Conditions will prevail. 
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law. 
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto. `;
 
 const DEFAULT_TC_VIPDM = `PROMOTIONAL TERMS AND CONDITIONS
 FANATICS CASINO (CANADA) – DEPOSIT {min_fmt} CAD, GET {pct}% CASINO CREDIT (UP TO {max_fmt} CAD) ({terms_id})
@@ -1566,14 +1649,14 @@ This Promotion begins at 12:00 a.m. ET on {date_fmt} and ends at 11:59 p.m. ET o
   if (t === 'LCREACT') return localStorage.getItem('lc_react_hiw') || DEFAULT_HIW_LCREACT;
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_hiw') || DEFAULT_HIW_CHURNDM;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_hiw') || DEFAULT_HIW_VIPDM;
-  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_hiw') || DEFAULT_HIW_VIPBG;
+  if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_hiw')) || (isVIPBGUS() ? DEFAULT_HIW_VIPBG_US : DEFAULT_HIW_VIPBG);
   return localStorage.getItem('rtc_hiw') || DEFAULT_HIW_RTC;
 }
 function getTC() {
   const t = getOfferType();
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_tc') || DEFAULT_TC_CHURNDM;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_tc') || DEFAULT_TC_VIPDM;
-  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_tc') || DEFAULT_TC_VIPBG;
+  if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_tc')) || (isVIPBGUS() ? DEFAULT_TC_VIPBG_US : DEFAULT_TC_VIPBG);
   if (t === 'LCREACT') return localStorage.getItem('lc_react_tc') || DEFAULT_TC_LCREACT_10;
   if (t === 'BG') return localStorage.getItem('bg_tc') || DEFAULT_TC_BG;
   if (t === 'FS') return localStorage.getItem('rtc_fs_tc') || `T&C copy for Free Spins — to be updated.`;
@@ -1645,7 +1728,7 @@ function openModal(type) {
     const isVIPDM = getOfferType() === 'VIPDM';
     const isVIPBG = getOfferType() === 'VIPBG';
     const tcTitle = document.getElementById('modal-tc-title');
-    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? 'Edit T&Cs — VIP Offer Library (CA — Canada)' : isVIPBG ? 'Edit T&Cs — VIP Offer Library B&G (CA — Canada)' : 'Edit T&Cs';
+    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? 'Edit T&Cs — VIP Offer Library (CA — Canada)' : isVIPBG ? `Edit T&Cs — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : 'Edit T&Cs';
     document.getElementById('tc-terms-ids-bar').style.display = (isRTC || isVIPDM || isVIPBG) ? 'flex' : 'none';
     const termsBarBtn = document.getElementById('tc-terms-ids-btn');
     if (termsBarBtn) termsBarBtn.setAttribute('onclick', isVIPDM ? 'openVIPDMTermsModal()' : isVIPBG ? 'openVIPBGTermsModal()' : 'openTermsIDModal()');
@@ -1653,7 +1736,7 @@ function openModal(type) {
   } else if (type === 'images') {
     const lt = getOfferType();
     const imgTitle = document.getElementById('modal-images-title');
-    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? 'Edit Images — VIP Offer Library B&G (CA — Canada)' : 'Edit Images';
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -1665,7 +1748,9 @@ function openModal(type) {
       : lt === 'VIPDM'
       ? 'https://drive.google.com/drive/folders/1v9DEVtCNQPCgUkJsWtsXn7UJVIyBYtr4'
       : lt === 'VIPBG'
-      ? 'https://drive.google.com/drive/folders/1tkMs1dx-gszSGzlBHxgMYvOYv2l-2UjO'
+      ? (isVIPBGUS()
+        ? 'https://drive.google.com/drive/folders/13neRGeYM4JLa98p827vbepp-eKu2_hXq'
+        : 'https://drive.google.com/drive/folders/1tkMs1dx-gszSGzlBHxgMYvOYv2l-2UjO')
       : isRTCCanada()
       ? 'https://drive.google.com/drive/folders/1W6ulHKv3ted9ZLNKzPgEbRoNCK_wFz6O'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
@@ -1685,11 +1770,11 @@ function closeModal(type) {
 function saveModal(type) {
   const t2 = getOfferType();
   if (type === 'hiw') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : t2 === 'VIPDM' ? 'vcl_dm_hiw' : t2 === 'VIPBG' ? 'vcl_bg_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : t2 === 'VIPDM' ? 'vcl_dm_hiw' : t2 === 'VIPBG' ? vipbgKey('vcl_bg_hiw') : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? 'vcl_dm_tc' : t2 === 'VIPBG' ? 'vcl_bg_tc' : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? 'vcl_dm_tc' : t2 === 'VIPBG' ? vipbgKey('vcl_bg_tc') : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : t2 === 'VIPDM' ? 'vcl_dm_image_path' : t2 === 'VIPBG' ? 'vcl_bg_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : t2 === 'VIPDM' ? 'vcl_dm_image_path' : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1814,15 +1899,18 @@ function updateVIPDMTermsDatePreviews() {
 
 // v2.24 — VIP Offer Library - Bet & Gets: Terms Expiry & Terms IDs modal
 function vipbgOfferKey(o) {
-  return `${o.cat}_B${o.bet}_G${o.get}`;
+  // v2.25 — US keys have no category prefix (all US tiers are slots B&Gs)
+  return isVIPBGUS() ? `B${o.bet}_G${o.get}` : `${o.cat}_B${o.bet}_G${o.get}`;
 }
 function openVIPBGTermsModal() {
   const ids = getVIPBGTermsIDs();
+  const vbgTermsTitle = document.getElementById('modal-vipbg-terms-title');
+  if (vbgTermsTitle) vbgTermsTitle.textContent = `Edit Terms Expiry & Terms IDs — VIP B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})`;
   document.getElementById('vipbg-terms-start-date-input').value = getVIPBGStartDate();
   document.getElementById('vipbg-terms-end-date-input').value = getVIPBGEndDate();
   updateVIPBGTermsDatePreviews();
   // union of default keys and any saved custom keys, defaults first
-  const keys = [...Object.keys(DEFAULT_VIPBG_TERMS_IDS)];
+  const keys = [...Object.keys(isVIPBGUS() ? DEFAULT_VIPBG_TERMS_IDS_US : DEFAULT_VIPBG_TERMS_IDS)];
   Object.keys(ids).forEach(k => { if (!keys.includes(k)) keys.push(k); });
   const grid = document.getElementById('vipbg-terms-grid');
   grid.innerHTML = `
@@ -1836,13 +1924,13 @@ function closeVIPBGTermsModal() {
   document.getElementById('modal-vipbg-terms').classList.remove('open');
 }
 function saveVIPBGTermsModal() {
-  localStorage.setItem('vcl_bg_terms_start_date', document.getElementById('vipbg-terms-start-date-input').value.trim());
-  localStorage.setItem('vcl_bg_terms_end_date', document.getElementById('vipbg-terms-end-date-input').value.trim());
+  localStorage.setItem(vipbgKey('vcl_bg_terms_start_date'), document.getElementById('vipbg-terms-start-date-input').value.trim());
+  localStorage.setItem(vipbgKey('vcl_bg_terms_end_date'), document.getElementById('vipbg-terms-end-date-input').value.trim());
   const ids = {};
   document.querySelectorAll('#vipbg-terms-grid input[data-vipbg-key]').forEach(el => {
     ids[el.getAttribute('data-vipbg-key')] = el.value.trim();
   });
-  localStorage.setItem('vcl_bg_terms_ids', JSON.stringify(ids));
+  localStorage.setItem(vipbgKey('vcl_bg_terms_ids'), JSON.stringify(ids));
   closeVIPBGTermsModal();
   if (getOfferType() === 'VIPBG') renderAll();
 }
@@ -1903,11 +1991,19 @@ const DYNAMIC_FIELDS = {
     { code: '{start_date_long}',     hint: 'e.g. August 17, 2026' },
     { code: '{end_date_long}',       hint: 'e.g. December 31, 2026' },
   ],
+  // v2.25 — US region has no game-category fields (all US tiers are slots)
+  VIPBG_US: [
+    { code: '{bet_fmt}',         hint: 'e.g. $1,000' },
+    { code: '{get_fmt}',         hint: 'e.g. $100' },
+    { code: '{terms_id}',        hint: 'e.g. CAS_10687' },
+    { code: '{start_date_long}', hint: 'e.g. July 1, 2026' },
+    { code: '{end_date_long}',   hint: 'e.g. December 31, 2026' },
+  ],
 };
 
 function renderFieldBar(modalType) {
   const offerType = getOfferType();
-  const fields = DYNAMIC_FIELDS[offerType] || [];
+  const fields = (offerType === 'VIPBG' && isVIPBGUS()) ? DYNAMIC_FIELDS.VIPBG_US : (DYNAMIC_FIELDS[offerType] || []);
   const barId = modalType === 'hiw' ? 'hiw-field-bar' : 'tc-field-bar';
   const chipsId = modalType === 'hiw' ? 'hiw-field-chips' : 'tc-field-chips';
   const bar = document.getElementById(barId);
@@ -2059,7 +2155,7 @@ function getVIPDMTermsIDs() {
 function getVIPDMStartDate() { return localStorage.getItem('vcl_dm_terms_start_date') || DEFAULT_VIPDM_START_DATE; }
 function getVIPDMEndDate() { return localStorage.getItem('vcl_dm_terms_end_date') || DEFAULT_VIPDM_END_DATE; }
 
-// v2.24 — VIP Offer Library - Bet & Gets (CA — Canada only)
+// v2.24 — VIP Offer Library - Bet & Gets, CA — Canada region (base keys)
 // cat: 'SBG' = Slots Bet & Get, 'TBG' = Table Games Bet & Get
 const DEFAULT_VIPBG_OFFERS = [
   { cat: 'SBG', bet: 1000,   get: 100,  active: false },
@@ -2085,12 +2181,36 @@ const DEFAULT_VIPBG_TERMS_IDS = {
 const DEFAULT_VIPBG_START_DATE = '08/17/26';
 const DEFAULT_VIPBG_END_DATE = '12/31/26';
 
-function getVIPBGTermsIDs() {
-  try { return JSON.parse(localStorage.getItem('vcl_bg_terms_ids')) || DEFAULT_VIPBG_TERMS_IDS; }
-  catch(e) { return DEFAULT_VIPBG_TERMS_IDS; }
+// v2.25 — VIP Offer Library - Bet & Gets, US — United States region.
+// All US tiers are slots B&Gs; no category token in keys, code names, or images.
+// Reward is FanCash (USD row). Code: MMDDYY_VCL_RET_BG_US_FC_B{bet}_G{get}.
+const DEFAULT_VIPBG_OFFERS_US = [
+  { bet: 1000,   get: 100,  active: false },
+  { bet: 5000,   get: 500,  active: false },
+  { bet: 20000,  get: 1000, active: false },
+  { bet: 100000, get: 5000, active: false },
+];
+
+const DEFAULT_VIPBG_TERMS_IDS_US = {
+  'B1000_G100':    'CAS_10687',
+  'B5000_G500':    'CAS_10688',
+  'B20000_G1000':  'CAS_10689',
+  'B100000_G5000': 'CAS_10690',
+};
+const DEFAULT_VIPBG_START_DATE_US = '07/01/26';
+const DEFAULT_VIPBG_END_DATE_US = '12/31/26';
+
+function vipbgDefaultOffers() {
+  return (isVIPBGUS() ? DEFAULT_VIPBG_OFFERS_US : DEFAULT_VIPBG_OFFERS).map(o => ({ ...o }));
 }
-function getVIPBGStartDate() { return localStorage.getItem('vcl_bg_terms_start_date') || DEFAULT_VIPBG_START_DATE; }
-function getVIPBGEndDate() { return localStorage.getItem('vcl_bg_terms_end_date') || DEFAULT_VIPBG_END_DATE; }
+
+function getVIPBGTermsIDs() {
+  const def = isVIPBGUS() ? DEFAULT_VIPBG_TERMS_IDS_US : DEFAULT_VIPBG_TERMS_IDS;
+  try { return JSON.parse(localStorage.getItem(vipbgKey('vcl_bg_terms_ids'))) || def; }
+  catch(e) { return def; }
+}
+function getVIPBGStartDate() { return localStorage.getItem(vipbgKey('vcl_bg_terms_start_date')) || (isVIPBGUS() ? DEFAULT_VIPBG_START_DATE_US : DEFAULT_VIPBG_START_DATE); }
+function getVIPBGEndDate() { return localStorage.getItem(vipbgKey('vcl_bg_terms_end_date')) || (isVIPBGUS() ? DEFAULT_VIPBG_END_DATE_US : DEFAULT_VIPBG_END_DATE); }
 
 const DEFAULT_BG_OFFERS = [
   { bet: 100, get: 2 },
@@ -2232,11 +2352,11 @@ function updateJurisdictionOptions(type) {
   sel.innerHTML = '';
   const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
   const vipdmOnly = ['CA'];     // v2.23 — VIP Offer Library - Deposit Matches is CA — Canada only
-  const vipbgOnly = ['CA'];     // v2.24 — VIP Offer Library - Bet & Gets is CA — Canada only (US planned)
+  const vipbgRegions = ['US','CA'];  // v2.25 — VIP Offer Library - Bet & Gets is US / CA (US: FanCash; CA: Casino Credit)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
     : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
     : (type === 'VIPDM') ? allOptions.filter(o => vipdmOnly.includes(o.value))
-    : (type === 'VIPBG') ? allOptions.filter(o => vipbgOnly.includes(o.value))
+    : (type === 'VIPBG') ? allOptions.filter(o => vipbgRegions.includes(o.value))
     : allOptions;
   filtered.forEach(o => {
     const opt = document.createElement('option');
@@ -2248,8 +2368,11 @@ function updateJurisdictionOptions(type) {
     sel.value = fsOnly.includes(current) ? current : 'MI';
   } else if (type === 'RTC') {
     sel.value = rtcOnly.includes(current) ? current : 'US';
-  } else if (type === 'VIPDM' || type === 'VIPBG') {
+  } else if (type === 'VIPDM') {
     sel.value = 'CA';
+  } else if (type === 'VIPBG') {
+    // v2.25 — keep the current region if valid, otherwise default to CA (the original region)
+    sel.value = vipbgRegions.includes(current) ? current : 'CA';
   } else {
     sel.value = 'US';
   }
@@ -2258,14 +2381,16 @@ function updateJurisdictionOptions(type) {
 
 function updateRegionTheme() {
   // v2.22 — RTC CC: red edit-button theme when Region = CA — Canada
-  document.body.classList.toggle('ca-region', isRTCCanada());
+  // v2.25 — VIPBG: same cue — red buttons for CA — Canada, blue (default) for US
+  const vipbgCA = getOfferType() === 'VIPBG' && !isVIPBGUS();
+  document.body.classList.toggle('ca-region', isRTCCanada() || vipbgCA);
 }
 
 function onJurisdictionChange() {
   updateRegionTheme();
-  // v2.22 — RTC CC: switching region resets all day-card values (dates,
-  // selected amounts, toggles) so US and CA inputs never mix
-  if (getOfferType() === 'RTC') resetAll();
+  // v2.22 — RTC CC / v2.25 — VIPBG: switching region resets all day-card values
+  // (dates, selected offers, toggles) so US and CA inputs never mix
+  if (getOfferType() === 'RTC' || getOfferType() === 'VIPBG') resetAll();
 }
 
 
@@ -2335,17 +2460,17 @@ const INFO_CHURNDM = `<ul>
 </ul>`;
 
 const INFO_VIPBG = `<ul>
-  <li><strong>Offer Type:</strong> VIP Offer Library - Bet &amp; Gets. <span style="color:#ffffff;">CA — Canada only.</span> Builds Segment, Promotion, and Bonus for each selected offer. Reward is paid in <span style="color:#ffffff;">Casino Credit</span> (CAD currency rows). The wager requirement is enforced upstream (XP/segment) — no bet amount is entered on the bonus.</li>
-  <li><strong>Offers:</strong> Each offer is Category (Slots/Tables) &rarr; Bet &rarr; Get. Eight defaults are provided, each mapped to a Terms ID (editable in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
-  <li><strong>Promo &amp; Activation Window:</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
-  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". <span style="color:#ffffff;">Button 2 label/link are left empty for CA — Canada</span> ("Play Now!" &rarr; /docs/usered/casgenericgamelist is reserved for the future US region).</li>
-  <li><strong>Send to XP &amp; External Bonus:</strong> <span style="color:#ffffff;">Both always ON</span> — no toggles for this offer type.</li>
-  <li><strong>Voucher Code format:</strong> <code>CLBGFC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
-  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{SBG|TBG}_B{bet}_G{get}.png</code> (e.g. <code>SBG_B1000_G100.png</code>).</li>
-  <li><strong>T&amp;Cs:</strong> Canadian (Ontario) legal copy with dynamic fields incl. <code>{game_category_lower}</code>/<code>{game_category_upper}</code>. Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal and baked in at generation time — changes require regenerating the script.</li>
-  <li><strong>Series:</strong> VIP &nbsp;|&nbsp; <strong>Origin:</strong> Opt-In Bonus &nbsp;|&nbsp; <strong>Type:</strong> Retention</li>
-  <li><strong>Platforms:</strong> Web + STAC: Standalone Casino only (all COMBO tags removed)</li>
-  <li><strong>Bonus Save:</strong> Confirmation modal handled defensively — confirmed if it appears, skipped if not (verify on first test build).</li>
+  <li><strong>Offer Type:</strong> VIP Offer Library - Bet &amp; Gets. <span style="color:#ffffff;">Dual region (v2.25):</span> <span style="color:#ffffff;">US — United States</span> pays <span style="color:#ffffff;">FanCash</span> (USD rows); <span style="color:#ffffff;">CA — Canada</span> pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. The wager requirement is enforced upstream (XP/segment) — no bet amount is entered on the bonus. <span style="color:#ffffff;">Switching Region resets all card values</span> (silent, by design).</li>
+  <li><strong>Offers:</strong> CA offers are Category (Slots/Tables) &rarr; Bet &rarr; Get (eight defaults); US offers are Bet &rarr; Get only — all US tiers are slots B&amp;Gs (four defaults, Terms IDs CAS_10687–CAS_10690). Each offer maps to a Terms ID (editable in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
+  <li><strong>Promo &amp; Activation Window (both regions):</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
+  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". Button 2: <span style="color:#ffffff;">US fills "Play Now!" &rarr; /docs/usered/casgenericgamelist; CA is left empty</span> by design.</li>
+  <li><strong>Send to XP &amp; External Bonus:</strong> <span style="color:#ffffff;">Both always ON</span> — no toggles for this offer type (both regions).</li>
+  <li><strong>Voucher Code format:</strong> <code>CLBGFC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime (both regions; shared with BG/BG-RE).</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, one per region. Use Edit Images to set each path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{SBG|TBG}_B{bet}_G{get}.png</code> for CA (e.g. <code>SBG_B1000_G100.png</code>) or <code>B{bet}_G{get}.png</code> for US (e.g. <code>B1000_G100.png</code>).</li>
+  <li><strong>T&amp;Cs:</strong> Region-scoped legal copy — CA: Canadian (Ontario) template with <code>{game_category_lower}</code>/<code>{game_category_upper}</code>; US: FanCash template (no category fields). Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal (per region) and baked in at generation time — changes require regenerating the script.</li>
+  <li><strong>Series:</strong> VIP &nbsp;|&nbsp; <strong>Origin:</strong> Opt-In Bonus &nbsp;|&nbsp; <strong>Type:</strong> Retention (both regions)</li>
+  <li><strong>Platforms:</strong> CA: Web + STAC: Standalone Casino only (all COMBO tags removed). <span style="color:#ffffff;">US keeps COMBO: Casino</span> (standard tag behavior).</li>
+  <li><strong>Bonus Save:</strong> Confirmation modal handled defensively — confirmed if it appears, noted if not. Expected: none for CA (Casino Credit); one for US (FanCash, as standard BG).</li>
 </ul>`;
 
 const INFO_VIPDM = `<ul>
@@ -2829,7 +2954,7 @@ function renderAll() {
       card.style.maxWidth = '680px';
       card.innerHTML = `
         <div class="day-header">
-          <span class="day-number">VIP Offer Library — Bet &amp; Gets — CA — Canada</span>
+          <span class="day-number">VIP Offer Library — Bet &amp; Gets — ${isVIPBGUS() ? 'US — United States' : 'CA — Canada'}</span>
           <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
         </div>
         ${stepBadgesHTML(i)}
@@ -2837,7 +2962,7 @@ function renderAll() {
         <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 090126" value="${day.date}"
           oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 6px;" />
         <p style="font-size: 11px; color: var(--muted); margin: 0 0 14px; font-family: 'SF Mono', ui-monospace, monospace;">Promo &amp; bonus start 1 day before this date (00:00 ET). End = last day of this month (23:59:59 ET) + Days to Entitlement.</p>
-        <span class="field-label">Offers (Category → Bet → Get)</span>
+        <span class="field-label">${isVIPBGUS() ? 'Offers (Bet → Get)' : 'Offers (Category → Bet → Get)'}</span>
         <div id="vipbg-offers-${i}"></div>
         <div class="add-row" style="margin-top: 8px;">
           <button class="reset-btn" onclick="addVIPBGOffer(${i})">+ Add</button>
@@ -3170,7 +3295,7 @@ function resetDay(i) {
   days[i].vipdmDaysToOptin = 3;
   days[i].vipdmDaysToEntitlement = 3;
   days[i].vipdmDaysToSettlement = 7;
-  days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
+  days[i].vipbgOfferData = vipbgDefaultOffers();
   days[i].vipbgDaysToOptin = 3;
   days[i].vipbgDaysToEntitlement = 3;
   days[i].vipbgDaysToSettlement = 7;
@@ -3380,7 +3505,7 @@ function renderVIPBGOffers(i) {
   const container = document.getElementById(`vipbg-offers-${i}`);
   if (!container) return;
   if (!days[i].vipbgOfferData) {
-    days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
+    days[i].vipbgOfferData = vipbgDefaultOffers();
   }
   const termsIds = getVIPBGTermsIDs();
   container.innerHTML = '';
@@ -3391,11 +3516,11 @@ function renderVIPBGOffers(i) {
     row.style.cssText = `border: ${offer.active ? (hasTerms ? '1.5px solid #ffffff' : '1.5px solid #e24b4a') : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
     row.innerHTML = `
       <div style="display: flex; align-items: center; gap: 6px;">
-        <select style="font-family: 'SF Mono', ui-monospace, monospace; font-size:12px; background: var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:4px 6px; cursor:pointer;"
+        ${isVIPBGUS() ? '' : `<select style="font-family: 'SF Mono', ui-monospace, monospace; font-size:12px; background: var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:4px 6px; cursor:pointer;"
           onchange="days[${i}].vipbgOfferData[${j}].cat = this.value; renderVIPBGOffers(${i});">
           <option value="SBG" ${offer.cat === 'SBG' ? 'selected' : ''}>Slots</option>
           <option value="TBG" ${offer.cat === 'TBG' ? 'selected' : ''}>Tables</option>
-        </select>
+        </select>`}
         <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Bet</span>
         <input type="number" value="${offer.bet || ''}" placeholder="1000" style="width:78px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
           oninput="days[${i}].vipbgOfferData[${j}].bet = parseFloat(this.value) || 0;" onchange="renderVIPBGOffers(${i});" />
@@ -3415,13 +3540,13 @@ function renderVIPBGOffers(i) {
 }
 
 function addVIPBGOffer(i) {
-  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
-  days[i].vipbgOfferData.push({ cat: 'SBG', bet: 0, get: 0, active: false });
+  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = vipbgDefaultOffers();
+  days[i].vipbgOfferData.push(isVIPBGUS() ? { bet: 0, get: 0, active: false } : { cat: 'SBG', bet: 0, get: 0, active: false });
   renderVIPBGOffers(i);
 }
 
 function selectAllVIPBGOffers(i) {
-  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o, active: true }));
+  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = vipbgDefaultOffers().map(o => ({ ...o, active: true }));
   else days[i].vipbgOfferData.forEach(o => o.active = true);
   renderVIPBGOffers(i);
 }
@@ -3539,7 +3664,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -8198,6 +8323,7 @@ asyncio.run(main())
 }
 
 function buildVIPBGScript(allNames, imagePath, hiwText, tcText) {
+  const isUS               = isVIPBGUS();  // v2.25 — US region (FanCash) vs CA (Casino Credit)
   const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
   const daysOptinLines     = allNames.map(n => `    ${n.daysToOptin},`).join('\n');
   const daysEntLines       = allNames.map(n => `    ${n.daysToEntitlement},`).join('\n');
@@ -8254,12 +8380,19 @@ async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
 
-# v2.24 — VIP Offer Library - Bet & Gets (CA — Canada only)
+${isUS ? `# v2.25 — VIP Offer Library - Bet & Gets (US — United States)
+# Reward: FanCash (flat amount = "get", USD row). Wager requirement ("bet") is
+# enforced upstream by XP / segment logic — it is NOT entered on the bonus.
+# All US tiers are slots B&Gs; there is no category token in codes or images.
+TITLE_HEADER_TEXT = "From Your VIP Host"
+BUTTON2_LABEL = "Play Now!"
+BUTTON2_LINK  = "/docs/usered/casgenericgamelist"
+` : `# v2.24 — VIP Offer Library - Bet & Gets (CA — Canada)
 # Reward: Casino Credit (flat amount = "get"). Wager requirement ("bet") is
 # enforced upstream by XP / segment logic — it is NOT entered on the bonus.
 TITLE_HEADER_TEXT = "From Your VIP Host"
 # v2.24 — CA — Canada: Button 2 label/link are left EMPTY on the promo.
-# The values below are reserved for the future US region of this offer type:
+# The values below are reserved for the US region of this offer type:
 #   BUTTON2_LABEL = "Play Now!"
 #   BUTTON2_LINK  = "/docs/usered/casgenericgamelist"
 
@@ -8268,7 +8401,7 @@ GAME_CATEGORIES = {
     "SBG": {"hiw": "Slots",  "tc_lower": "slots", "tc_upper": "SLOTS"},
     "TBG": {"hiw": "Tables", "tc_lower": "table", "tc_upper": "TABLES"},
 }
-
+`}
 NAMES = [
 ${namesLines}
 ]
@@ -8310,7 +8443,17 @@ TERMS_END_LONG    = "${endLong}"
 
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
-def parse_vipbg(code):
+${isUS ? `def parse_vipbg(code):
+    """Returns (bet, get) from MMDDYY_VCL_RET_BG_US_FC_B{bet}_G{get}."""
+    parts = code.split("_")
+    bet, get = None, None
+    for part in parts:
+        if part.startswith("B") and part[1:].isdigit():
+            bet = part[1:]
+        elif part.startswith("G") and part[1:].isdigit():
+            get = part[1:]
+    return bet, get
+` : `def parse_vipbg(code):
     """Returns (cat, bet, get) from MMDDYY_VCL_RET_{SBG|TBG}_CA_CC_B{bet}_G{get}."""
     parts = code.split("_")
     cat, bet, get = None, None, None
@@ -8322,7 +8465,7 @@ def parse_vipbg(code):
         elif part.startswith("G") and part[1:].isdigit():
             get = part[1:]
     return cat, bet, get
-
+`}
 def parse_dates(code, entitlement_days):
     """VIP Offer Library window:
     Start = 00:00:00 ET one day BEFORE the typed code date.
@@ -8353,7 +8496,24 @@ def format_currency(amount_str):
     amount = int(float(amount_str))
     return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
 
-def format_hiw(code):
+${isUS ? `def format_hiw(code):
+    bet, get = parse_vipbg(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    terms_id = TERMS_IDS.get(f"B{bet}_G{get}", "")
+    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    bet, get = parse_vipbg(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    terms_id = TERMS_IDS.get(f"B{bet}_G{get}", "")
+    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
+    return f"""${tcText}"""
+` : `def format_hiw(code):
     cat, bet, get = parse_vipbg(code)
     bet_fmt = format_currency(bet)
     get_fmt = format_currency(get)
@@ -8376,7 +8536,7 @@ def format_tc(code):
     start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
     end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
     return f"""${tcText}"""
-
+`}
 def notify(message):
     subprocess.run(["osascript", "-e", f'display notification "{message}" with title "VIP Offer Library B&G Setup Script" sound name "Glass"'])
 
@@ -8508,9 +8668,11 @@ async def create_promo(page, name, idx):
     await page.get_by_text("Overlay", exact=True).click()
     await page.get_by_text("Save", exact=True).click()
     await page.wait_for_load_state("networkidle")
-    cat, bet, get = parse_vipbg(name)
+${isUS ? `    bet, get = parse_vipbg(name)
+    discover_filename = f"B{bet}_G{get}.png"
+` : `    cat, bet, get = parse_vipbg(name)
     discover_filename = f"{cat}_B{bet}_G{get}.png"
-    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+`}    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
     await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
     await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
     await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
@@ -8518,9 +8680,15 @@ async def create_promo(page, name, idx):
     bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
     await bonus_tile_row.locator(".ant-switch").click()
     await page.wait_for_timeout(500)
-    # v2.24 — CA — Canada: Button 2 label/link intentionally left empty
+${isUS ? `    # v2.25 — US — United States: Button 2 filled
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill(BUTTON2_LABEL)
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill(BUTTON2_LINK)
+    print(f"    OK Button 2: {BUTTON2_LABEL} -> {BUTTON2_LINK}")
+` : `    # v2.24 — CA — Canada: Button 2 label/link intentionally left empty
     print("    -- Button 2: left empty (CA — Canada; values reserved for US region)")
-    await fill_rich_text(page, "How it works", format_hiw(name))
+`}    await fill_rich_text(page, "How it works", format_hiw(name))
     await fill_rich_text(page, "T&C", format_tc(name))
     await page.get_by_text("Save", exact=True).click()
     await page.wait_for_load_state("networkidle")
@@ -8554,25 +8722,37 @@ async def create_bonus(page, name, idx):
     await page.wait_for_timeout(500)
     print("    OK Send To XP: ON | External Bonus: ON")
 
-    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino", "COMBO: Casino"]:
+${isUS ? `    # v2.25 — US keeps COMBO: Casino (standard pre-v2.23 platform-tag behavior)
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+    print("    OK Platforms: Web + STAC: Standalone Casino + COMBO: Casino")
+` : `    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino", "COMBO: Casino"]:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
     print("    OK Platforms: Web + STAC: Standalone Casino only")
-
+`}
     voucher_code = parse_voucher(name)
     voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
     await voucher_row.locator("input.ant-input").fill(voucher_code)
     await page.wait_for_timeout(500)
     print(f"    OK Voucher Code: {voucher_code}")
 
-    await page.get_by_text("Casino Credit", exact=True).click()
+${isUS ? `    await page.get_by_text("FanCash", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    bet, get = parse_vipbg(name)
+
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Fancash Settlement"))
+` : `    await page.get_by_text("Casino Credit", exact=True).click()
     await page.wait_for_timeout(500)
 
     cat, bet, get = parse_vipbg(name)
 
     days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Casino_credit Settlement"))
-    await days_row.locator("input.ant-input-number-input").click()
+`}    await days_row.locator("input.ant-input-number-input").click()
     await days_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_SETTLEMENT[idx]))
     await page.wait_for_timeout(500)
 
@@ -8587,8 +8767,9 @@ async def create_bonus(page, name, idx):
     await page.wait_for_timeout(500)
     print("    OK Days fields filled")
 
-    # Stake Chunk Sizes — present on the flat Casino Credit form (RTC CC / LC-REACT
-    # both set 1). Filled conditionally in case the wager-entitled variant differs.
+${isUS ? `    # Stake Chunk Sizes — conditional: filled with 1 if the FanCash form exposes
+    # it, skipped with a note if not (standard FanCash BG does not fill it).` : `    # Stake Chunk Sizes — present on the flat Casino Credit form (RTC CC / LC-REACT
+    # both set 1). Filled conditionally in case the wager-entitled variant differs.`}
     stake_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Stake Chunk Sizes"))
     if await stake_row.count() > 0:
         await stake_row.locator("input.ant-input-number-input").fill("1")
@@ -8596,9 +8777,11 @@ async def create_bonus(page, name, idx):
     else:
         print("    -- Stake Chunk Sizes field not present, skipping")
 
-    # Casino Credit amount = the "get" value — CAD currency row
+${isUS ? `    # FanCash amount = the "get" value — USD currency row (from the _US_ code token)
+    await fill_currency_amount(page, name, get, label="FanCash Amount")
+` : `    # Casino Credit amount = the "get" value — CAD currency row
     await fill_currency_amount(page, name, get, label="Casino Credit Amount")
-
+`}
     status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
     await status_row.locator("input.ant-checkbox-input").click()
     await page.wait_for_timeout(500)
@@ -8677,16 +8860,18 @@ async def create_bonus(page, name, idx):
 
     await page.locator("button.ant-btn-primary.save").click()
     await page.wait_for_timeout(2000)
-    # v2.24 — Defensive confirmation-modal handling: the flat Casino Credit save
+${isUS ? `    # v2.25 — Defensive confirmation-modal handling: the FanCash save is expected
+    # to SHOW a confirmation modal (standard FanCash BG does). Confirm it if it
+    # appears; continue with a note if it doesn't.` : `    # v2.24 — Defensive confirmation-modal handling: the flat Casino Credit save
     # is expected to have NO modal (like VIPDM/LC-REACT), but standard BG (FanCash)
-    # does show one. Confirm it if it appears; continue if it doesn't.
+    # does show one. Confirm it if it appears; continue if it doesn't.`}
     modal = page.locator(".ant-modal-content")
     try:
         await modal.wait_for(state="visible", timeout=5000)
         await modal.locator("button.ant-btn-primary").click()
         print("    OK Confirmation modal appeared — confirmed")
     except Exception:
-        print("    -- No confirmation modal (expected)")
+        print("    -- No confirmation modal${isUS ? ' (unexpected for FanCash — verify the bonus saved)' : ' (expected)'}")
     await page.wait_for_load_state("networkidle")
     print(f"  OK Bonus done: {name}")
 
@@ -9511,11 +9696,12 @@ function generateScript() {
       const offers = (days[i].vipbgOfferData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`The VIP Offer Library B&G card has a date but no offers selected.`); return; }
       const vipbgTermsIds = getVIPBGTermsIDs();
+      const vipbgUS = isVIPBGUS();  // v2.25 — US region: no category, FanCash reward
       for (const o of offers) {
-        if (!o.cat || !o.bet || !o.get) { alert(`VIP Offer Library B&G: every selected offer needs a Category, Bet, and Get value.`); return; }
-        const key = `${o.cat}_B${o.bet}_G${o.get}`;
+        if (vipbgUS ? (!o.bet || !o.get) : (!o.cat || !o.bet || !o.get)) { alert(vipbgUS ? `VIP Offer Library B&G: every selected offer needs a Bet and Get value.` : `VIP Offer Library B&G: every selected offer needs a Category, Bet, and Get value.`); return; }
+        const key = vipbgUS ? `B${o.bet}_G${o.get}` : `${o.cat}_B${o.bet}_G${o.get}`;
         if (!vipbgTermsIds[key]) {
-          alert(`VIP Offer Library B&G: no Terms ID is configured for offer ${key} (${o.cat === 'SBG' ? 'Slots' : 'Tables'}, Bet $${o.bet}, Get $${o.get}).\n\nScript generation is blocked. Add a Terms ID for this offer via the Edit T&Cs modal, or use one of the configured offers.`);
+          alert(`VIP Offer Library B&G: no Terms ID is configured for offer ${key} (${vipbgUS ? '' : (o.cat === 'SBG' ? 'Slots, ' : 'Tables, ')}Bet $${o.bet}, Get $${o.get}).\n\nScript generation is blocked. Add a Terms ID for this offer via the Edit T&Cs modal, or use one of the configured offers.`);
           return;
         }
       }
@@ -9527,7 +9713,9 @@ function generateScript() {
       const vbgDoBonus = days[i].doBonus !== false;
       offers.forEach(o => {
         allNames.push({
-          code: `${date}_VCL_RET_${o.cat}_CA_CC_B${o.bet}_G${o.get}`,
+          // v2.25 — US: MMDDYY_VCL_RET_BG_US_FC_B{bet}_G{get} (FanCash, USD row)
+          //          CA: MMDDYY_VCL_RET_{SBG|TBG}_CA_CC_B{bet}_G{get} (Casino Credit, CAD row)
+          code: vipbgUS ? `${date}_VCL_RET_BG_US_FC_B${o.bet}_G${o.get}` : `${date}_VCL_RET_${o.cat}_CA_CC_B${o.bet}_G${o.get}`,
           sendToXP: true,          // v2.24 — always ON for VIPBG (no toggle)
           externalBonus: true,     // v2.24 — always ON for VIPBG (no toggle)
           daysToOptin: vbgDaysToOptin,
