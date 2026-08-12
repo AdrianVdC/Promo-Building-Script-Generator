@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.23</title>
+  <title>NATS Bonus Creator v2.24</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -756,6 +756,7 @@
           <option value="LCREACT">Lifecycle - REACT CC Drop</option>
           <option value="CHURNDM">Lifecycle - Churn DM</option>
           <option value="VIPDM">VIP Offer Library - Deposit Matches</option>
+          <option value="VIPBG">VIP Offer Library - Bet &amp; Gets</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -964,6 +965,41 @@
     <div class="modal-footer">
       <button class="btn-reset" onclick="closeVIPDMTermsModal()">Cancel</button>
       <button class="btn-edit-tc" onclick="saveVIPDMTermsModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal-vipbg-terms">
+  <div class="modal" style="width: 560px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <span class="modal-title">Edit Terms Expiry &amp; Terms IDs — VIP Offer Library B&amp;G (CA — Canada)</span>
+      <button class="modal-close" onclick="closeVIPBGTermsModal()">✕</button>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">PROMOTIONAL START DATE</p>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <input type="text" id="vipbg-terms-start-date-input" placeholder="MM/DD/YY" maxlength="8" oninput="updateVIPBGTermsDatePreviews()" style="width: 110px; font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: #9090a0;" id="vipbg-terms-start-preview"></span>
+      </div>
+      <p style="font-size: 11px; color: var(--muted); margin: 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {start_date_long} (and {start_date_short}) in the T&amp;C.</p>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">PROMOTIONAL END DATE</p>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <input type="text" id="vipbg-terms-end-date-input" placeholder="MM/DD/YY" maxlength="8" oninput="updateVIPBGTermsDatePreviews()" style="width: 110px; font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px;" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: #9090a0;" id="vipbg-terms-end-preview"></span>
+      </div>
+      <p style="font-size: 11px; color: var(--muted); margin: 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {end_date_long} (and {end_date_short}) in the T&amp;C.</p>
+    </div>
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+      <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">TERMS IDS — PER OFFER (CATEGORY / BET / GET)</p>
+      <div id="vipbg-terms-grid" style="display: grid; grid-template-columns: 190px 1fr; gap: 8px 12px; align-items: center;"></div>
+      <p style="font-size: 11px; color: var(--muted); margin: 10px 0 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {terms_id} in the T&amp;C. Each offer key {SBG|TBG}_B{bet}_G{get} gets its own ID. Active offers without an ID block script generation.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" onclick="closeVIPBGTermsModal()">Cancel</button>
+      <button class="btn-edit-tc" onclick="saveVIPBGTermsModal()">Save</button>
     </div>
   </div>
 </div>
@@ -1227,10 +1263,12 @@ function getImagePath() {
   if (t === 'LCREACT') return localStorage.getItem('lc_react_image_path') || DEFAULT_LCREACT_IMAGE_PATH;
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_image_path') || DEFAULT_VIPDM_IMAGE_PATH;
+  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_image_path') || DEFAULT_VIPBG_IMAGE_PATH;
   return localStorage.getItem(rtcKey('rtc_image_path')) || (isRTCCanada() ? DEFAULT_IMAGE_PATH_CA : DEFAULT_IMAGE_PATH);
 }
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_VIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Deposit Matches";
+const DEFAULT_VIPBG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Bet & Gets";
 const DEFAULT_HIW_LCREACT = `1. Opt-in to the promotion
 2. We'll instantly drop Casino Credit into your account
 3. Play the Casino Credit on any of your favorite games
@@ -1400,6 +1438,65 @@ const DEFAULT_HIW_VIPDM = `1. Opt-in to the promotion
 2. Make a single deposit of {min_fmt} or more
 3. We'll instantly match your deposit {pct}%, up to {max_fmt} Casino Credit`;
 
+const DEFAULT_HIW_VIPBG = `1. Opt-in to the promotion
+2. Wager {bet_fmt}+ on any of your favourite {game_category} games
+3. I'll instantly give you {get_fmt} in Casino Credit`;
+
+const DEFAULT_TC_VIPBG = `PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) – {game_category_upper} BET {bet_fmt} CAD, GET {get_fmt} CAD IN CASINO CREDIT ({terms_id})
+
+1.   Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (“Fanatics Casino”). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any {game_category_lower} games available in the Fanatics Casino within seventy-two (72) hours of receiving this offer are eligible to receive {get_fmt} CAD in Casino Credit (“Rewards”). Your seventy-two (72) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
+2.   Promotional Period
+This “Promotion” begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (“Promotional Period”).
+3.   Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (“Account”). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+4.   Action Required
+To be eligible for the Rewards: (i) each time you are eligible for this Promotion, you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any {game_category_lower} games available in the Fanatics Casino within seventy-two (72) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 72 hours of satisfying the wagering requirement. You will receive {get_fmt} CAD in Casino Credit.
+5.   Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+Casino Credit expires seven (7) days from issuance (at 11:59 p.m. ET).
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+Casino Credit can be combined with deposited funds (cash) to place a wager. As an example, if you have $20 CAD in cash and $2 CAD in Casino Credit in your Account and you wager $5 CAD on a blackjack hand, $2 CAD in Casino Credit and $3 CAD in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $2 CAD in Casino Credit and place a $1 CAD wager, $1 CAD of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you wager $2 CAD in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $2 CAD stake will be added to your cash balance).
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Casino Credit may not be exchanged, substituted, or transferred.
+6.   Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+7.   Limitations on Participation
+Limit one (1) Reward per customer, up to a maximum of {get_fmt} CAD in Casino Credit, each time you are eligible for this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+8.   Wagering Requirements/Exclusions
+Bets must be placed with cash (CAD). Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement.
+9.   Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+10.   Eligible Games
+Cash wagers can be placed on any {game_category_lower} games available in the Fanatics Casino within seventy-two (72) hours of receiving this offer. Rewards issued with this Promotion can be used on any Fanatics Casino games and expire seven (7) days from the date of issuance (at 11:59 p.m. ET).
+11.   Restrictions on Withdrawal
+Casino Credit or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+12.   Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+13.   Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+14.   Other
+Participation in this Promotion is subject to Fanatics Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control.`;
+
 const DEFAULT_TC_VIPDM = `PROMOTIONAL TERMS AND CONDITIONS
 FANATICS CASINO (CANADA) – DEPOSIT {min_fmt} CAD, GET {pct}% CASINO CREDIT (UP TO {max_fmt} CAD) ({terms_id})
 
@@ -1469,12 +1566,14 @@ This Promotion begins at 12:00 a.m. ET on {date_fmt} and ends at 11:59 p.m. ET o
   if (t === 'LCREACT') return localStorage.getItem('lc_react_hiw') || DEFAULT_HIW_LCREACT;
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_hiw') || DEFAULT_HIW_CHURNDM;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_hiw') || DEFAULT_HIW_VIPDM;
+  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_hiw') || DEFAULT_HIW_VIPBG;
   return localStorage.getItem('rtc_hiw') || DEFAULT_HIW_RTC;
 }
 function getTC() {
   const t = getOfferType();
   if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_tc') || DEFAULT_TC_CHURNDM;
   if (t === 'VIPDM') return localStorage.getItem('vcl_dm_tc') || DEFAULT_TC_VIPDM;
+  if (t === 'VIPBG') return localStorage.getItem('vcl_bg_tc') || DEFAULT_TC_VIPBG;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_tc') || DEFAULT_TC_LCREACT_10;
   if (t === 'BG') return localStorage.getItem('bg_tc') || DEFAULT_TC_BG;
   if (t === 'FS') return localStorage.getItem('rtc_fs_tc') || `T&C copy for Free Spins — to be updated.`;
@@ -1544,16 +1643,17 @@ function openModal(type) {
     renderFieldBar('tc');
     const isRTC = getOfferType() === 'RTC';
     const isVIPDM = getOfferType() === 'VIPDM';
+    const isVIPBG = getOfferType() === 'VIPBG';
     const tcTitle = document.getElementById('modal-tc-title');
-    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? 'Edit T&Cs — VIP Offer Library (CA — Canada)' : 'Edit T&Cs';
-    document.getElementById('tc-terms-ids-bar').style.display = (isRTC || isVIPDM) ? 'flex' : 'none';
+    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? 'Edit T&Cs — VIP Offer Library (CA — Canada)' : isVIPBG ? 'Edit T&Cs — VIP Offer Library B&G (CA — Canada)' : 'Edit T&Cs';
+    document.getElementById('tc-terms-ids-bar').style.display = (isRTC || isVIPDM || isVIPBG) ? 'flex' : 'none';
     const termsBarBtn = document.getElementById('tc-terms-ids-btn');
-    if (termsBarBtn) termsBarBtn.setAttribute('onclick', isVIPDM ? 'openVIPDMTermsModal()' : 'openTermsIDModal()');
+    if (termsBarBtn) termsBarBtn.setAttribute('onclick', isVIPDM ? 'openVIPDMTermsModal()' : isVIPBG ? 'openVIPBGTermsModal()' : 'openTermsIDModal()');
     document.getElementById('modal-tc').classList.add('open');
   } else if (type === 'images') {
     const lt = getOfferType();
     const imgTitle = document.getElementById('modal-images-title');
-    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : 'Edit Images';
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? 'Edit Images — VIP Offer Library B&G (CA — Canada)' : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -1564,6 +1664,8 @@ function openModal(type) {
       ? 'https://drive.google.com/drive/folders/1KJfVtJVwBbGkJJTr8T-PGeWHm5c8qc-2'
       : lt === 'VIPDM'
       ? 'https://drive.google.com/drive/folders/1v9DEVtCNQPCgUkJsWtsXn7UJVIyBYtr4'
+      : lt === 'VIPBG'
+      ? 'https://drive.google.com/drive/folders/1tkMs1dx-gszSGzlBHxgMYvOYv2l-2UjO'
       : isRTCCanada()
       ? 'https://drive.google.com/drive/folders/1W6ulHKv3ted9ZLNKzPgEbRoNCK_wFz6O'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
@@ -1583,11 +1685,11 @@ function closeModal(type) {
 function saveModal(type) {
   const t2 = getOfferType();
   if (type === 'hiw') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : t2 === 'VIPDM' ? 'vcl_dm_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_hiw' : t2 === 'DM' ? 'dm_hiw' : t2 === 'FS' ? 'rtc_fs_hiw' : t2 === 'LCREACT' ? 'lc_react_hiw' : t2 === 'CHURNDM' ? 'lc_churn_dm_hiw' : t2 === 'VIPDM' ? 'vcl_dm_hiw' : t2 === 'VIPBG' ? 'vcl_bg_hiw' : 'rtc_hiw', document.getElementById('hiw-textarea').value);
   } else if (type === 'tc') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? 'vcl_dm_tc' : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? 'vcl_dm_tc' : t2 === 'VIPBG' ? 'vcl_bg_tc' : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : t2 === 'VIPDM' ? 'vcl_dm_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : t2 === 'VIPDM' ? 'vcl_dm_image_path' : t2 === 'VIPBG' ? 'vcl_bg_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -1710,6 +1812,49 @@ function updateVIPDMTermsDatePreviews() {
     '{end_date_long} = <span style="color:#4e8ff0;">' + parseDateLong(ev) + '</span>';
 }
 
+// v2.24 — VIP Offer Library - Bet & Gets: Terms Expiry & Terms IDs modal
+function vipbgOfferKey(o) {
+  return `${o.cat}_B${o.bet}_G${o.get}`;
+}
+function openVIPBGTermsModal() {
+  const ids = getVIPBGTermsIDs();
+  document.getElementById('vipbg-terms-start-date-input').value = getVIPBGStartDate();
+  document.getElementById('vipbg-terms-end-date-input').value = getVIPBGEndDate();
+  updateVIPBGTermsDatePreviews();
+  // union of default keys and any saved custom keys, defaults first
+  const keys = [...Object.keys(DEFAULT_VIPBG_TERMS_IDS)];
+  Object.keys(ids).forEach(k => { if (!keys.includes(k)) keys.push(k); });
+  const grid = document.getElementById('vipbg-terms-grid');
+  grid.innerHTML = `
+    <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em;">OFFER KEY</span>
+    <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em;">TERMS ID</span>` +
+    keys.map(k => `
+    <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 13px; color: #9090a0;">${k}</span><input type="text" data-vipbg-key="${k}" value="${ids[k] || ''}" style="font-family:'SF Mono',ui-monospace,monospace; font-size:13px;" />`).join('');
+  document.getElementById('modal-vipbg-terms').classList.add('open');
+}
+function closeVIPBGTermsModal() {
+  document.getElementById('modal-vipbg-terms').classList.remove('open');
+}
+function saveVIPBGTermsModal() {
+  localStorage.setItem('vcl_bg_terms_start_date', document.getElementById('vipbg-terms-start-date-input').value.trim());
+  localStorage.setItem('vcl_bg_terms_end_date', document.getElementById('vipbg-terms-end-date-input').value.trim());
+  const ids = {};
+  document.querySelectorAll('#vipbg-terms-grid input[data-vipbg-key]').forEach(el => {
+    ids[el.getAttribute('data-vipbg-key')] = el.value.trim();
+  });
+  localStorage.setItem('vcl_bg_terms_ids', JSON.stringify(ids));
+  closeVIPBGTermsModal();
+  if (getOfferType() === 'VIPBG') renderAll();
+}
+function updateVIPBGTermsDatePreviews() {
+  const sv = document.getElementById('vipbg-terms-start-date-input').value.trim();
+  const ev = document.getElementById('vipbg-terms-end-date-input').value.trim();
+  document.getElementById('vipbg-terms-start-preview').innerHTML =
+    '{start_date_long} = <span style="color:#4e8ff0;">' + parseDateLong(sv) + '</span>';
+  document.getElementById('vipbg-terms-end-preview').innerHTML =
+    '{end_date_long} = <span style="color:#4e8ff0;">' + parseDateLong(ev) + '</span>';
+}
+
 const DYNAMIC_FIELDS = {
   RTC: [
     { code: '{amount_fmt}',       hint: 'e.g. $50' },
@@ -1747,6 +1892,16 @@ const DYNAMIC_FIELDS = {
     { code: '{terms_id}',        hint: 'e.g. CAS_CA_0083' },
     { code: '{start_date_long}', hint: 'e.g. August 17, 2026' },
     { code: '{end_date_long}',   hint: 'e.g. December 31, 2026' },
+  ],
+  VIPBG: [
+    { code: '{bet_fmt}',             hint: 'e.g. $1,000' },
+    { code: '{get_fmt}',             hint: 'e.g. $100' },
+    { code: '{game_category}',       hint: 'Slots / Tables (HIW)' },
+    { code: '{game_category_lower}', hint: 'slots / table (T&C)' },
+    { code: '{game_category_upper}', hint: 'SLOTS / TABLES (T&C title)' },
+    { code: '{terms_id}',            hint: 'e.g. CAS_CA_0069' },
+    { code: '{start_date_long}',     hint: 'e.g. August 17, 2026' },
+    { code: '{end_date_long}',       hint: 'e.g. December 31, 2026' },
   ],
 };
 
@@ -1808,7 +1963,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : t === 'LCREACT' ? 3 : t === 'VIPDM' ? 1 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : t === 'LCREACT' ? 3 : (t === 'VIPDM' || t === 'VIPBG') ? 1 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -1837,6 +1992,9 @@ function initDays() {
     vipdmDaysToOptin: 3,
     vipdmDaysToEntitlement: 3,
     vipdmDaysToSettlement: 7,
+    vipbgDaysToOptin: 3,
+    vipbgDaysToEntitlement: 3,
+    vipbgDaysToSettlement: 7,
     doSegment: true,
     doPromo: true,
     doBonus: true,
@@ -1900,6 +2058,39 @@ function getVIPDMTermsIDs() {
 }
 function getVIPDMStartDate() { return localStorage.getItem('vcl_dm_terms_start_date') || DEFAULT_VIPDM_START_DATE; }
 function getVIPDMEndDate() { return localStorage.getItem('vcl_dm_terms_end_date') || DEFAULT_VIPDM_END_DATE; }
+
+// v2.24 — VIP Offer Library - Bet & Gets (CA — Canada only)
+// cat: 'SBG' = Slots Bet & Get, 'TBG' = Table Games Bet & Get
+const DEFAULT_VIPBG_OFFERS = [
+  { cat: 'SBG', bet: 1000,   get: 100,  active: false },
+  { cat: 'SBG', bet: 5000,   get: 500,  active: false },
+  { cat: 'SBG', bet: 20000,  get: 1000, active: false },
+  { cat: 'SBG', bet: 100000, get: 5000, active: false },
+  { cat: 'TBG', bet: 2000,   get: 100,  active: false },
+  { cat: 'TBG', bet: 10000,  get: 500,  active: false },
+  { cat: 'TBG', bet: 25000,  get: 1000, active: false },
+  { cat: 'TBG', bet: 100000, get: 2500, active: false },
+];
+
+const DEFAULT_VIPBG_TERMS_IDS = {
+  'SBG_B1000_G100':    'CAS_CA_0069',
+  'SBG_B5000_G500':    'CAS_CA_0070',
+  'SBG_B20000_G1000':  'CAS_CA_0071',
+  'SBG_B100000_G5000': 'CAS_CA_0072',
+  'TBG_B2000_G100':    'CAS_CA_0073',
+  'TBG_B10000_G500':   'CAS_CA_0074',
+  'TBG_B25000_G1000':  'CAS_CA_0075',
+  'TBG_B100000_G2500': 'CAS_CA_0076',
+};
+const DEFAULT_VIPBG_START_DATE = '08/17/26';
+const DEFAULT_VIPBG_END_DATE = '12/31/26';
+
+function getVIPBGTermsIDs() {
+  try { return JSON.parse(localStorage.getItem('vcl_bg_terms_ids')) || DEFAULT_VIPBG_TERMS_IDS; }
+  catch(e) { return DEFAULT_VIPBG_TERMS_IDS; }
+}
+function getVIPBGStartDate() { return localStorage.getItem('vcl_bg_terms_start_date') || DEFAULT_VIPBG_START_DATE; }
+function getVIPBGEndDate() { return localStorage.getItem('vcl_bg_terms_end_date') || DEFAULT_VIPBG_END_DATE; }
 
 const DEFAULT_BG_OFFERS = [
   { bet: 100, get: 2 },
@@ -2041,9 +2232,11 @@ function updateJurisdictionOptions(type) {
   sel.innerHTML = '';
   const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
   const vipdmOnly = ['CA'];     // v2.23 — VIP Offer Library - Deposit Matches is CA — Canada only
+  const vipbgOnly = ['CA'];     // v2.24 — VIP Offer Library - Bet & Gets is CA — Canada only (US planned)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
     : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
     : (type === 'VIPDM') ? allOptions.filter(o => vipdmOnly.includes(o.value))
+    : (type === 'VIPBG') ? allOptions.filter(o => vipbgOnly.includes(o.value))
     : allOptions;
   filtered.forEach(o => {
     const opt = document.createElement('option');
@@ -2055,7 +2248,7 @@ function updateJurisdictionOptions(type) {
     sel.value = fsOnly.includes(current) ? current : 'MI';
   } else if (type === 'RTC') {
     sel.value = rtcOnly.includes(current) ? current : 'US';
-  } else if (type === 'VIPDM') {
+  } else if (type === 'VIPDM' || type === 'VIPBG') {
     sel.value = 'CA';
   } else {
     sel.value = 'US';
@@ -2141,6 +2334,20 @@ const INFO_CHURNDM = `<ul>
   <li><strong>No confirmation modal</strong> after Bonus Save.</li>
 </ul>`;
 
+const INFO_VIPBG = `<ul>
+  <li><strong>Offer Type:</strong> VIP Offer Library - Bet &amp; Gets. <span style="color:#ffffff;">CA — Canada only.</span> Builds Segment, Promotion, and Bonus for each selected offer. Reward is paid in <span style="color:#ffffff;">Casino Credit</span> (CAD currency rows). The wager requirement is enforced upstream (XP/segment) — no bet amount is entered on the bonus.</li>
+  <li><strong>Offers:</strong> Each offer is Category (Slots/Tables) &rarr; Bet &rarr; Get. Eight defaults are provided, each mapped to a Terms ID (editable in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
+  <li><strong>Promo &amp; Activation Window:</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
+  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". <span style="color:#ffffff;">Button 2 label/link are left empty for CA — Canada</span> ("Play Now!" &rarr; /docs/usered/casgenericgamelist is reserved for the future US region).</li>
+  <li><strong>Send to XP &amp; External Bonus:</strong> <span style="color:#ffffff;">Both always ON</span> — no toggles for this offer type.</li>
+  <li><strong>Voucher Code format:</strong> <code>CLBGFC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{SBG|TBG}_B{bet}_G{get}.png</code> (e.g. <code>SBG_B1000_G100.png</code>).</li>
+  <li><strong>T&amp;Cs:</strong> Canadian (Ontario) legal copy with dynamic fields incl. <code>{game_category_lower}</code>/<code>{game_category_upper}</code>. Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal and baked in at generation time — changes require regenerating the script.</li>
+  <li><strong>Series:</strong> VIP &nbsp;|&nbsp; <strong>Origin:</strong> Opt-In Bonus &nbsp;|&nbsp; <strong>Type:</strong> Retention</li>
+  <li><strong>Platforms:</strong> Web + STAC: Standalone Casino only (all COMBO tags removed)</li>
+  <li><strong>Bonus Save:</strong> Confirmation modal handled defensively — confirmed if it appears, skipped if not (verify on first test build).</li>
+</ul>`;
+
 const INFO_VIPDM = `<ul>
   <li><strong>Offer Type:</strong> VIP Offer Library - Deposit Matches. <span style="color:#ffffff;">CA — Canada only.</span> Builds Segment, Promotion, and Bonus for each selected offer. Reward is paid in <span style="color:#ffffff;">Casino Credit</span> (CAD currency rows).</li>
   <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Nine defaults are provided, each mapped to a Terms ID (editable in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
@@ -2187,7 +2394,7 @@ const INFO_FS = `<ul>
 </ul>`;
 
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
   document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
   document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
@@ -2232,10 +2439,11 @@ function renderAll() {
   const isLCREACT = getOfferType() === 'LCREACT';
   const isCHURNDM = getOfferType() === 'CHURNDM';
   const isVIPDM = getOfferType() === 'VIPDM';
+  const isVIPBG = getOfferType() === 'VIPBG';
   if (isBG || isDM || isBGRE || isCHURNDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
-  else if (isRAF || isSUO || isVIPDM) { container.style.gridTemplateColumns = '1fr'; }
+  else if (isRAF || isSUO || isVIPDM || isVIPBG) { container.style.gridTemplateColumns = '1fr'; }
   else if (isBG || isDM || isBGRE || isCHURNDM) { container.style.gridTemplateColumns = ''; }
   else { container.style.gridTemplateColumns = ''; }
 
@@ -2617,6 +2825,44 @@ function renderAll() {
           </div>
         </div>
       `;
+    } else if (isVIPBG) {
+      card.style.maxWidth = '680px';
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">VIP Offer Library — Bet &amp; Gets — CA — Canada</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY)</span>
+        <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 090126" value="${day.date}"
+          oninput="days[${i}].date = this.value; updateGenerateButton()" onchange="days[${i}].date = this.value" style="width: 160px; margin-bottom: 6px;" />
+        <p style="font-size: 11px; color: var(--muted); margin: 0 0 14px; font-family: 'SF Mono', ui-monospace, monospace;">Promo &amp; bonus start 1 day before this date (00:00 ET). End = last day of this month (23:59:59 ET) + Days to Entitlement.</p>
+        <span class="field-label">Offers (Category → Bet → Get)</span>
+        <div id="vipbg-offers-${i}"></div>
+        <div class="add-row" style="margin-top: 8px;">
+          <button class="reset-btn" onclick="addVIPBGOffer(${i})">+ Add</button>
+          <button class="reset-btn" onclick="selectAllVIPBGOffers(${i})">Select All</button>
+        </div>
+        <p style="margin-top: 12px; font-size: 12px; color: var(--muted); font-family: 'SF Mono', ui-monospace, monospace;">Send to XP + External Bonus: <span style="color:#ffffff;">always ON</span> for this offer type.</p>
+        <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Opt In</span>
+            <input type="number" min="0" value="${day.vipbgDaysToOptin !== undefined ? day.vipbgDaysToOptin : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].vipbgDaysToOptin = parseInt(this.value) || 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Entitlement</span>
+            <input type="number" min="0" value="${day.vipbgDaysToEntitlement !== undefined ? day.vipbgDaysToEntitlement : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].vipbgDaysToEntitlement = parseInt(this.value) || 0;" />
+            <span style="font-size:11px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">extends promo/bonus end date</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Settlement</span>
+            <input type="number" min="0" value="${day.vipbgDaysToSettlement !== undefined ? day.vipbgDaysToSettlement : 7}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].vipbgDaysToSettlement = parseInt(this.value) || 0;" />
+          </div>
+        </div>
+      `;
     } else if (isCHURNDM) {
       card.innerHTML = `
         <div class="day-header">
@@ -2821,6 +3067,7 @@ function renderAll() {
     else if (isDM) renderDMOffers(i);
     else if (isCHURNDM) renderChurnDMOffers(i);
     else if (isVIPDM) renderVIPDMOffers(i);
+    else if (isVIPBG) renderVIPBGOffers(i);
     else if (isFS) renderFSOffers(i);
     else if (isBGRE) renderBGREOffers(i);
     else renderAmounts(i); // covers both RTC and LCREACT (both use amounts grid)
@@ -2862,7 +3109,7 @@ function addAmount(i) {
 }
 
 function addDay() {
-  if (getOfferType() === 'RAF' || getOfferType() === 'SUO' || getOfferType() === 'VIPDM') return;
+  if (getOfferType() === 'RAF' || getOfferType() === 'SUO' || getOfferType() === 'VIPDM' || getOfferType() === 'VIPBG') return;
   const maxDays = (getOfferType() === 'BG' || getOfferType() === 'DM') ? 8 : getOfferType() === 'LCREACT' ? 99 : 99;
   if (days.length >= maxDays) return;
   days.push({ date: '', amounts: new Set(), offers: new Set() });
@@ -2923,6 +3170,10 @@ function resetDay(i) {
   days[i].vipdmDaysToOptin = 3;
   days[i].vipdmDaysToEntitlement = 3;
   days[i].vipdmDaysToSettlement = 7;
+  days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
+  days[i].vipbgDaysToOptin = 3;
+  days[i].vipbgDaysToEntitlement = 3;
+  days[i].vipbgDaysToSettlement = 7;
   days[i].churndmSendToXP = true;
   days[i].churndmExternalBonus = false;
   days[i].churndmDaysToOptin = 3;
@@ -3124,6 +3375,57 @@ function selectAllVIPDMOffers(i) {
   renderVIPDMOffers(i);
 }
 
+// v2.24 — VIP Offer Library - Bet & Gets offer rows
+function renderVIPBGOffers(i) {
+  const container = document.getElementById(`vipbg-offers-${i}`);
+  if (!container) return;
+  if (!days[i].vipbgOfferData) {
+    days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
+  }
+  const termsIds = getVIPBGTermsIDs();
+  container.innerHTML = '';
+  days[i].vipbgOfferData.forEach((offer, j) => {
+    const key = vipbgOfferKey(offer);
+    const hasTerms = !!termsIds[key];
+    const row = document.createElement('div');
+    row.style.cssText = `border: ${offer.active ? (hasTerms ? '1.5px solid #ffffff' : '1.5px solid #e24b4a') : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
+    row.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <select style="font-family: 'SF Mono', ui-monospace, monospace; font-size:12px; background: var(--surface2); color:#ffffff; border:1px solid var(--border); border-radius:6px; padding:4px 6px; cursor:pointer;"
+          onchange="days[${i}].vipbgOfferData[${j}].cat = this.value; renderVIPBGOffers(${i});">
+          <option value="SBG" ${offer.cat === 'SBG' ? 'selected' : ''}>Slots</option>
+          <option value="TBG" ${offer.cat === 'TBG' ? 'selected' : ''}>Tables</option>
+        </select>
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Bet</span>
+        <input type="number" value="${offer.bet || ''}" placeholder="1000" style="width:78px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+          oninput="days[${i}].vipbgOfferData[${j}].bet = parseFloat(this.value) || 0;" onchange="renderVIPBGOffers(${i});" />
+        <span style="font-size:12px; color:var(--muted);">&rarr;</span>
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:11px; color:var(--muted); white-space:nowrap;">Get</span>
+        <input type="number" value="${offer.get || ''}" placeholder="100" style="width:70px; text-align:center; font-family: 'SF Mono', ui-monospace, monospace; font-size:13px;"
+          oninput="days[${i}].vipbgOfferData[${j}].get = parseFloat(this.value) || 0;" onchange="renderVIPBGOffers(${i});" />
+        <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size:10px; color:${hasTerms ? '#7070a0' : '#e24b4a'}; margin-left:6px; white-space:nowrap;">${termsIds[key] || 'no ID'}</span>
+        <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#ffffff;"
+          onchange="days[${i}].vipbgOfferData[${j}].active = this.checked; renderVIPBGOffers(${i});" />
+      </div>
+      ${offer.active && !hasTerms ? `<div style="margin-top:5px; font-size:11px; color:#e24b4a; font-family:'SF Mono',ui-monospace,monospace;">No Terms ID configured for ${key} — generation blocked</div>` : ''}
+    `;
+    container.appendChild(row);
+  });
+  updateGenerateButton();
+}
+
+function addVIPBGOffer(i) {
+  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o }));
+  days[i].vipbgOfferData.push({ cat: 'SBG', bet: 0, get: 0, active: false });
+  renderVIPBGOffers(i);
+}
+
+function selectAllVIPBGOffers(i) {
+  if (!days[i].vipbgOfferData) days[i].vipbgOfferData = DEFAULT_VIPBG_OFFERS.map(o => ({ ...o, active: true }));
+  else days[i].vipbgOfferData.forEach(o => o.active = true);
+  renderVIPBGOffers(i);
+}
+
 function renderFSOffers(i) {
   const container = document.getElementById(`fs-offers-${i}`);
   if (!container) return;
@@ -3237,7 +3539,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -4390,6 +4692,9 @@ function updateGenerateButton() {
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'VIPDM') {
       const offers = (d.vipdmOfferData || []).filter(o => o.active);
+      if (offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'VIPBG') {
+      const offers = (d.vipbgOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'FS') {
       const offers = (d.fsOfferData || []).filter(o => o.active && o.spinAmount && o.spinValue);
@@ -7892,6 +8197,568 @@ asyncio.run(main())
 `;
 }
 
+function buildVIPBGScript(allNames, imagePath, hiwText, tcText) {
+  const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
+  const daysOptinLines     = allNames.map(n => `    ${n.daysToOptin},`).join('\n');
+  const daysEntLines       = allNames.map(n => `    ${n.daysToEntitlement},`).join('\n');
+  const daysSettLines      = allNames.map(n => `    ${n.daysToSettlement},`).join('\n');
+  const doSegmentLines     = allNames.map(n => `    ${n.doSegment !== false ? 'True' : 'False'},`).join('\n');
+  const doPromoLines       = allNames.map(n => `    ${n.doPromo  !== false ? 'True' : 'False'},`).join('\n');
+  const doBonusLines       = allNames.map(n => `    ${n.doBonus  !== false ? 'True' : 'False'},`).join('\n');
+  const vipbgTermsIds      = getVIPBGTermsIDs();
+  const startShort         = parseDateShort(getVIPBGStartDate());
+  const startLong          = parseDateLong(getVIPBGStartDate());
+  const endShort           = parseDateShort(getVIPBGEndDate());
+  const endLong            = parseDateLong(getVIPBGEndDate());
+
+  return `import asyncio
+import calendar
+import random
+import re
+import string
+import subprocess
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
+    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
+
+URL = "https://trading.1.betfanatics.com/"
+IMAGE_FOLDER = "${imagePath}"
+
+# v2.24 — VIP Offer Library - Bet & Gets (CA — Canada only)
+# Reward: Casino Credit (flat amount = "get"). Wager requirement ("bet") is
+# enforced upstream by XP / segment logic — it is NOT entered on the bonus.
+TITLE_HEADER_TEXT = "From Your VIP Host"
+# v2.24 — CA — Canada: Button 2 label/link are left EMPTY on the promo.
+# The values below are reserved for the future US region of this offer type:
+#   BUTTON2_LABEL = "Play Now!"
+#   BUTTON2_LINK  = "/docs/usered/casgenericgamelist"
+
+# SBG = Slots Bet & Get / TBG = Table Games Bet & Get
+GAME_CATEGORIES = {
+    "SBG": {"hiw": "Slots",  "tc_lower": "slots", "tc_upper": "SLOTS"},
+    "TBG": {"hiw": "Tables", "tc_lower": "table", "tc_upper": "TABLES"},
+}
+
+NAMES = [
+${namesLines}
+]
+
+# v2.24 — Send To XP and External Bonus are ALWAYS ON for this offer type.
+SEND_TO_XP = [True] * len(NAMES)
+EXTERNAL_BONUS = [True] * len(NAMES)
+
+DAYS_TO_OPTIN = [
+${daysOptinLines}
+]
+
+DAYS_TO_ENTITLEMENT = [
+${daysEntLines}
+]
+
+DAYS_TO_SETTLEMENT = [
+${daysSettLines}
+]
+
+DO_SEGMENT = [
+${doSegmentLines}
+]
+
+DO_PROMO = [
+${doPromoLines}
+]
+
+DO_BONUS = [
+${doBonusLines}
+]
+
+TERMS_IDS = ${JSON.stringify(vipbgTermsIds)}
+
+TERMS_START_SHORT = "${startShort}"
+TERMS_START_LONG  = "${startLong}"
+TERMS_END_SHORT   = "${endShort}"
+TERMS_END_LONG    = "${endLong}"
+
+# ── Parsing ───────────────────────────────────────────────────────────────────
+
+def parse_vipbg(code):
+    """Returns (cat, bet, get) from MMDDYY_VCL_RET_{SBG|TBG}_CA_CC_B{bet}_G{get}."""
+    parts = code.split("_")
+    cat, bet, get = None, None, None
+    for part in parts:
+        if part in ("SBG", "TBG"):
+            cat = part
+        elif part.startswith("B") and part[1:].isdigit():
+            bet = part[1:]
+        elif part.startswith("G") and part[1:].isdigit():
+            get = part[1:]
+    return cat, bet, get
+
+def parse_dates(code, entitlement_days):
+    """VIP Offer Library window:
+    Start = 00:00:00 ET one day BEFORE the typed code date.
+    End   = last day of the code date's calendar month at 23:59:59 ET,
+            plus entitlement_days (Days to Meet Entitlement)."""
+    date_part = code.split("_")[0]
+    mm, dd, yy = int(date_part[0:2]), int(date_part[2:4]), int("20" + date_part[4:6])
+    dt_typed = datetime(yy, mm, dd, 0, 0, 0, tzinfo=EASTERN)
+    dt_start = dt_typed - timedelta(days=1)
+    last_day = calendar.monthrange(yy, mm)[1]
+    dt_month_end = datetime(yy, mm, last_day, 23, 59, 59, tzinfo=EASTERN)
+    dt_end = dt_month_end + timedelta(days=int(entitlement_days))
+    start = dt_start.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return start, end
+
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
+def parse_voucher(code):
+    date_part = code.split("_")[0]
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"CLBGFC{mmddyy}{suffix}"
+
+def format_currency(amount_str):
+    amount = int(float(amount_str))
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def format_hiw(code):
+    cat, bet, get = parse_vipbg(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    game_category = GAME_CATEGORIES[cat]["hiw"]
+    game_category_lower = GAME_CATEGORIES[cat]["tc_lower"]
+    game_category_upper = GAME_CATEGORIES[cat]["tc_upper"]
+    terms_id = TERMS_IDS.get(f"{cat}_B{bet}_G{get}", "")
+    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    cat, bet, get = parse_vipbg(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    game_category = GAME_CATEGORIES[cat]["hiw"]
+    game_category_lower = GAME_CATEGORIES[cat]["tc_lower"]
+    game_category_upper = GAME_CATEGORIES[cat]["tc_upper"]
+    terms_id = TERMS_IDS.get(f"{cat}_B{bet}_G{get}", "")
+    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
+    return f"""${tcText}"""
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "VIP Offer Library B&G Setup Script" sound name "Glass"'])
+
+# ── Shared helpers ────────────────────────────────────────────────────────────
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    OK Image uploaded: {display_name or filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Rich text filled: {label_title}")
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id\$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Promos page")
+            return
+        print(f"  WARN Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id\$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Bonus Manager page")
+            return
+        print(f"  WARN Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
+
+# ── Segment ───────────────────────────────────────────────────────────────────
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Segment done: {name}")
+
+# ── Promo ─────────────────────────────────────────────────────────────────────
+
+async def create_promo(page, name, idx):
+    print(f"\\n  Creating promotion: {name}")
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name, DAYS_TO_ENTITLEMENT[idx])
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    print(f"    OK Promo Dates: {start_date} -> {end_date} (day-1 -> month-end + {DAYS_TO_ENTITLEMENT[idx]} entitlement days)")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    cat, bet, get = parse_vipbg(name)
+    discover_filename = f"{cat}_B{bet}_G{get}.png"
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
+    await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
+    await page.locator("input[placeholder='Title']").fill(TITLE_HEADER_TEXT)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    # v2.24 — CA — Canada: Button 2 label/link intentionally left empty
+    print("    -- Button 2: left empty (CA — Canada; values reserved for US region)")
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Promotion done: {name}")
+
+# ── Bonus ─────────────────────────────────────────────────────────────────────
+
+async def create_bonus(page, name, idx):
+    print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(120):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(TITLE_HEADER_TEXT)
+
+    # v2.24 — Send To XP and External Bonus are always clicked ON for VIPBG
+    await page.get_by_text("Send To XP", exact=True).click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("External Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("    OK Send To XP: ON | External Bonus: ON")
+
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino", "COMBO: Casino"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+    print("    OK Platforms: Web + STAC: Standalone Casino only")
+
+    voucher_code = parse_voucher(name)
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"    OK Voucher Code: {voucher_code}")
+
+    await page.get_by_text("Casino Credit", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    cat, bet, get = parse_vipbg(name)
+
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Casino_credit Settlement"))
+    await days_row.locator("input.ant-input-number-input").click()
+    await days_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_SETTLEMENT[idx]))
+    await page.wait_for_timeout(500)
+
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_OPTIN[idx]))
+    await page.wait_for_timeout(500)
+
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(DAYS_TO_ENTITLEMENT[idx]))
+    await page.wait_for_timeout(500)
+    print("    OK Days fields filled")
+
+    # Stake Chunk Sizes — present on the flat Casino Credit form (RTC CC / LC-REACT
+    # both set 1). Filled conditionally in case the wager-entitled variant differs.
+    stake_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Stake Chunk Sizes"))
+    if await stake_row.count() > 0:
+        await stake_row.locator("input.ant-input-number-input").fill("1")
+        print("    OK Stake Chunk Sizes: 1")
+    else:
+        print("    -- Stake Chunk Sizes field not present, skipping")
+
+    # Casino Credit amount = the "get" value — CAD currency row
+    await fill_currency_amount(page, name, get, label="Casino Credit Amount")
+
+    status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+
+    act_start, act_end = parse_dates(name, DAYS_TO_ENTITLEMENT[idx])
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"    OK Activation Dates: {act_start} -> {act_end} (day-1 -> month-end + {DAYS_TO_ENTITLEMENT[idx]} entitlement days)")
+
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    seg_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
+    await seg_option.wait_for(state="visible", timeout=15000)
+    await seg_option.click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    await promo_tile_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
+    await promo_option.wait_for(state="visible", timeout=15000)
+    await promo_option.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Promotion Tile: {name}")
+
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Opt-In Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("    OK Bonus Origin: Opt-In Bonus")
+
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("VIP")
+    await page.wait_for_timeout(500)
+    vip_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^VIP\$")).first
+    await vip_option.wait_for(state="visible", timeout=15000)
+    await vip_option.click()
+    await page.wait_for_timeout(500)
+    print("    OK Series: VIP")
+
+    # Type: Retention — MUST stay scoped to the visible dropdown: the hidden
+    # Bonus Origin dropdown also contains a 'Retention' option (strict mode).
+    type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row2.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    type_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^Retention\$")).first
+    await type_option.wait_for(state="visible", timeout=15000)
+    await type_option.click()
+    await page.wait_for_timeout(500)
+    print("    OK Type: Retention")
+
+    await page.locator("button.ant-btn-primary.save").click()
+    await page.wait_for_timeout(2000)
+    # v2.24 — Defensive confirmation-modal handling: the flat Casino Credit save
+    # is expected to have NO modal (like VIPDM/LC-REACT), but standard BG (FanCash)
+    # does show one. Confirm it if it appears; continue if it doesn't.
+    modal = page.locator(".ant-modal-content")
+    try:
+        await modal.wait_for(state="visible", timeout=5000)
+        await modal.locator("button.ant-btn-primary").click()
+        print("    OK Confirmation modal appeared — confirmed")
+    except Exception:
+        print("    -- No confirmation modal (expected)")
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Bonus done: {name}")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+        print("\\nPlease log in to the site in the browser window.")
+        print("   Once logged in, come back here and press Enter.\\n")
+        input("Press Enter when ready...")
+        segment_names = [n for n, do in zip(NAMES, DO_SEGMENT) if do]
+        promo_names = [n for n, do in zip(NAMES, DO_PROMO) if do]
+        bonus_names = [n for n, do in zip(NAMES, DO_BONUS) if do]
+
+        if segment_names:
+            print("\\n--- Creating Segments ---")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id\$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  WARN Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+            for name in segment_names:
+                await create_segment(page, name)
+                await page.wait_for_timeout(1000)
+            print("\\nAll segments created!")
+        else:
+            print("\\nSkipping segments (none selected)")
+
+        if promo_names:
+            await nav_to_promos(page)
+            print("\\n--- Creating Promotions ---")
+            for name in promo_names:
+                idx = NAMES.index(name)
+                await create_promo(page, name, idx)
+                await page.wait_for_timeout(1000)
+            print("\\nAll promotions created!")
+        else:
+            print("\\nSkipping promotions (none selected)")
+
+        if bonus_names:
+            await nav_to_bonus(page)
+            print("\\n--- Creating Bonuses ---")
+            for name in bonus_names:
+                idx = NAMES.index(name)
+                await create_bonus(page, name, idx)
+                await page.wait_for_load_state("networkidle")
+                await page.wait_for_timeout(3000)
+            print("\\nAll bonuses created!")
+        else:
+            print("\\nSkipping bonuses (none selected)")
+
+        notify(f"VIP Offer Library B&G complete! {len(NAMES)} codes created.")
+        print("\\nAll done!")
+        await browser.close()
+
+asyncio.run(main())
+`;
+}
+
 function buildLCREACTScript(allNames, imagePath, hiwText) {
   const namesLines       = allNames.map(n => `    "${n.code}",`).join('\n');
   const sendToXPLines    = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
@@ -8639,6 +9506,38 @@ function generateScript() {
           doBonus: vdmDoBonus,
         });
       });
+    } else if (offerType === 'VIPBG') {
+      if (date.length !== 6 || !/^\d{6}$/.test(date)) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
+      const offers = (days[i].vipbgOfferData || []).filter(o => o.active);
+      if (offers.length === 0) { alert(`The VIP Offer Library B&G card has a date but no offers selected.`); return; }
+      const vipbgTermsIds = getVIPBGTermsIDs();
+      for (const o of offers) {
+        if (!o.cat || !o.bet || !o.get) { alert(`VIP Offer Library B&G: every selected offer needs a Category, Bet, and Get value.`); return; }
+        const key = `${o.cat}_B${o.bet}_G${o.get}`;
+        if (!vipbgTermsIds[key]) {
+          alert(`VIP Offer Library B&G: no Terms ID is configured for offer ${key} (${o.cat === 'SBG' ? 'Slots' : 'Tables'}, Bet $${o.bet}, Get $${o.get}).\n\nScript generation is blocked. Add a Terms ID for this offer via the Edit T&Cs modal, or use one of the configured offers.`);
+          return;
+        }
+      }
+      const vbgDaysToOptin = days[i].vipbgDaysToOptin !== undefined ? days[i].vipbgDaysToOptin : 3;
+      const vbgDaysToEntitlement = days[i].vipbgDaysToEntitlement !== undefined ? days[i].vipbgDaysToEntitlement : 3;
+      const vbgDaysToSettlement = days[i].vipbgDaysToSettlement !== undefined ? days[i].vipbgDaysToSettlement : 7;
+      const vbgDoSegment = days[i].doSegment !== false;
+      const vbgDoPromo = days[i].doPromo !== false;
+      const vbgDoBonus = days[i].doBonus !== false;
+      offers.forEach(o => {
+        allNames.push({
+          code: `${date}_VCL_RET_${o.cat}_CA_CC_B${o.bet}_G${o.get}`,
+          sendToXP: true,          // v2.24 — always ON for VIPBG (no toggle)
+          externalBonus: true,     // v2.24 — always ON for VIPBG (no toggle)
+          daysToOptin: vbgDaysToOptin,
+          daysToEntitlement: vbgDaysToEntitlement,
+          daysToSettlement: vbgDaysToSettlement,
+          doSegment: vbgDoSegment,
+          doPromo: vbgDoPromo,
+          doBonus: vbgDoBonus,
+        });
+      });
     } else if (offerType === 'LCREACT') {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
@@ -8723,6 +9622,8 @@ function generateScript() {
     script = buildChurnDMScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'VIPDM') {
     script = buildVIPDMScript(allNames, imagePath, hiwText, tcText);
+  } else if (offerType === 'VIPBG') {
+    script = buildVIPBGScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'LCREACT') {
     script = buildLCREACTScript(allNames, imagePath, hiwText);
   } else {
@@ -9207,7 +10108,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
