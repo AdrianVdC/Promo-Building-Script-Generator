@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.26</title>
+  <title>NATS Bonus Creator v2.27</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2602,7 +2602,7 @@ const INFO_VIPBG = `<ul>
   <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". Button 2: <span style="color:#ffffff;">US fills "Play Now!" &rarr; /docs/usered/casgenericgamelist; CA is left empty</span> by design.</li>
   <li><strong>Send to XP &amp; External Bonus:</strong> <span style="color:#ffffff;">Both always ON</span> — no toggles for this offer type (both regions).</li>
   <li><strong>Voucher Code format:</strong> <code>CLBGFC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime (both regions; shared with BG/BG-RE).</li>
-  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, one per region. Use Edit Images to set each path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{SBG|TBG}_B{bet}_G{get}.png</code> for CA (e.g. <code>SBG_B1000_G100.png</code>) or <code>B{bet}_G{get}.png</code> for US (e.g. <code>B1000_G100.png</code>).</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, one per region. Use Edit Images to set each path. <span style="color:#ffffff;">US required filenames:</span> <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>B{bet}_G{get}.png</code> (e.g. <code>B1000_G100.png</code>). <span style="color:#ffffff;">CA required filenames (v2.27 — category-specific):</span> <code>Slots Promo Detail.png</code> + <code>Slots Masthead.png</code> for Slots offers, <code>Tables Promo Detail.png</code> + <code>Tables Masthead.png</code> for Tables offers, and a Discover image named <code>{SBG|TBG}_B{bet}_G{get}.png</code> (e.g. <code>SBG_B1000_G100.png</code>).</li>
   <li><strong>T&amp;Cs:</strong> Region-scoped legal copy — CA: Canadian (Ontario) template with <code>{game_category_lower}</code>/<code>{game_category_upper}</code>; US: FanCash template (no category fields). Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal (per region) and baked in at generation time — changes require regenerating the script.</li>
   <li><strong>Series:</strong> VIP &nbsp;|&nbsp; <strong>Origin:</strong> Opt-In Bonus &nbsp;|&nbsp; <strong>Type:</strong> Retention (both regions)</li>
   <li><strong>Platforms:</strong> CA: Web + STAC: Standalone Casino only (all COMBO tags removed). <span style="color:#ffffff;">US keeps COMBO: Casino</span> (standard tag behavior).</li>
@@ -8825,10 +8825,17 @@ async def create_promo(page, name, idx):
     await page.wait_for_load_state("networkidle")
 ${isUS ? `    bet, get = parse_vipbg(name)
     discover_filename = f"B{bet}_G{get}.png"
+    promo_detail_filename = "Promo Detail.png"
+    masthead_filename = "Masthead.png"
 ` : `    cat, bet, get = parse_vipbg(name)
     discover_filename = f"{cat}_B{bet}_G{get}.png"
-`}    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
-    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    # v2.27 — CA — Canada: Slots and Tables use category-specific Masthead and
+    # Promo Detail creatives ("Slots Masthead.png" / "Tables Masthead.png", etc.).
+    category_word = GAME_CATEGORIES[cat]["hiw"]  # "Slots" / "Tables"
+    promo_detail_filename = f"{category_word} Promo Detail.png"
+    masthead_filename = f"{category_word} Masthead.png"
+`}    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/{promo_detail_filename}", promo_detail_filename)
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/{masthead_filename}", masthead_filename)
     await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
     await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
     await page.locator("input[placeholder='Title']").fill(TITLE_HEADER_TEXT)
