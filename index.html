@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.29</title>
+  <title>NATS Bonus Creator v2.30</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2374,12 +2374,15 @@ const BGRE_JURISDICTIONS = [
   { value: 'PA',  label: 'PA — Pennsylvania only',    pm: 'Pennsylvania' },
 ];
 
-// ── Daily Missions - Canada (DMCA) — v2.28 ────────────────────────────────────
+// ── Daily Missions - Canada (DMCA) — v2.28; FS unlocked v2.30 ────────────────────────────────────
+const DMCA_STAKES_FULL = ['0.10','0.20','0.30','0.40','0.50','0.60','0.70','0.80','0.90','1.00','1.50','2.00','2.50','3.00','3.50','4.00','4.50','5.00','6.00','7.00','8.00','9.00','10.00','20.00','30.00','40.00','50.00','60.00','70.00','80.00','90.00','100.00'];
+// MFB's ladder caps at 50.00 (no 60-100) — captured from PROD Playmaker Aug 2026.
+const DMCA_STAKES_TO_50 = DMCA_STAKES_FULL.slice(0, DMCA_STAKES_FULL.indexOf('50.00') + 1);
 const DMCA_GAMES = {
-  Monday:    { name: 'Baa Baa Baa\u2122', token: 'BAA' },
-  Wednesday: { name: '4 Crazy Cluckers\u2122', token: '4CC' },
-  Friday:    { name: 'Mega Fire Blaze\u2122: Legacy of the Tiger\u2122', token: 'MFB' },
-  Sunday:    { name: 'Blue Wizard: Cash Collect & Link\u2122', token: 'BWZ' },
+  Monday:    { name: 'Baa Baa Baa\u2122', token: 'BAA', search: 'Baa Baa Baa', stakes: DMCA_STAKES_FULL },
+  Wednesday: { name: '4 Crazy Cluckers\u2122', token: '4CC', search: '4 Crazy Cluckers', stakes: DMCA_STAKES_FULL },
+  Friday:    { name: 'Mega Fire Blaze\u2122: Legacy of the Tiger\u2122', token: 'MFB', search: 'Mega Fire Blaze', stakes: DMCA_STAKES_TO_50 },
+  Sunday:    { name: 'Blue Wizard: Cash Collect & Link\u2122', token: 'BWZ', search: 'Blue Wizard', stakes: DMCA_STAKES_FULL },
 };
 const DMCA_CC_TIERS = [
   { bet: '50',   get: '2',   tid: 'CAS_CA_0019' },
@@ -2387,7 +2390,7 @@ const DMCA_CC_TIERS = [
   { bet: '500',  get: '25',  tid: 'CAS_CA_0021' },
   { bet: '5000', get: '300', tid: 'CAS_CA_0022' },
 ];
-// FS tiers are display-only until Playmaker Bonus Spins is functional.
+// FS tiers — unlocked v2.30. Spin values are validated against the weekday game's stakes ladder at generation time.
 const DMCA_FS_TIERS = [
   { bet: '50',   spins: '20',  value: '0.10', vtok: '10V',  tids: { Monday:'CAS_CA_0043', Wednesday:'CAS_CA_0047', Friday:'CAS_CA_0051', Sunday:'CAS_CA_0055' } },
   { bet: '125',  spins: '50',  value: '0.10', vtok: '10V',  tids: { Monday:'CAS_CA_0044', Wednesday:'CAS_CA_0048', Friday:'CAS_CA_0052', Sunday:'CAS_CA_0056' } },
@@ -3028,17 +3031,27 @@ function renderAll() {
       const dmcaIsFS = dmcaInfo && !dmcaInfo.isCC;
       let dmcaTiersHTML = '';
       if (dmcaIsFS) {
+        if (!days[i].dmcaFSOfferData) days[i].dmcaFSOfferData = DMCA_FS_TIERS.map(o => ({ ...o, active: false }));
+        const fsGame = dmcaInfo.game;
         dmcaTiersHTML = `
-          <div style="margin-top:14px; padding:12px; border:1px solid rgba(240,176,64,0.4); border-radius:8px; background:rgba(240,176,64,0.07); font-size:12.5px; color:#f0b040; line-height:1.5;">
-            \u26a0\ufe0f <strong>Free Spins days are not yet supported.</strong> Playmaker Bonus Spins setup is pending. Choose a Tuesday, Thursday, or Saturday date, or leave this card blank.
+          <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Spins) \u2014 ${dmcaInfo.weekday} terms \u2014 ${fsGame ? fsGame.name : ''}</span>
+          ${days[i].dmcaFSOfferData.map((o, j) => {
+            const tid = o.tids ? o.tids[dmcaInfo.weekday] : null;
+            const stakeOK = fsGame && fsGame.stakes.includes(o.value);
+            return `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
+              <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].dmcaFSOfferData[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
+              <span style="flex:1;">Bet ${dmcaFmtMoney(o.bet)} \u2192 ${o.spins} Spins @ $${o.value}</span>
+              ${!stakeOK ? `<span style="font-size:11px; color:#ff6b6b;">$${o.value} not in ${fsGame ? fsGame.token : '?'} stakes</span>` : ''}
+              <span style="font-size:11px; color:${tid ? '#a0d070' : '#ff6b6b'};">${tid || 'no ID'}</span>
+            </div>`; }).join('')}
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Use Reward</span>
+            <input type="number" min="1" value="${days[i].dmcaDaysToUseReward}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].dmcaDaysToUseReward = parseInt(this.value) || 7;" />
           </div>
-          <span class="field-label" style="opacity:0.5; margin-top:12px;">Offers \u2014 locked</span>
-          ${DMCA_FS_TIERS.map(t => `
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--border); border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; opacity:0.45;">
-              <input type="checkbox" disabled />
-              <span style="flex:1;">Bet ${dmcaFmtMoney(t.bet)} \u2192 ${t.spins} Spins @ $${t.value}</span>
-              <span style="font-size:11px; color:var(--muted);">${(t.tids[dmcaInfo.weekday]) || 'no ID'}</span>
-            </div>`).join('')}`;
+          <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "Promotion Complete! You have been awarded {spins} Bonus Spins to ${fsGame ? fsGame.name : ''}"</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${dmcaInfo.weekday}_</span>Promo_Detail / Masthead / B{bet}_G{spins}S_{value}V.png</p>`;
       } else {
         dmcaTiersHTML = `
           <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Get) \u2014 Tue/Thu/Sat shared terms</span>
@@ -3068,7 +3081,7 @@ function renderAll() {
             oninput="dmcaDateInput(${i}, this.value)" onchange="days[${i}].date = this.value.trim(); renderAll(); updateGenerateButton();" style="width: 120px;" />
           <span id="dmca-pill-${i}">${dmcaPillHTML(dmcaInfo)}</span>
         </div>
-        <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:00 this date \u2192 00:00 next day.</p>
+        <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:01 this date \u2192 00:01 next day.</p>
         ${dmcaTiersHTML}
       `;
     } else if (isBGRE) {
@@ -3511,6 +3524,7 @@ function resetDay(i) {
   days[i].dmOfferData = DEFAULT_DM_OFFERS.map(o => ({ ...o, active: false }));
   days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
   days[i].dmcaOfferData = DMCA_CC_TIERS.map(o => ({ ...o, active: false }));
+  days[i].dmcaFSOfferData = DMCA_FS_TIERS.map(o => ({ ...o, active: false }));
   days[i].dmcaDaysToUseReward = 7;
   days[i].bgreRewardType = 'FC';
   days[i].bgreJurisdiction = 'US';
@@ -5062,8 +5076,10 @@ function updateGenerateButton() {
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
-      const offers = (d.dmcaOfferData || []).filter(o => o.active);
-      if (info && info.isCC && offers.length > 0) { ready = true; break; }
+      const offers = info && info.isCC
+        ? (d.dmcaOfferData || []).filter(o => o.active)
+        : (d.dmcaFSOfferData || []).filter(o => o.active);
+      if (info && offers.length > 0) { ready = true; break; }
     } else if (offerType === 'DM') {
       const offers = (d.dmOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
@@ -9679,9 +9695,15 @@ if __name__ == "__main__":
 function buildDMCAScript(allNames, imagePath) {
   const codesStr = allNames.map(n => `    {
         "code_name":       "${n.code}",
+        "reward":          "${n.reward}",
         "weekday":         "${n.weekday}",
         "bet":             "${n.bet}",
         "get":             "${n.get}",
+        "spins":           "${n.spins}",
+        "spin_value":      "${n.spinValue}",
+        "vtok":            "${n.vtok}",
+        "game_name":       "${n.gameName}",
+        "game_search":     "${n.gameSearch}",
         "terms_id":        "${n.termsId}",
         "days_to_fulfill": "${n.daysToUseReward}",
         "do_promo":        ${n.doPromo ? 'True' : 'False'},
@@ -9690,15 +9712,16 @@ function buildDMCAScript(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada Auto-Generated Script
-Generated by NATS Bonus Creator v2.28
+Generated by NATS Bonus Creator v2.30
 
 Phase 1 (NATS, production):     builds Promotions
-Phase 2 (Playmaker, production): builds Casino Credit bonuses (Save Bonus IS clicked)
-Free Spins days are not supported yet (Playmaker Bonus Spins pending).
+Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
+CC days (Tue/Thu/Sat) and FS days (Mon/Wed/Fri/Sun) are both supported as of v2.30.
 """
 
 import asyncio
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -9780,7 +9803,65 @@ This Promotion is subject to all applicable federal, provincial, and municipal l
 Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
 In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control."""
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+HIW_FS_TEMPLATE = """1) Opt in
+2) Place {bet_fmt}+ in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer
+3) We'll reward you with {spins} Bonus Spins to use on the slots game {game_name}"""
+
+# Byte-verified against all sixteen filings (CAS_CA_0043-0058) with two approved
+# normalizations: (1) exactly one space always follows {game_name} (corrects the
+# glued-TM and double-space filing defects), (2) trailing whitespace stripped.
+TC_FS_TEMPLATE = """PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) \\u2013 BET {bet_fmt} CAD, GET {spins} BONUS SPINS ({terms_id})
+
+1.   Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (\\u201cFanatics Casino\\u201d). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer are eligible to receive {spins} Bonus Spins (valued at \${spin_value} CAD each) to use on the slots game {game_name} (\\u201cRewards\\u201d). Your twenty-four (24) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
+2.   Promotional Period
+This \\u201cPromotion\\u201d begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (\\u201cPromotional Period\\u201d).
+3.   Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (\\u201cAccount\\u201d). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+4.   Action Required
+To be eligible for the Rewards: (i) you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 24 hours of satisfying the wagering requirement. You will receive {spins} Bonus Spins (valued at \${spin_value} CAD each) to use on the slots game {game_name}.
+5.   Claiming Promotional Offer
+Bonus Spins (Rewards) Terms
+Bonus Spins are valued at \${spin_value} CAD each.
+Bonus Spins will not be included in any winnings (e.g., if you place a Bonus Spin that wins \$15 CAD, you will only receive the \$15 CAD in winnings).
+Bonus Spins can only be used on the slots game {game_name} and cannot be redeemed on Tables, Poker, Live Dealer, Video Poker, or any other slots games.
+Bonus Spins expire at 11:59 p.m. ET on the 7th day following the date of issuance.
+Bonus Spins cannot be redeemed for or withdrawn as cash at any time.
+Bonus Spins can only be redeemed in-app with a valid Account.
+Bonus Spins do not count towards qualifying for any other promotional offers.
+There are no playthrough requirements on Bonus Spins.
+Bonus Spins are non-refundable and may not be exchanged, substituted, or transferred.
+6.   Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino\\u2019s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+7.   Limitations on Participation
+Limit one (1) Reward per customer, up to a maximum of {spins} Bonus Spins. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino\\u2019s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+8.   Wagering Requirements/Exclusions
+Bets must be placed with cash (CAD). Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement.
+9.   Order of Funds Used for Wagering
+To place a bet using a Bonus Spin, select \\u201cBonus Spin\\u201d in the slots game. If you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash).
+10.   Eligible Games
+Cash wagers can be placed on any games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. Rewards issued with this Promotion can only be used on the slots game {game_name} and expire at 11:59 p.m. ET on the 7th day following the date of issuance.
+11.   Restrictions on Withdrawal
+Bonus Spins or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. There are no playthrough requirements on Bonus Spins.
+12.   Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+13.   Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+14.   Other
+Participation in this Promotion is subject to Fanatics Casino\\u2019s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino\\u2019s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino\\u2019s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to \\u201cyou\\u201d or \\u201cyour\\u201d throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control."""
+
+# \u2500\u2500 Helpers ────────────────────────────────────────────────────────────────────
 def fmt_money(s):
     v = int(s)
     return f"\${v:,}" if v >= 1000 else f"\${v}"
@@ -9798,15 +9879,26 @@ def parse_dates(code):
             end_et.astimezone().strftime('%d-%m-%Y %H:%M:%S'))
 
 def build_hiw(c):
+    if c["reward"] == "FS":
+        return HIW_FS_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]),
+                                      spins=c["spins"], game_name=c["game_name"])
     return HIW_CC_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), get_fmt=fmt_money(c["get"]))
 
 def build_tc(c):
+    if c["reward"] == "FS":
+        return TC_FS_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), spins=c["spins"],
+                                     spin_value=c["spin_value"], game_name=c["game_name"],
+                                     terms_id=c["terms_id"], start_date_long=TERMS_START_LONG,
+                                     end_date_long=TERMS_END_LONG)
     return TC_CC_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), get_fmt=fmt_money(c["get"]),
                                  terms_id=c["terms_id"], start_date_long=TERMS_START_LONG,
                                  end_date_long=TERMS_END_LONG)
 
 def image_files_for(c):
     w = c["weekday"]
+    if c["reward"] == "FS":
+        return [f"{w}_Promo_Detail.png", f"{w}_Masthead.png",
+                f"{w}_B{c['bet']}_G{c['spins']}S_{c['vtok']}.png"]
     return [f"{w}_Promo_Detail.png", f"{w}_Masthead.png", f"{w}_B{c['bet']}_G{c['get']}.png"]
 
 def notify(message):
@@ -9976,7 +10068,50 @@ async def select_promotion(page, promo_name):
     await page.wait_for_timeout(500)
     print(f"    OK Promotion: {promo_name}")
 
-async def set_toast(page, get):
+async def dump_open_options(page, header):
+    """Print every visible [role='option']; returns list of (handle, text)."""
+    await page.wait_for_timeout(800)
+    opts = await page.query_selector_all("[role='option']")
+    out = []
+    print(f"    {header} - {len(opts)} option(s)")
+    for o in opts:
+        txt = (await o.inner_text()).strip()
+        out.append((o, txt))
+    return out
+
+async def find_combobox_by_label(page, label_substring):
+    boxes = await page.query_selector_all("button[role='combobox']")
+    for b in boxes:
+        label = (await b.get_attribute("aria-label")) or ""
+        if label_substring.lower() in label.lower():
+            return b
+    return None
+
+def _norm_game_text(s):
+    s = s.replace("\\u2122", "").replace("\\u00ae", "")
+    return re.sub(r"\\s+", " ", s).strip().lower()
+
+async def select_radix_option(page, combobox, want, header, tm_tolerant=False):
+    """Open a Radix select, click the option matching want. Returns clicked text or None."""
+    await combobox.click()
+    options = await dump_open_options(page, header)
+    want_n = _norm_game_text(want) if tm_tolerant else want.strip().lower()
+    clicked = None
+    for handle, txt in options:
+        txt_cmp = _norm_game_text(txt) if tm_tolerant else txt.strip().lower()
+        if txt_cmp == want_n or (tm_tolerant and want_n in txt_cmp):
+            await handle.click()
+            clicked = txt
+            break
+    if clicked:
+        print(f"    OK selected: {clicked!r}")
+    else:
+        print(f"    WARN no option matched {want!r}")
+        await page.keyboard.press("Escape")
+    await page.wait_for_timeout(500)
+    return clicked
+
+async def set_toast(page, c):
     toast_cb = await page.wait_for_selector("#toastEnabled", timeout=15000)
     if not await toast_cb.is_checked():
         await toast_cb.click()
@@ -9984,7 +10119,12 @@ async def set_toast(page, get):
     title_input = await page.wait_for_selector("input[name='toastTitle']", timeout=15000)
     await clear_and_fill(title_input, "Promotion Complete!")
     desc_input = await page.wait_for_selector("input[name='toastDescription']", timeout=15000)
-    await clear_and_fill(desc_input, f"You have been awarded \${get} Casino Credit")
+    if c["reward"] == "FS":
+        # FS toast - no quotes around the game name (stakeholder-confirmed)
+        await clear_and_fill(desc_input,
+            f"You have been awarded {c['spins']} Bonus Spins to {c['game_name']}")
+    else:
+        await clear_and_fill(desc_input, f"You have been awarded \${c['get']} Casino Credit")
     print(f"    OK Toast set")
 
 async def create_pm_bonus(page, c):
@@ -10016,12 +10156,27 @@ async def create_pm_bonus(page, c):
         await page.evaluate("""el => {
             const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
                 window.HTMLInputElement.prototype, 'value').set;
-            nativeInputValueSetter.call(el, '00:00');
+            nativeInputValueSetter.call(el, '00:01');
             el.dispatchEvent(new Event('input', { bubbles: true }));
             el.dispatchEvent(new Event('change', { bubbles: true }));
         }""", _el)
-        await page.wait_for_timeout(300)
-        print(f"    OK {_label} Time: 12:00 AM")
+        await page.wait_for_timeout(400)
+        _val = await _field.input_value()
+        if "00:01" not in _val and "12:01 AM" not in _val:
+            print(f"    WARN {_label} Time native-setter did not stick (reads {_val!r}) - retrying via keyboard")
+            await _field.click()
+            await _field.click(click_count=3)
+            await page.keyboard.type("00:01", delay=50)
+            await page.keyboard.press("Enter")
+            await page.wait_for_timeout(400)
+            _val = await _field.input_value()
+            if "00:01" not in _val and "12:01 AM" not in _val:
+                await _field.fill("00:01")
+                await page.keyboard.press("Tab")
+                await page.wait_for_timeout(400)
+                _val = await _field.input_value()
+        _ok = "00:01" in _val or "12:01 AM" in _val
+        print(f"    {'OK' if _ok else 'WARN'} {_label} Time now reads: {_val!r}")
 
     print(f"  --- Step 2: Eligibility")
     step2 = await page.wait_for_selector("button:has-text('Step 2: Eligibility')", timeout=15000)
@@ -10046,14 +10201,68 @@ async def create_pm_bonus(page, c):
     step4 = await page.wait_for_selector("button:has-text('Step 4: Settlement')", timeout=15000)
     await step4.click()
     await page.wait_for_timeout(2000)
-    cc_radio = await page.wait_for_selector("button[role='radio'][value='casino_credit']", timeout=15000)
-    if await cc_radio.get_attribute("aria-checked") != "true":
-        await cc_radio.click()
-        await page.wait_for_timeout(500)
-    print("    OK Reward Type: Casino Credit")
-    settlement_input = await page.wait_for_selector("input[name='settlementAmount']", timeout=15000)
-    await settlement_input.fill(get)
-    print(f"    OK Settlement Amount: {get}")
+    if c["reward"] == "FS":
+        fs_radio = await page.wait_for_selector("button[role='radio'][value='free_spin']", timeout=15000)
+        if await fs_radio.get_attribute("aria-checked") != "true":
+            await fs_radio.click()
+            await page.wait_for_timeout(1000)
+        print("    OK Reward Type: Bonus Spins (free_spin)")
+        spins_input = await page.wait_for_selector("#fs-count", timeout=15000)
+        await clear_and_fill(spins_input, c["spins"])
+        print(f"    OK Number of Spins: {c['spins']}")
+        agg_box = await find_combobox_by_label(page, "Aggregator")
+        if not agg_box:
+            raise Exception("Aggregator combobox not found")
+        if not await select_radix_option(page, agg_box, "PLAYTECH", "Aggregator options"):
+            raise Exception("Aggregator PLAYTECH not selectable")
+        await page.wait_for_timeout(1000)
+        prov_box = await find_combobox_by_label(page, "Provider")
+        if not prov_box:
+            raise Exception("Provider combobox not found")
+        if not await select_radix_option(page, prov_box, "PLAYTECH", "Provider options"):
+            raise Exception("Provider PLAYTECH not selectable")
+        await page.wait_for_timeout(1000)
+        game_box = await find_combobox_by_label(page, "Game")
+        if not game_box:
+            raise Exception("Casino Game combobox not found")
+        game_clicked = await select_radix_option(
+            page, game_box, c["game_search"], "Casino Game options", tm_tolerant=True)
+        if not game_clicked:
+            raise Exception(f"Casino Game matching {c['game_search']!r} not found in dropdown")
+        print(f"    OK Casino Game: {game_clicked!r}")
+        await page.wait_for_timeout(1500)
+        # Free Spin Stakes grid - HARD FAIL if the exact value is absent (never substitute:
+        # the T&C and Terms ID legally state the spin value).
+        grid = await page.wait_for_selector("[data-testid='free-spin-stakes-grid']", timeout=15000)
+        grid_text = (await grid.inner_text()).strip().replace("\\n", " | ")
+        print(f"    Stakes grid: {grid_text}")
+        stakes_box = await grid.query_selector("button[role='combobox']")
+        if not stakes_box:
+            raise Exception("Stakes combobox not found inside free-spin-stakes-grid")
+        await stakes_box.click()
+        options = await dump_open_options(page, "Stake options")
+        want = c["spin_value"]
+        clicked = None
+        for handle, txt in options:
+            if txt.strip() == want:
+                await handle.click()
+                clicked = txt
+                break
+        if not clicked:
+            avail = ", ".join(t for _h, t in options)
+            await page.keyboard.press("Escape")
+            raise Exception(f"Spin value {want!r} NOT in this game's stakes list ({avail}) - refusing to substitute")
+        shown = (await stakes_box.inner_text()).strip()
+        print(f"    OK Spin Value: {shown!r}")
+    else:
+        cc_radio = await page.wait_for_selector("button[role='radio'][value='casino_credit']", timeout=15000)
+        if await cc_radio.get_attribute("aria-checked") != "true":
+            await cc_radio.click()
+            await page.wait_for_timeout(500)
+        print("    OK Reward Type: Casino Credit")
+        settlement_input = await page.wait_for_selector("input[name='settlementAmount']", timeout=15000)
+        await settlement_input.fill(get)
+        print(f"    OK Settlement Amount: {get}")
     days_input = await page.wait_for_selector("input[name='daysToFulfill']", timeout=15000)
     if await days_input.input_value() != str(days_to_fulfill):
         await clear_and_fill(days_input, str(days_to_fulfill))
@@ -10064,7 +10273,7 @@ async def create_pm_bonus(page, c):
     await step5.click()
     await page.wait_for_timeout(2000)
     await select_promotion(page, name)
-    await set_toast(page, get)
+    await set_toast(page, c)
 
     print(f"  --- Step 6: Review")
     step6 = await page.wait_for_selector("button:has-text('Step 6: Review')", timeout=15000)
@@ -10146,10 +10355,33 @@ async def main():
             await bonus_setup.click()
             await pm_page.wait_for_timeout(2000)
             print(f"\\n--- Creating {len(bonus_codes)} Playmaker Bonus(es) ---")
+            results = {}
             for c in bonus_codes:
-                await create_pm_bonus(pm_page, c)
+                try:
+                    await create_pm_bonus(pm_page, c)
+                    results[c["code_name"]] = True
+                except Exception as e:
+                    print(f"  FAILED {c['code_name']}: {type(e).__name__}: {e}")
+                    results[c["code_name"]] = False
+                    try:
+                        await pm_page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+                        await pm_page.wait_for_timeout(2000)
+                        icasino = await pm_page.wait_for_selector("h3:has-text('iCasino')", timeout=15000)
+                        await icasino.click()
+                        await pm_page.wait_for_timeout(2000)
+                        bonus_setup = await pm_page.wait_for_selector("[data-testid='bonus-setup-navItem']", timeout=15000)
+                        await bonus_setup.click()
+                        await pm_page.wait_for_timeout(2000)
+                    except Exception:
+                        pass
                 await pm_page.wait_for_timeout(1000)
-            print("\\nOK Phase 2 complete - all Playmaker bonuses created.")
+            print("\\nPhase 2 results:")
+            for k, v in results.items():
+                print(f"   {'SAVED ' if v else 'FAILED'} {k}")
+            if all(results.values()):
+                print("OK Phase 2 complete - all Playmaker bonuses created.")
+            else:
+                print("WARN Phase 2 finished with failures - see list above.")
         else:
             print("\\nSkipping Phase 2 (no codes with Bonus enabled)")
 
@@ -10269,24 +10501,55 @@ function generateScript() {
     if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
       if (!info) { alert(`Day ${i + 1}: invalid date.`); return; }
-      if (!info.isCC) { alert(`Day ${i + 1}: ${info.weekday} is a Free Spins day \u2014 not yet supported (Playmaker Bonus Spins pending). Use a Tuesday, Thursday, or Saturday date.`); return; }
-      const offers = (days[i].dmcaOfferData || []).filter(o => o.active);
-      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
       const dmcaDoPromo = days[i].doPromo !== false;
       const dmcaDoBonus = days[i].doBonus !== false;
       const dmcaDays = days[i].dmcaDaysToUseReward !== undefined ? days[i].dmcaDaysToUseReward : 7;
-      offers.forEach(o => {
-        allNames.push({
-          code: `${date}_CAS_RET_BG_CA_CC_B${o.bet}_G${o.get}`,
-          weekday: info.weekday,
-          bet: o.bet,
-          get: o.get,
-          termsId: o.tid,
-          daysToUseReward: dmcaDays,
-          doPromo: dmcaDoPromo,
-          doBonus: dmcaDoBonus,
+      if (info.isCC) {
+        const offers = (days[i].dmcaOfferData || []).filter(o => o.active);
+        if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+        offers.forEach(o => {
+          allNames.push({
+            code: `${date}_CAS_RET_BG_CA_CC_B${o.bet}_G${o.get}`,
+            reward: 'CC',
+            weekday: info.weekday,
+            bet: o.bet,
+            get: o.get,
+            spins: '', spinValue: '', vtok: '', gameName: '', gameSearch: '',
+            termsId: o.tid,
+            daysToUseReward: dmcaDays,
+            doPromo: dmcaDoPromo,
+            doBonus: dmcaDoBonus,
+          });
         });
-      });
+      } else {
+        const fsGame = info.game;
+        if (!fsGame) { alert(`Day ${i + 1}: no game configured for ${info.weekday}.`); return; }
+        const offers = (days[i].dmcaFSOfferData || []).filter(o => o.active);
+        if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+        for (const o of offers) {
+          const tid = o.tids ? o.tids[info.weekday] : null;
+          if (!tid) { alert(`Day ${i + 1}: Bet ${dmcaFmtMoney(o.bet)} \u2192 ${o.spins} Spins has no Terms ID for ${info.weekday}. Script generation is blocked.`); return; }
+          if (!fsGame.stakes.includes(o.value)) { alert(`Day ${i + 1}: spin value $${o.value} is not in ${fsGame.name}'s Free Spin Stakes ladder. Script generation is blocked \u2014 the value must exist in Playmaker for this game.`); return; }
+        }
+        offers.forEach(o => {
+          allNames.push({
+            code: `${date}_CAS_RET_BG_CA_FS_B${o.bet}_G${o.spins}S_${o.vtok}_${fsGame.token}`,
+            reward: 'FS',
+            weekday: info.weekday,
+            bet: o.bet,
+            get: '',
+            spins: o.spins,
+            spinValue: o.value,
+            vtok: o.vtok,
+            gameName: fsGame.name,
+            gameSearch: fsGame.search,
+            termsId: o.tids[info.weekday],
+            daysToUseReward: dmcaDays,
+            doPromo: dmcaDoPromo,
+            doBonus: dmcaDoBonus,
+          });
+        });
+      }
     } else if (offerType === 'BGRE') {
       const offers = (days[i].bgreOfferData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
