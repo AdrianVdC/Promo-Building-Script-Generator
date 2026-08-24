@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.31</title>
+  <title>NATS Bonus Creator v2.33</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2449,6 +2449,7 @@ const FS_GAMES = {
   "7FH": {
     fullName: "7's Fire Blitz Hotstepper",
     searchName: "7's Fire Blitz\u2122 Hotstepper",
+    searchOverride: "Hotstepper",
     aggregator: "WHG",
     provider: "WHITEHATSTUDIOS",
     deeplink: "/casino_game/WHS_7sFireBlitzHotStepper95",
@@ -2470,6 +2471,7 @@ const FS_GAMES = {
   "7H2": {
     fullName: "7's Fire Blitz Hotstepper 2",
     searchName: "7's Fire Blitz\u2122 Hotstepper 2",
+    searchOverride: "Hotstepper 2",
     aggregator: "WHG",
     provider: "WHITEHATSTUDIOS",
     deeplink: "/casino_game/WHS_7sFireBlitzHotStepper2US94",
@@ -3967,6 +3969,7 @@ function buildFSScript(allNames, imagePath, hiwText, tcText) {
     return `    "${g}": {
         "fullName": "${gd.fullName}",
         "searchName": "${gd.searchName.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}",
+        "searchOverride": ${gd.searchOverride ? `"${gd.searchOverride}"` : 'None'},
         "aggregator": "${gd.aggregator}",
         "provider": "${gd.provider}",
         "deeplink": "${gd.deeplink}",
@@ -4100,8 +4103,18 @@ def parse_voucher(code):
 def parse_casino_game_search(code):
     """Text typed into the Casino Game search box. NATS game names may now
     include a trademark symbol (e.g. 'Triple Cash Eruption™ (WV)'), so type
-    only the portion before any ™ to surface every variant."""
+    only the portion before any ™ to surface every variant.
+    v2.33: NATS's game search is hard-capped at ~12 rendered results with no
+    scrollable overflow, so a game whose pre-™ search is shared by many
+    catalog entries carries a searchOverride; it is typed together with the
+    jurisdiction suffix (NATS matches contiguous substrings of the full
+    option text, suffix included) to return a near-unique result."""
+    parts = code.split("_")
+    jurisdiction = parts[4]
     _, _, game = parse_fs(code)
+    override = GAMES[game].get("searchOverride")
+    if override:
+        return f"{override} ({jurisdiction})"
     return GAMES[game]["searchName"].split("™")[0].strip()
 
 def parse_casino_game_pattern(code):
@@ -6224,12 +6237,14 @@ GAMES = {
     },
     "7FH": {
         "searchName": "7's Fire Blitz\\u2122 Hotstepper",
+        "searchOverride": "Hotstepper",
         "aggregator": "WHG",
         "provider": "WHITEHATSTUDIOS",
         "deeplink": "/casino_game/WHS_7sFireBlitzHotStepper95",
     },
     "7H2": {
         "searchName": "7's Fire Blitz\\u2122 Hotstepper 2",
+        "searchOverride": "Hotstepper 2",
         "aggregator": "WHG",
         "provider": "WHITEHATSTUDIOS",
         "deeplink": "/casino_game/WHS_7sFireBlitzHotStepper2US94",
@@ -6279,7 +6294,15 @@ def parse_fs_description_day(n):
 
 def parse_casino_game_search():
     """Type only the portion before any ™ — NATS game names may now
-    include a trademark symbol."""
+    include a trademark symbol.
+    v2.33: NATS's game search is hard-capped at ~12 rendered results with no
+    scrollable overflow, so a game whose pre-™ search is shared by many
+    catalog entries carries a searchOverride; it is typed together with the
+    jurisdiction suffix (NATS matches contiguous substrings of the full
+    option text, suffix included) to return a near-unique result."""
+    override = GAMES[GAME_KEY].get("searchOverride")
+    if override:
+        return f"{override} ({JURISDICTION})"
     return GAMES[GAME_KEY]["searchName"].split("™")[0].strip()
 
 def parse_casino_game_pattern():
@@ -7146,12 +7169,14 @@ GAMES = {
     },
     "7FH": {
         "searchName": "7's Fire Blitz\\u2122 Hotstepper",
+        "searchOverride": "Hotstepper",
         "aggregator": "WHG",
         "provider": "WHITEHATSTUDIOS",
         "deeplink": "/casino_game/WHS_7sFireBlitzHotStepper95",
     },
     "7H2": {
         "searchName": "7's Fire Blitz\\u2122 Hotstepper 2",
+        "searchOverride": "Hotstepper 2",
         "aggregator": "WHG",
         "provider": "WHITEHATSTUDIOS",
         "deeplink": "/casino_game/WHS_7sFireBlitzHotStepper2US94",
@@ -7187,7 +7212,15 @@ def parse_fs_description_day(n):
 
 def parse_casino_game_search():
     """Type only the portion before any ™ — NATS game names may now
-    include a trademark symbol."""
+    include a trademark symbol.
+    v2.33: NATS's game search is hard-capped at ~12 rendered results with no
+    scrollable overflow, so a game whose pre-™ search is shared by many
+    catalog entries carries a searchOverride; it is typed together with the
+    jurisdiction suffix (NATS matches contiguous substrings of the full
+    option text, suffix included) to return a near-unique result."""
+    override = GAMES[GAME_KEY].get("searchOverride")
+    if override:
+        return f"{override} ({JURISDICTION})"
     return GAMES[GAME_KEY]["searchName"].split("™")[0].strip()
 
 def parse_casino_game_pattern():
