@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.0</title>
+  <title>NATS Bonus Creator v3.1</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2558,10 +2558,12 @@ function updateJurisdictionOptions(type) {
   const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
   const vipdmRegions = ['US','CA'];  // v2.26 — VIP Offer Library - Deposit Matches is US / CA (US: FanCash; CA: Casino Credit)
   const vipbgRegions = ['US','CA'];  // v2.25 — VIP Offer Library - Bet & Gets is US / CA (US: FanCash; CA: Casino Credit)
+  const churnRegions = ['US','CA'];  // v3.1 — LC-CHURN-DM restricted to US / CA (state codes + the v3.1 state suffix would exceed the 40-char NATS limit)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
     : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
     : (type === 'VIPDM') ? allOptions.filter(o => vipdmRegions.includes(o.value))
     : (type === 'VIPBG') ? allOptions.filter(o => vipbgRegions.includes(o.value))
+    : (type === 'CHURNDM') ? allOptions.filter(o => churnRegions.includes(o.value))
     : allOptions;
   filtered.forEach(o => {
     const opt = document.createElement('option');
@@ -2580,6 +2582,9 @@ function updateJurisdictionOptions(type) {
   } else if (type === 'VIPBG') {
     // v2.25 — keep the current region if valid, otherwise default to CA (the original region)
     sel.value = vipbgRegions.includes(current) ? current : 'CA';
+  } else if (type === 'CHURNDM') {
+    // v3.1 — keep the current region if valid, otherwise default to US
+    sel.value = churnRegions.includes(current) ? current : 'US';
   } else {
     sel.value = 'US';
   }
@@ -6271,20 +6276,23 @@ assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
 
 # ── Derived names ─────────────────────────────────────────────────────────────
 
-# v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+# v3.1 naming: position 1 is the US/CA group; the specific state rides at the end of the freeform
+JURISDICTION_GROUP = "CA" if JURISDICTION in CANADIAN_JURISDICTIONS else "US"
+JURISDICTION_SUFFIX = "" if JURISDICTION in ("US", "CA") else f"_{JURISDICTION}"
+
 def _check_code_len(code):
     if len(code) > 40:
         raise ValueError(f"code exceeds the 40-character NATS limit ({len(code)}): {code}")
     return code
 
 def rfre_name():
-    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_RFRE_{SPIN_AMOUNT}")
+    return _check_code_len(f"{DATE}_{JURISDICTION_GROUP}_CAS_ACQ_SUO_RAF_FS_RFRE_{SPIN_AMOUNT}{JURISDICTION_SUFFIX}")
 
 def rfer_name():
-    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_RFER_{SPIN_AMOUNT}")
+    return _check_code_len(f"{DATE}_{JURISDICTION_GROUP}_CAS_ACQ_SUO_RAF_FS_RFER_{SPIN_AMOUNT}{JURISDICTION_SUFFIX}")
 
 def day_name(n):
-    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_DAY{n}_{SPIN_AMOUNT}")
+    return _check_code_len(f"{DATE}_{JURISDICTION_GROUP}_CAS_ACQ_SUO_RAF_FS_DAY{n}_{SPIN_AMOUNT}{JURISDICTION_SUFFIX}")
 
 def day_names():
     return [day_name(n) for n in range(2, NUM_DAYS + 1)]
@@ -7236,9 +7244,12 @@ assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
 
 # ── Derived names ─────────────────────────────────────────────────────────────
 
+JURISDICTION_GROUP = "CA" if JURISDICTION in CANADIAN_JURISDICTIONS else "US"
+JURISDICTION_SUFFIX = "" if JURISDICTION in ("US", "CA") else f"_{JURISDICTION}"
+
 def day_name(n):
-    # v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
-    code = f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_DR_FS_DAY{n}_{SPIN_AMOUNT}"
+    # v3.1 naming: position 1 is the US/CA group; the specific state rides at the end of the freeform
+    code = f"{DATE}_{JURISDICTION_GROUP}_CAS_ACQ_SUO_DR_FS_DAY{n}_{SPIN_AMOUNT}{JURISDICTION_SUFFIX}"
     if len(code) > 40:
         raise ValueError(f"code exceeds the 40-character NATS limit ({len(code)}): {code}")
     return code
@@ -9526,12 +9537,18 @@ TC_BY_AMOUNT = {
 ${tcDataLines}
 }
 
+STATE_TOKENS = {"MI", "WV", "PA", "NJ", "ON", "AB"}
+
 def parse_amount(code):
-    """v3.0: the freeform (everything after the 7th underscore) is the amount."""
+    """v3.1: the freeform is the amount, optionally followed by a trailing state/province
+    token (e.g. 800_MI) when a specific state was picked at generation time."""
     parts = code.split("_")
     if len(parts) < 8:
         raise ValueError(f"code has fewer than 8 fields: {code}")
-    amount = "_".join(parts[7:])
+    freeform = parts[7:]
+    if len(freeform) >= 2 and freeform[-1] in STATE_TOKENS:
+        freeform = freeform[:-1]
+    amount = "_".join(freeform)
     if not amount.isdigit():
         raise ValueError(f"LC-REACT freeform is not a plain amount: {amount!r} in {code}")
     return amount
@@ -9907,7 +9924,7 @@ function buildDMCAScript(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada Auto-Generated Script
-Generated by NATS Bonus Creator v3.0
+Generated by NATS Bonus Creator v3.1
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
@@ -10834,6 +10851,11 @@ function generateScript() {
   if (suoDateEl) days[0].date = suoDateEl.value.trim();
 
   const jurisdiction = document.getElementById('jurisdiction-select').value;
+  // v3.1 — jurisdiction group + state suffix: position 1 of every code is always US or CA;
+  // a specific state/province rides at the END of the freeform (e.g. ..._DAY3_50_WV)
+  const CA_GROUP = ['ON','AB','CA'];
+  const jurGroup = j => CA_GROUP.includes(j) ? 'CA' : 'US';
+  const jurSuffix = j => (j === 'US' || j === 'CA') ? '' : `_${j}`;
   const offerType = getOfferType();
 
   // ── RAF: bypass allNames loop entirely ───────────────────────────────────
@@ -10857,7 +10879,7 @@ function generateScript() {
       doReferrer: d.rafDoReferrer !== false,
     };
     // v3.0: guard the longest codes against the 40-char NATS limit (DAY{numDays} is the longest freeform)
-    const rafLongest = `${rafCfg.date}_${rafCfg.jurisdiction}_CAS_ACQ_SUO_RAF_FS_DAY${rafCfg.numDays}_${rafCfg.spinAmount}`;
+    const rafLongest = `${rafCfg.date}_${jurGroup(rafCfg.jurisdiction)}_CAS_ACQ_SUO_RAF_FS_DAY${rafCfg.numDays}_${rafCfg.spinAmount}${jurSuffix(rafCfg.jurisdiction)}`;
     if (rafLongest.length > 40) { alert(`Code exceeds the 40-character NATS limit (${rafLongest.length}):\n${rafLongest}`); return; }
     const script = buildRAFScript(rafCfg);
     document.getElementById('script-output').value = script;
@@ -10899,7 +10921,7 @@ function generateScript() {
       gameKey: d.suoGame || '7FH',
     };
     // v3.0: guard the longest code (highest day number) against the 40-char NATS limit
-    const suoLongest = `${suoCfg.date}_${suoCfg.jurisdiction}_CAS_ACQ_SUO_DR_FS_DAY${suoCfg.numDays}_${suoCfg.spinAmount}`;
+    const suoLongest = `${suoCfg.date}_${jurGroup(suoCfg.jurisdiction)}_CAS_ACQ_SUO_DR_FS_DAY${suoCfg.numDays}_${suoCfg.spinAmount}${jurSuffix(suoCfg.jurisdiction)}`;
     if (suoLongest.length > 40) { alert(`Code exceeds the 40-character NATS limit (${suoLongest.length}):\n${suoLongest}`); return; }
     const script = buildSUOScript(suoCfg);
     document.getElementById('script-output').value = script;
@@ -11262,7 +11284,7 @@ function generateScript() {
       // v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
       const lcOverlong = [];
       amounts.forEach(a => {
-        const code = `${date}_${jurisdiction}_CAS_LC_REACT_OPT_CC_${a}`;
+        const code = `${date}_${jurGroup(jurisdiction)}_CAS_LC_REACT_OPT_CC_${a}${jurSuffix(jurisdiction)}`;
         if (code.length > 40) lcOverlong.push(`${code} (${code.length})`);
         allNames.push({ code: code, sendToXP: lcSendToXP, daysToOptin: lcDaysToOptin, daysToEntitlement: lcDaysToEntitlement, daysToSettlement: lcDaysToSettlement, doSegment: lcDoSegment, doPromo: lcDoPromo, doBonus: lcDoBonus });
       });
