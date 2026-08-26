@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v2.34</title>
+  <title>NATS Bonus Creator v3.0</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -747,12 +747,9 @@
         <label style="font-family: system-ui, -apple-system, sans-serif; font-size: 16px; color: #ffffff; white-space: nowrap;">Offer Type</label>
         <select id="offer-type-select" onchange="onOfferTypeChange()" style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; flex: 1;">
           <option value="RTC">RTC Top Up - Casino Credit</option>
-          <option value="FS">RTC Top Up - Free Spins</option>
-          <option value="BG">Bet &amp; Get</option>
-          <option value="DM">Deposit Match</option>
+          <!-- v3.0: RTC FS / BG / DM / BG-RE removed from the selector (builders retained in this file for reference) -->
           <option value="RAF">Refer a Friend</option>
           <option value="SUO">SUO Day 2+ Spins</option>
-          <option value="BGRE">Bet &amp; Get - Rules Engine</option>
           <option value="LCREACT">Lifecycle - REACT CC Drop</option>
           <option value="CHURNDM">Lifecycle - Churn DM</option>
           <option value="VIPDM">VIP Offer Library - Deposit Matches</option>
@@ -6188,11 +6185,16 @@ from playwright.async_api import async_playwright
 EASTERN = ZoneInfo("America/New_York")
 
 # --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
-def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+def currency_for(jur):
+    """v3.0: RAF passes the bare JURISDICTION constant (not a code). GBP is never used."""
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -6269,14 +6271,20 @@ assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
 
 # ── Derived names ─────────────────────────────────────────────────────────────
 
+# v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+def _check_code_len(code):
+    if len(code) > 40:
+        raise ValueError(f"code exceeds the 40-character NATS limit ({len(code)}): {code}")
+    return code
+
 def rfre_name():
-    return f"{DATE}_CAS_ACQ_SUO_RAF_RFRE_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_RFRE_{SPIN_AMOUNT}")
 
 def rfer_name():
-    return f"{DATE}_CAS_ACQ_SUO_RAF_RFER_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_RFER_{SPIN_AMOUNT}")
 
 def day_name(n):
-    return f"{DATE}_CAS_ACQ_SUO_RAF_DAY{n}_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+    return _check_code_len(f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_RAF_FS_DAY{n}_{SPIN_AMOUNT}")
 
 def day_names():
     return [day_name(n) for n in range(2, NUM_DAYS + 1)]
@@ -6737,13 +6745,24 @@ async def create_bonus_rfre(page, voucher_code):
     print("  ✅ Status Active: checked")
     await fill_reporting_fields(page)
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
-        has_text=re.compile(r"^" + re.escape(name) + r"$")
-    ).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+            has_text=re.compile(r"^" + re.escape(name) + r"$")
+        ).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"  WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"  ✅ Promotion Tile: {name}")
@@ -6867,13 +6886,24 @@ async def create_bonus_rfer(page, voucher_code):
     await fill_days_and_activation(page, optin=0, entitlement=0, settlement=7)
     await fill_reporting_fields(page)
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
-        has_text=re.compile(r"^" + re.escape(name) + r"$")
-    ).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+            has_text=re.compile(r"^" + re.escape(name) + r"$")
+        ).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"  WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"  ✅ Promotion Tile: {name}")
@@ -7122,11 +7152,16 @@ from playwright.async_api import async_playwright
 EASTERN = ZoneInfo("America/New_York")
 
 # --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
-def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+def currency_for(jur):
+    """v3.0: SUO passes the bare JURISDICTION constant (not a code). GBP is never used."""
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -7202,7 +7237,11 @@ assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
 # ── Derived names ─────────────────────────────────────────────────────────────
 
 def day_name(n):
-    return f"{DATE}_CAS_ACQ_SUO_DAY{n}_{JURISDICTION}_FS_{SPIN_AMOUNT}"
+    # v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+    code = f"{DATE}_{JURISDICTION}_CAS_ACQ_SUO_DR_FS_DAY{n}_{SPIN_AMOUNT}"
+    if len(code) > 40:
+        raise ValueError(f"code exceeds the 40-character NATS limit ({len(code)}): {code}")
+    return code
 
 def day_names():
     return [day_name(n) for n in range(2, NUM_DAYS + 1)]
@@ -7552,12 +7591,18 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
-# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
 def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -7626,18 +7671,21 @@ TERMS_IDS = ${JSON.stringify(CHURNDM_TERMS_IDS)}
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
 def parse_churn_dm(code):
-    """Returns (min_deposit, pct, max_bonus) from ..._M{min}_{pct}M{max}."""
+    """v3.0: freeform (everything after the 7th underscore) is M{min}_{pct}M{max},
+    with optional K-notation on min/max (e.g. M1K_50M2K). Returns expanded literal
+    strings so Terms ID keys and Discover filenames keep their current shapes."""
     parts = code.split("_")
-    min_deposit, pct, max_bonus = None, None, None
-    for part in parts:
-        if part.startswith("M") and part[1:].isdigit():
-            min_deposit = part[1:]
-        elif "M" in part and not part.startswith("M"):
-            idx = part.index("M")
-            if part[:idx].isdigit() and part[idx+1:].isdigit():
-                pct = part[:idx]
-                max_bonus = part[idx+1:]
-    return min_deposit, pct, max_bonus
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
+        raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"M(\\d+K?)_(\\d+)M(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"Churn DM freeform is not M{{min}}_{{pct}}M{{max}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return expand_k(m.group(1)), m.group(2), expand_k(m.group(3))
 
 def parse_dates(code):
     """Start = 00:00:00 ET on code date; End = exactly 10 days later at 00:00:00 ET."""
@@ -7970,11 +8018,22 @@ async def create_bonus(page, name, idx):
     await page.wait_for_timeout(500)
 
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"    OK Promotion Tile: {name}")
@@ -8107,12 +8166,18 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
-# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
 def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -8192,18 +8257,21 @@ TERMS_END_LONG    = "${endLong}"
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
 def parse_vipdm(code):
-    """Returns (min_deposit, pct, max_bonus) from ..._M{min}_{pct}M{max}."""
+    """v3.0: freeform (everything after the 7th underscore) is M{min}_{pct}M{max},
+    with optional K-notation on min/max (e.g. M250_20M5K). Returns expanded literal
+    strings so Terms ID keys and Discover filenames keep their current shapes."""
     parts = code.split("_")
-    min_deposit, pct, max_bonus = None, None, None
-    for part in parts:
-        if part.startswith("M") and part[1:].isdigit():
-            min_deposit = part[1:]
-        elif "M" in part and not part.startswith("M"):
-            idx = part.index("M")
-            if part[:idx].isdigit() and part[idx+1:].isdigit():
-                pct = part[:idx]
-                max_bonus = part[idx+1:]
-    return min_deposit, pct, max_bonus
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
+        raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"M(\\d+K?)_(\\d+)M(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"VIPDM freeform is not M{{min}}_{{pct}}M{{max}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return expand_k(m.group(1)), m.group(2), expand_k(m.group(3))
 
 def parse_dates(code, entitlement_days):
     """VIP Offer Library window:
@@ -8558,11 +8626,22 @@ ${isUS ? `    await page.get_by_text("FanCash", exact=True).click()
     await page.wait_for_timeout(500)
 
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"    OK Promotion Tile: {name}")
@@ -8711,12 +8790,18 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
-# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
 def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -8806,27 +8891,40 @@ TERMS_END_LONG    = "${endLong}"
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
 ${isUS ? `def parse_vipbg(code):
-    """Returns (bet, get) from MMDDYY_VCL_RET_BG_US_FC_B{bet}_G{get}."""
+    """v3.0: freeform (after the 7th underscore) is B{bet}_G{get}, optional K-notation
+    (e.g. B100K_G5K). Returns expanded literal strings so Terms ID keys and Discover
+    filenames keep their current shapes. US codes carry mechanic SBG (all tiers slots)."""
     parts = code.split("_")
-    bet, get = None, None
-    for part in parts:
-        if part.startswith("B") and part[1:].isdigit():
-            bet = part[1:]
-        elif part.startswith("G") and part[1:].isdigit():
-            get = part[1:]
-    return bet, get
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
+        raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"B(\\d+K?)_G(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"VIPBG freeform is not B{{bet}}_G{{get}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return expand_k(m.group(1)), expand_k(m.group(2))
 ` : `def parse_vipbg(code):
-    """Returns (cat, bet, get) from MMDDYY_VCL_RET_{SBG|TBG}_CA_CC_B{bet}_G{get}."""
+    """v3.0: category is the MECHANIC field (parts[5], SBG|TBG); freeform (after the
+    7th underscore) is B{bet}_G{get}, optional K-notation. Returns (cat, bet, get) as
+    expanded literal strings so Terms ID keys and Discover filenames keep their shapes."""
     parts = code.split("_")
-    cat, bet, get = None, None, None
-    for part in parts:
-        if part in ("SBG", "TBG"):
-            cat = part
-        elif part.startswith("B") and part[1:].isdigit():
-            bet = part[1:]
-        elif part.startswith("G") and part[1:].isdigit():
-            get = part[1:]
-    return cat, bet, get
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
+        raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    cat = parts[5]
+    if cat not in ("SBG", "TBG"):
+        raise ValueError(f"VIPBG mechanic (field 5) must be SBG or TBG, got {cat!r} in {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"B(\\d+K?)_G(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"VIPBG freeform is not B{{bet}}_G{{get}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return cat, expand_k(m.group(1)), expand_k(m.group(2))
 `}
 def parse_dates(code, entitlement_days):
     """VIP Offer Library window:
@@ -9183,11 +9281,22 @@ ${isUS ? `    # FanCash amount = the "get" value — USD currency row (from the 
     await page.wait_for_timeout(500)
 
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"\$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     print(f"    OK Promotion Tile: {name}")
@@ -9342,12 +9451,18 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
-# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
 def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -9412,12 +9527,14 @@ ${tcDataLines}
 }
 
 def parse_amount(code):
+    """v3.0: the freeform (everything after the 7th underscore) is the amount."""
     parts = code.split("_")
-    for part in reversed(parts):
-        digits = ''.join(filter(str.isdigit, part))
-        if digits:
-            return digits
-    return ""
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    amount = "_".join(parts[7:])
+    if not amount.isdigit():
+        raise ValueError(f"LC-REACT freeform is not a plain amount: {amount!r} in {code}")
+    return amount
 
 def format_tc(code):
     amount = parse_amount(code)
@@ -9692,11 +9809,22 @@ async def create_bonus(page, name, idx):
     await page.get_by_text("Lifecycle", exact=True).click()
     await page.wait_for_timeout(500)
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     await page.locator("button.ant-btn-primary.save").click()
@@ -9779,7 +9907,7 @@ function buildDMCAScript(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada Auto-Generated Script
-Generated by NATS Bonus Creator v2.34
+Generated by NATS Bonus Creator v3.0
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
@@ -10728,6 +10856,9 @@ function generateScript() {
       doReferee: d.rafDoReferee !== false,
       doReferrer: d.rafDoReferrer !== false,
     };
+    // v3.0: guard the longest codes against the 40-char NATS limit (DAY{numDays} is the longest freeform)
+    const rafLongest = `${rafCfg.date}_${rafCfg.jurisdiction}_CAS_ACQ_SUO_RAF_FS_DAY${rafCfg.numDays}_${rafCfg.spinAmount}`;
+    if (rafLongest.length > 40) { alert(`Code exceeds the 40-character NATS limit (${rafLongest.length}):\n${rafLongest}`); return; }
     const script = buildRAFScript(rafCfg);
     document.getElementById('script-output').value = script;
     document.getElementById('script-area').style.display = 'block';
@@ -10767,6 +10898,9 @@ function generateScript() {
       numDays: d.suoNumDays || 10,
       gameKey: d.suoGame || '7FH',
     };
+    // v3.0: guard the longest code (highest day number) against the 40-char NATS limit
+    const suoLongest = `${suoCfg.date}_${suoCfg.jurisdiction}_CAS_ACQ_SUO_DR_FS_DAY${suoCfg.numDays}_${suoCfg.spinAmount}`;
+    if (suoLongest.length > 40) { alert(`Code exceeds the 40-character NATS limit (${suoLongest.length}):\n${suoLongest}`); return; }
     const script = buildSUOScript(suoCfg);
     document.getElementById('script-output').value = script;
     document.getElementById('script-area').style.display = 'block';
@@ -10801,12 +10935,18 @@ function generateScript() {
       const dmcaDoPromo = days[i].doPromo !== false;
       const dmcaDoBonus = days[i].doBonus !== false;
       const dmcaDays = days[i].dmcaDaysToUseReward !== undefined ? days[i].dmcaDaysToUseReward : 7;
+      // v3.0 naming: CC: MMDDYY_CA_CAS_RET_BAU_BG_CC_B{bet}_G{get}
+      //              FS: MMDDYY_CA_CAS_RET_BAU_BG_FS_T{n} (tier index; values live in the baked config)
+      const DMCA_FS_TIER_INDEX = { '50': '1', '125': '2', '500': '3', '5000': '4' };
+      const dmcaOverlong = [];
       if (info.isCC) {
         const offers = (days[i].dmcaOfferData || []).filter(o => o.active);
         if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
         offers.forEach(o => {
+          const code = `${date}_CA_CAS_RET_BAU_BG_CC_B${o.bet}_G${o.get}`;
+          if (code.length > 40) dmcaOverlong.push(`${code} (${code.length})`);
           allNames.push({
-            code: `${date}_CAS_RET_BG_CA_CC_B${o.bet}_G${o.get}`,
+            code: code,
             reward: 'CC',
             weekday: info.weekday,
             bet: o.bet,
@@ -10828,10 +10968,13 @@ function generateScript() {
           const tid = o.tids ? o.tids[info.weekday] : null;
           if (!tid) { alert(`Day ${i + 1}: Bet ${dmcaFmtMoney(o.bet)} \u2192 ${o.spins} Spins has no Terms ID for ${info.weekday}. Script generation is blocked.`); return; }
           if (!fsGame.stakes.includes(o.value)) { alert(`Day ${i + 1}: spin value $${o.value} is not in ${fsGame.name}'s Free Spin Stakes ladder. Script generation is blocked \u2014 the value must exist in Playmaker for this game.`); return; }
+          if (!DMCA_FS_TIER_INDEX[String(o.bet)]) { alert(`Day ${i + 1}: Bet ${dmcaFmtMoney(o.bet)} has no v3.0 tier index (T1\u2013T4 map covers bets 50/125/500/5000). Script generation is blocked \u2014 reach out to Adrian Van de Camp to add the new tier.`); return; }
         }
         offers.forEach(o => {
+          const code = `${date}_CA_CAS_RET_BAU_BG_FS_T${DMCA_FS_TIER_INDEX[String(o.bet)]}`;
+          if (code.length > 40) dmcaOverlong.push(`${code} (${code.length})`);
           allNames.push({
-            code: `${date}_CAS_RET_BG_CA_FS_B${o.bet}_G${o.spins}S_${o.vtok}_${fsGame.token}`,
+            code: code,
             reward: 'FS',
             weekday: info.weekday,
             bet: o.bet,
@@ -10849,6 +10992,7 @@ function generateScript() {
           });
         });
       }
+      if (dmcaOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + dmcaOverlong.join('\n')); return; }
     } else if (offerType === 'BGRE') {
       const offers = (days[i].bgreOfferData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
@@ -11001,9 +11145,13 @@ function generateScript() {
       const cdmDoSegment = days[i].doSegment !== false;
       const cdmDoPromo = days[i].doPromo !== false;
       const cdmDoBonus = days[i].doBonus !== false;
+      // v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+      const cdmOverlong = [];
       offers.forEach(o => {
+        const code = `${date}_${jurisdiction}_CAS_LC_CHURN_DM_CC_M${o.min}_${o.pct}M${o.max}`;
+        if (code.length > 40) cdmOverlong.push(`${code} (${code.length})`);
         allNames.push({
-          code: `${date}_CAS_LC_CHURN_DM_${jurisdiction}_CC_M${o.min}_${o.pct}M${o.max}`,
+          code: code,
           sendToXP: cdmSendToXP,
           externalBonus: cdmExternalBonus,
           daysToOptin: cdmDaysToOptin,
@@ -11014,6 +11162,7 @@ function generateScript() {
           doBonus: cdmDoBonus,
         });
       });
+      if (cdmOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + cdmOverlong.join('\n')); return; }
     } else if (offerType === 'VIPDM') {
       if (date.length !== 6 || !/^\d{6}$/.test(date)) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
       const offers = (days[i].vipdmOfferData || []).filter(o => o.active);
@@ -11035,11 +11184,17 @@ function generateScript() {
       const vdmDoSegment = days[i].doSegment !== false;
       const vdmDoPromo = days[i].doPromo !== false;
       const vdmDoBonus = days[i].doBonus !== false;
+      // v3.0 naming: MMDDYY_JUR_VCAS_RET_OL_DM_{FC|CC}_M{min}_{pct}M{max}
+      // K-notation: min/max >= 1000 and divisible by 1000 render as {n}K (expanded back at runtime)
+      const vdmK = v => { const n = parseInt(v, 10); return (n >= 1000 && n % 1000 === 0) ? (n / 1000) + 'K' : String(n); };
+      const vdmOverlong = [];
       offers.forEach(o => {
+        const code = isVIPDMUS()
+          ? `${date}_US_VCAS_RET_OL_DM_FC_M${vdmK(o.min)}_${o.pct}M${vdmK(o.max)}`
+          : `${date}_CA_VCAS_RET_OL_DM_CC_M${vdmK(o.min)}_${o.pct}M${vdmK(o.max)}`;
+        if (code.length > 40) vdmOverlong.push(`${code} (${code.length})`);
         allNames.push({
-          // v2.26 — US: MMDDYY_VCL_RET_DM_US_FC_M{min}_{pct}M{max} (FanCash, USD row)
-          //          CA: MMDDYY_VCL_RET_DM_CA_CC_M{min}_{pct}M{max} (Casino Credit, CAD row)
-          code: isVIPDMUS() ? `${date}_VCL_RET_DM_US_FC_M${o.min}_${o.pct}M${o.max}` : `${date}_VCL_RET_DM_CA_CC_M${o.min}_${o.pct}M${o.max}`,
+          code: code,
           sendToXP: vdmSendToXP,
           externalBonus: vdmExternalBonus,
           daysToOptin: vdmDaysToOptin,
@@ -11050,6 +11205,7 @@ function generateScript() {
           doBonus: vdmDoBonus,
         });
       });
+      if (vdmOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + vdmOverlong.join('\n')); return; }
     } else if (offerType === 'VIPBG') {
       if (date.length !== 6 || !/^\d{6}$/.test(date)) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
       const offers = (days[i].vipbgOfferData || []).filter(o => o.active);
@@ -11070,11 +11226,18 @@ function generateScript() {
       const vbgDoSegment = days[i].doSegment !== false;
       const vbgDoPromo = days[i].doPromo !== false;
       const vbgDoBonus = days[i].doBonus !== false;
+      // v3.0 naming: US: MMDDYY_US_VCAS_RET_OL_SBG_FC_B{bet}_G{get} (all US tiers are slots)
+      //              CA: MMDDYY_CA_VCAS_RET_OL_{SBG|TBG}_CC_B{bet}_G{get}
+      // K-notation: bet/get >= 1000 and divisible by 1000 render as {n}K (expanded back at runtime)
+      const vbgK = v => { const n = parseInt(v, 10); return (n >= 1000 && n % 1000 === 0) ? (n / 1000) + 'K' : String(n); };
+      const vbgOverlong = [];
       offers.forEach(o => {
+        const code = vipbgUS
+          ? `${date}_US_VCAS_RET_OL_SBG_FC_B${vbgK(o.bet)}_G${vbgK(o.get)}`
+          : `${date}_CA_VCAS_RET_OL_${o.cat}_CC_B${vbgK(o.bet)}_G${vbgK(o.get)}`;
+        if (code.length > 40) vbgOverlong.push(`${code} (${code.length})`);
         allNames.push({
-          // v2.25 — US: MMDDYY_VCL_RET_BG_US_FC_B{bet}_G{get} (FanCash, USD row)
-          //          CA: MMDDYY_VCL_RET_{SBG|TBG}_CA_CC_B{bet}_G{get} (Casino Credit, CAD row)
-          code: vipbgUS ? `${date}_VCL_RET_BG_US_FC_B${o.bet}_G${o.get}` : `${date}_VCL_RET_${o.cat}_CA_CC_B${o.bet}_G${o.get}`,
+          code: code,
           sendToXP: true,          // v2.24 — always ON for VIPBG (no toggle)
           externalBonus: true,     // v2.24 — always ON for VIPBG (no toggle)
           daysToOptin: vbgDaysToOptin,
@@ -11085,6 +11248,7 @@ function generateScript() {
           doBonus: vbgDoBonus,
         });
       });
+      if (vbgOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + vbgOverlong.join('\n')); return; }
     } else if (offerType === 'LCREACT') {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
@@ -11095,7 +11259,14 @@ function generateScript() {
       const lcDoSegment = days[i].doSegment !== false;
       const lcDoPromo = days[i].doPromo !== false;
       const lcDoBonus = days[i].doBonus !== false;
-      amounts.forEach(a => allNames.push({ code: `${date}_CAS_LC_REACT_${jurisdiction}_CC_${a}`, sendToXP: lcSendToXP, daysToOptin: lcDaysToOptin, daysToEntitlement: lcDaysToEntitlement, daysToSettlement: lcDaysToSettlement, doSegment: lcDoSegment, doPromo: lcDoPromo, doBonus: lcDoBonus }));
+      // v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+      const lcOverlong = [];
+      amounts.forEach(a => {
+        const code = `${date}_${jurisdiction}_CAS_LC_REACT_OPT_CC_${a}`;
+        if (code.length > 40) lcOverlong.push(`${code} (${code.length})`);
+        allNames.push({ code: code, sendToXP: lcSendToXP, daysToOptin: lcDaysToOptin, daysToEntitlement: lcDaysToEntitlement, daysToSettlement: lcDaysToSettlement, doSegment: lcDoSegment, doPromo: lcDoPromo, doBonus: lcDoBonus });
+      });
+      if (lcOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + lcOverlong.join('\n')); return; }
     } else {
       const amounts = [...days[i].amounts].sort((a, b) => a - b);
       if (amounts.length === 0) { alert(`Day ${i + 1} has a date but no amounts selected. Please select at least one amount or clear the date.`); return; }
@@ -11106,7 +11277,14 @@ function generateScript() {
       const rtcDoSegment = days[i].doSegment !== false;
       const rtcDoPromo = days[i].doPromo !== false;
       const rtcDoBonus = days[i].doBonus !== false;
-      amounts.forEach(a => allNames.push({ code: `${date}_CAS_RET_RTC_${jurisdiction}_CC_${a}`, sendToXP: rtcSendToXP, daysToOptin: rtcDaysToOptin, daysToEntitlement: rtcDaysToEntitlement, daysToSettlement: rtcDaysToSettlement, doSegment: rtcDoSegment, doPromo: rtcDoPromo, doBonus: rtcDoBonus }));
+      // v3.0 naming: MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM
+      const rtcOverlong = [];
+      amounts.forEach(a => {
+        const code = `${date}_${jurisdiction}_CAS_RET_RTC_OPT_CC_${a}`;
+        if (code.length > 40) rtcOverlong.push(`${code} (${code.length})`);
+        allNames.push({ code: code, sendToXP: rtcSendToXP, daysToOptin: rtcDaysToOptin, daysToEntitlement: rtcDaysToEntitlement, daysToSettlement: rtcDaysToSettlement, doSegment: rtcDoSegment, doPromo: rtcDoPromo, doBonus: rtcDoBonus });
+      });
+      if (rtcOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + rtcOverlong.join('\n')); return; }
     }
   }
   if (allNames.length === 0) { alert('Please enter at least one date with offers selected.'); return; }
@@ -11187,12 +11365,18 @@ from playwright.async_api import async_playwright
 
 EASTERN = ZoneInfo("America/New_York")
 
-# --- v2.18/v2.19: NATS multi-currency amount tables (USD / GBP / CAD) ---
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
 CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
 
 def currency_for(name):
-    """USD for US and US-state codes; CAD for ON/AB/CA codes. GBP is never used."""
-    return "CAD" if any(tok in CANADIAN_JURISDICTIONS for tok in name.split("_")) else "USD"
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
 
 async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
     """Fill an amount table that may now contain one row per currency
@@ -11292,12 +11476,14 @@ def parse_dates(code):
     return start, end
 
 def parse_amount(code):
+    """v3.0: the freeform (everything after the 7th underscore) is the amount."""
     parts = code.split("_")
-    for part in parts:
-        digits = ''.join(filter(str.isdigit, part))
-        if digits and part != parts[0]:
-            return digits
-    return ""
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    amount = "_".join(parts[7:])
+    if not amount.isdigit():
+        raise ValueError(f"RTC CC freeform is not a plain amount: {amount!r} in {code}")
+    return amount
 
 def generate_suffix():
     chars = string.ascii_uppercase + string.digits
@@ -11568,11 +11754,22 @@ async def create_bonus(page, name):
     await page.get_by_text("Lifecycle", exact=True).click()
     await page.wait_for_timeout(500)
     promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
-    await promo_tile_row.locator(".ant-select-selector").click()
-    await page.wait_for_timeout(500)
-    await page.keyboard.type(name)
-    promo_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
-    await promo_option.wait_for(state="visible", timeout=15000)
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
     await promo_option.click()
     await page.wait_for_timeout(500)
     await page.locator("button.ant-btn-primary.save").click()
