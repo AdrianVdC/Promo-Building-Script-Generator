@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.2</title>
+  <title>NATS Bonus Creator v3.4</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -946,6 +946,7 @@
         <span style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 11px; color: #9090a0;" id="vipdm-terms-start-preview"></span>
       </div>
       <p style="font-size: 11px; color: var(--muted); margin: 0; font-family: 'SF Mono', ui-monospace, monospace;">Used as {start_date_long} (and {start_date_short}) in the T&amp;C.</p>
+      <p style="font-size: 11px; color: #e2b04a; margin: 4px 0 0; font-family: 'SF Mono', ui-monospace, monospace;">⚠ CA tiers with a baked start-date override of 09/01/26 (this field does not affect them): M250_20M10000 (CAS_CA_0092), M250_20M20000 (CAS_CA_0093), M100_50M5000 (CAS_CA_0094).</p>
     </div>
     <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
       <p style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.08em; margin: 0 0 10px;">PROMOTIONAL END DATE</p>
@@ -2221,28 +2222,50 @@ const CHURNDM_TERMS_IDS = {
 };
 
 // v2.23 — VIP Offer Library - Deposit Matches (CA — Canada only)
+// v3.3 — added the 20% → $10,000 and 20% → $20,000 tiers (CAS_CA_0092/0093,
+// filed with a 09/01/26 Terms start — see VIPDM_TERMS_START_OVERRIDES).
+// v3.4 — added the 50% → $5,000 tier (CAS_CA_0094, also 09/01/26 start).
+// Note the CA Discover-filename near-collisions these introduce:
+// 20M1000.png vs 20M10000.png, and 20M2000.png vs 20M20000.png.
 const DEFAULT_VIPDM_OFFERS = [
-  { min: 100, pct: 50,  max: 250,  active: false },
-  { min: 100, pct: 100, max: 250,  active: false },
-  { min: 250, pct: 10,  max: 250,  active: false },
-  { min: 250, pct: 10,  max: 2500, active: false },
-  { min: 250, pct: 10,  max: 5000, active: false },
-  { min: 250, pct: 20,  max: 500,  active: false },
-  { min: 250, pct: 20,  max: 1000, active: false },
-  { min: 250, pct: 20,  max: 2000, active: false },
-  { min: 250, pct: 20,  max: 5000, active: false },
+  { min: 100, pct: 50,  max: 250,   active: false },
+  { min: 100, pct: 50,  max: 5000,  active: false },
+  { min: 100, pct: 100, max: 250,   active: false },
+  { min: 250, pct: 10,  max: 250,   active: false },
+  { min: 250, pct: 10,  max: 2500,  active: false },
+  { min: 250, pct: 10,  max: 5000,  active: false },
+  { min: 250, pct: 20,  max: 500,   active: false },
+  { min: 250, pct: 20,  max: 1000,  active: false },
+  { min: 250, pct: 20,  max: 2000,  active: false },
+  { min: 250, pct: 20,  max: 5000,  active: false },
+  { min: 250, pct: 20,  max: 10000, active: false },
+  { min: 250, pct: 20,  max: 20000, active: false },
 ];
 
 const DEFAULT_VIPDM_TERMS_IDS = {
-  'M100_50M250':  'CAS_CA_0078',
-  'M100_100M250': 'CAS_CA_0079',
-  'M250_10M250':  'CAS_CA_0080',
-  'M250_10M2500': 'CAS_CA_0081',
-  'M250_10M5000': 'CAS_CA_0082',
-  'M250_20M500':  'CAS_CA_0083',
-  'M250_20M1000': 'CAS_CA_0084',
-  'M250_20M2000': 'CAS_CA_0085',
-  'M250_20M5000': 'CAS_CA_0086',
+  'M100_50M250':   'CAS_CA_0078',
+  'M100_50M5000':  'CAS_CA_0094',
+  'M100_100M250':  'CAS_CA_0079',
+  'M250_10M250':   'CAS_CA_0080',
+  'M250_10M2500':  'CAS_CA_0081',
+  'M250_10M5000':  'CAS_CA_0082',
+  'M250_20M500':   'CAS_CA_0083',
+  'M250_20M1000':  'CAS_CA_0084',
+  'M250_20M2000':  'CAS_CA_0085',
+  'M250_20M5000':  'CAS_CA_0086',
+  'M250_20M10000': 'CAS_CA_0092',
+  'M250_20M20000': 'CAS_CA_0093',
+};
+
+// v3.3 — per-tier Terms start-date overrides (CA only; keys as in the Terms ID
+// map). The CAS_CA_0092/0093/0094 filings begin September 1, 2026 while the
+// shared CA default remains 08/17/26 (filings 0078–0086). Baked into the
+// generated script as TERMS_START_OVERRIDES so mixed-tier runs type the
+// correct Promotional Period per tier. US has no overrides.
+const VIPDM_TERMS_START_OVERRIDES = {
+  'M250_20M10000': '09/01/26',
+  'M250_20M20000': '09/01/26',
+  'M100_50M5000':  '09/01/26',
 };
 const DEFAULT_VIPDM_START_DATE = '08/17/26';
 const DEFAULT_VIPDM_END_DATE = '12/31/26';
@@ -2284,8 +2307,15 @@ function vipdmDefaultOffers() {
 }
 
 function getVIPDMTermsIDs() {
+  // v3.3 — merge baked defaults under any saved map (saved values win per key)
+  // so newly-added default tiers get their Terms IDs even on machines with a
+  // pre-existing saved vcl_dm_terms_ids. Pre-v3.3 saved maps cannot contain
+  // the new keys, so nothing a user saved is ever overridden.
   const def = isVIPDMUS() ? DEFAULT_VIPDM_TERMS_IDS_US : DEFAULT_VIPDM_TERMS_IDS;
-  try { return JSON.parse(localStorage.getItem(vipdmKey('vcl_dm_terms_ids'))) || def; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(vipdmKey('vcl_dm_terms_ids')));
+    return saved ? { ...def, ...saved } : def;
+  }
   catch(e) { return def; }
 }
 function getVIPDMStartDate() { return localStorage.getItem(vipdmKey('vcl_dm_terms_start_date')) || (isVIPDMUS() ? DEFAULT_VIPDM_START_DATE_US : DEFAULT_VIPDM_START_DATE); }
@@ -2690,12 +2720,12 @@ const INFO_VIPBG = `<ul>
 
 const INFO_VIPDM = `<ul>
   <li><strong>Offer Type:</strong> VIP Offer Library - Deposit Matches. <span style="color:#ffffff;">Dual region (v2.26):</span> <span style="color:#ffffff;">US — United States</span> (default) pays <span style="color:#ffffff;">FanCash</span> (USD rows); <span style="color:#ffffff;">CA — Canada</span> pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. <span style="color:#ffffff;">Switching Region resets all card values</span> (silent, by design).</li>
-  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max reward. US has ten defaults (Terms IDs CAS_10677&ndash;CAS_10686); CA has nine defaults (CAS_CA_0078&ndash;CAS_CA_0086). Each offer maps to a Terms ID (editable per region in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
+  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max reward. US has ten defaults (Terms IDs CAS_10677&ndash;CAS_10686); CA has twelve defaults (CAS_CA_0078&ndash;CAS_CA_0086 plus the v3.3/v3.4 additions: 20% &rarr; $10,000 / 20% &rarr; $20,000 / 50% &rarr; $5,000, Terms IDs CAS_CA_0092&ndash;CAS_CA_0094). Each offer maps to a Terms ID (editable per region in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
   <li><strong>Promo &amp; Activation Window (both regions):</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
   <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". Button 2: "Deposit" &rarr; /auth/account/deposit (both regions).</li>
   <li><strong>Voucher Code format:</strong> US: <code>VRDMFC{MMDDYY}{XXX}</code>; CA: <code>VRDMCC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
-  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, one per region. Use Edit Images to set each path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>20M500.png</code>). <span style="color:#ffffff;">Several US filenames differ by one character (10M500 / 10M5000 / 20M500 / 20M5000)</span> — double-check the creatives.</li>
-  <li><strong>T&amp;Cs:</strong> Region-scoped legal copy — CA: Canadian (Ontario) template; US: canonical FanCash template (CAS_10679&ndash;CAS_10685 filings not supplied — verify on first use). Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal (per region) and baked in at generation time — changes require regenerating the script.</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, one per region. Use Edit Images to set each path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>20M500.png</code>). <span style="color:#ffffff;">Several filenames differ by one character — US: 10M500 / 10M5000 and 20M500 / 20M5000; CA (v3.3): 20M1000 / 20M10000 and 20M2000 / 20M20000</span> — double-check the creatives.</li>
+  <li><strong>T&amp;Cs:</strong> Region-scoped legal copy — CA: Canadian (Ontario) template; US: canonical FanCash template (CAS_10679&ndash;CAS_10685 filings not supplied — verify on first use). Promotional dates and Terms IDs are edited via the Edit T&amp;Cs modal (per region) and baked in at generation time — changes require regenerating the script. <span style="color:#ffffff;">v3.3/v3.4: the CA CAS_CA_0092/0093/0094 tiers carry a baked Terms start-date override of 09/01/26</span> (their filings begin September 1, 2026; the shared CA start date still governs every other tier and the modal's date field does not affect overridden tiers).</li>
   <li><strong>Series:</strong> VIP &nbsp;|&nbsp; <strong>Origin:</strong> Opt-In Bonus &nbsp;|&nbsp; <strong>Type:</strong> Retention (both regions)</li>
   <li><strong>Platforms:</strong> CA: Web + STAC: Standalone Casino only (all COMBO tags removed). <span style="color:#ffffff;">US keeps COMBO: Casino</span> (standard tag behavior). <strong>Matched Deposit:</strong> always checked (both regions).</li>
   <li><strong>Bonus Save:</strong> CA: no confirmation modal. <span style="color:#ffffff;">US: FanCash confirmation modal expected</span> — handled defensively (confirmed if it appears, noted if not).</li>
@@ -8164,6 +8194,11 @@ function buildVIPDMScript(allNames, imagePath, hiwText, tcText) {
   const startLong          = parseDateLong(getVIPDMStartDate());
   const endShort           = parseDateShort(getVIPDMEndDate());
   const endLong            = parseDateLong(getVIPDMEndDate());
+  // v3.3 — per-tier Terms start-date overrides, CA only (US has none). Baked
+  // as {key: [short, long]} so format_hiw/format_tc unpack per tier.
+  const startOverrides     = isUS ? {} : Object.fromEntries(
+    Object.entries(VIPDM_TERMS_START_OVERRIDES).map(([k, v]) => [k, [parseDateShort(v), parseDateLong(v)]])
+  );
 
   return `import asyncio
 import calendar
@@ -8265,6 +8300,10 @@ TERMS_START_LONG  = "${startLong}"
 TERMS_END_SHORT   = "${endShort}"
 TERMS_END_LONG    = "${endLong}"
 
+# v3.3 — tiers whose legal filing starts later than the shared region default
+# (key -> [short, long]). Empty for US.
+TERMS_START_OVERRIDES = ${JSON.stringify(startOverrides)}
+
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
 def parse_vipdm(code):
@@ -8318,8 +8357,11 @@ def format_hiw(code):
     min_deposit, pct, max_bonus = parse_vipdm(code)
     min_fmt = format_currency(min_deposit)
     max_fmt = format_currency(max_bonus)
-    terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
-    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    key = f"M{min_deposit}_{pct}M{max_bonus}"
+    terms_id = TERMS_IDS.get(key, "")
+    # v3.3 — per-tier Terms start-date override (tiers filed with a later start
+    # than the shared region default, e.g. CAS_CA_0092/0093 begin 09/01/26).
+    start_date_short, start_date_long = TERMS_START_OVERRIDES.get(key, (TERMS_START_SHORT, TERMS_START_LONG))
     end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
     return f"""${hiwText}"""
 
@@ -8327,8 +8369,10 @@ def format_tc(code):
     min_deposit, pct, max_bonus = parse_vipdm(code)
     min_fmt = format_currency(min_deposit)
     max_fmt = format_currency(max_bonus)
-    terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
-    start_date_short, start_date_long = TERMS_START_SHORT, TERMS_START_LONG
+    key = f"M{min_deposit}_{pct}M{max_bonus}"
+    terms_id = TERMS_IDS.get(key, "")
+    # v3.3 — per-tier Terms start-date override (see format_hiw).
+    start_date_short, start_date_long = TERMS_START_OVERRIDES.get(key, (TERMS_START_SHORT, TERMS_START_LONG))
     end_date_short, end_date_long = TERMS_END_SHORT, TERMS_END_LONG
     return f"""${tcText}"""
 
@@ -9924,7 +9968,7 @@ function buildDMCAScript(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada Auto-Generated Script
-Generated by NATS Bonus Creator v3.2
+Generated by NATS Bonus Creator v3.4
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
