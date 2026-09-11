@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.5</title>
+  <title>NATS Bonus Creator v3.6</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2168,6 +2168,7 @@ function initDays() {
     fsOfferData: getFSPresets('TCE'),
     dmcaOfferData: DMCA_CC_TIERS.map(o => ({ ...o, active: false })),
     dmcaDaysToUseReward: 7,
+    dmcaReward: null, // v3.6 — null = weekday default (see DMCA_DAY_REWARDS)
     fsSendToXP: true,
     fsDaysToOptin: 1,
     fsDaysToEntitlement: 1,
@@ -2435,16 +2436,57 @@ function dmcaInfoForDate(dateStr) {
   const isCC = (dt.getDay() === 2 || dt.getDay() === 4 || dt.getDay() === 6);
   return { weekday, isCC, game: DMCA_GAMES[weekday] || null };
 }
-function dmcaPillHTML(info) {
+// v3.6 — per-weekday reward options; the FIRST entry is that weekday's default.
+// FS is only offered on days with a configured game + filed FS Terms IDs
+// (Mon/Wed/Fri/Sun today). CC is offered on every day — CAS_CA_0019–0022 were
+// filed covering the promotion generally, not specific weekdays (confirmed Sep 2026).
+// Data-driven on purpose: filing FS terms for a new weekday = add 'FS' to its list
+// (plus the DMCA_GAMES entry and per-weekday tids in DMCA_FS_TIERS).
+const DMCA_DAY_REWARDS = {
+  Sunday:    ['FS', 'CC'],
+  Monday:    ['FS', 'CC'],
+  Tuesday:   ['CC'],
+  Wednesday: ['FS', 'CC'],
+  Thursday:  ['CC'],
+  Friday:    ['FS', 'CC'],
+  Saturday:  ['CC'],
+};
+function dmcaAllowedRewards(info) { return info ? (DMCA_DAY_REWARDS[info.weekday] || ['CC']) : []; }
+function dmcaSyncWeekday(i) {
+  // Any date edit that changes the weekday resets the reward selection to that
+  // weekday's default (matches the tool's silent-reset behavior elsewhere) and
+  // guarantees a stale FS selection can never survive onto a Tue/Thu/Sat date.
+  const info = dmcaInfoForDate(days[i].date);
+  const w = info ? info.weekday : null;
+  if (days[i].dmcaLastWeekday !== w) { days[i].dmcaLastWeekday = w; days[i].dmcaReward = null; }
+  return info;
+}
+function dmcaEffectiveReward(i, info) {
+  if (!info) return null;
+  const allowed = dmcaAllowedRewards(info);
+  return allowed.includes(days[i].dmcaReward) ? days[i].dmcaReward : allowed[0];
+}
+function dmcaSetReward(i, r) {
+  const info = dmcaInfoForDate(days[i].date);
+  if (!info || !dmcaAllowedRewards(info).includes(r)) return;
+  days[i].dmcaReward = r;
+  days[i].dmcaLastWeekday = info.weekday;
+  renderAll();
+  updateGenerateButton();
+}
+function dmcaPillHTML(i, info) {
   if (!info) return '';
-  if (info.isCC) return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(160,208,112,0.12); color:#a0d070; border:1px solid rgba(160,208,112,0.4);">${info.weekday} \u2022 Casino Credit</span>`;
+  const reward = dmcaEffectiveReward(i, info);
+  const isOverride = reward !== dmcaAllowedRewards(info)[0];
+  if (reward === 'CC') return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(160,208,112,0.12); color:#a0d070; border:1px solid rgba(160,208,112,0.4);">${info.weekday} \u2022 Casino Credit${isOverride ? ' (override)' : ''}</span>`;
   return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(240,176,64,0.10); color:#f0b040; border:1px solid rgba(240,176,64,0.4);">${info.weekday} \u2022 Free Spins \u2014 ${info.game ? info.game.name : ''}</span>`;
 }
 function dmcaDateInput(i, val) {
   days[i].date = val.trim();
+  const info = dmcaSyncWeekday(i);
   updateGenerateButton();
   const pill = document.getElementById('dmca-pill-' + i);
-  if (pill) pill.innerHTML = dmcaPillHTML(dmcaInfoForDate(days[i].date));
+  if (pill) pill.innerHTML = dmcaPillHTML(i, info);
 }
 
 function getOfferType() {
@@ -2733,11 +2775,11 @@ const INFO_VIPDM = `<ul>
 
 function onOfferTypeChange() {
 const INFO_DMCA = `<ul>
-  <li><strong>Weekday-driven:</strong> The typed date's weekday determines everything \u2014 reward type, T&amp;Cs, game, images, and title. Tue/Thu/Sat = Casino Credit; Mon/Wed/Fri/Sun = Free Spins.</li>
+  <li><strong>Weekday-driven defaults, per-card override (v3.6):</strong> The typed date's weekday sets the default reward \u2014 Tue/Thu/Sat = Casino Credit; Mon/Wed/Fri/Sun = Free Spins (with that day's game) \u2014 but each card carries a <span style="color:#ffffff;">Reward selector</span>. Casino Credit can be selected on any day (CAS_CA_0019\u20130022 were filed covering the promotion generally); Bonus Spins is only selectable on Mon/Wed/Fri/Sun, the days with per-day games and filed FS Terms IDs. A date edit that changes the weekday silently resets the selector to the new default.</li>
   <li><strong>All seven weekdays generate (v2.30):</strong> Free Spins days were unlocked when Playmaker Bonus Spins became functional. Spin values are validated against each game's baked-in stakes ladder.</li>
   <li><strong>Two-phase script (v2.31 flow):</strong> Phase 1 builds Segments, then Promos in NATS (production). Phase 2 builds bonuses in Playmaker at playmaker-internal.1.betfanatics.com, attaching the NATS segment via the <span style="color:#ffffff;">Include Segments \u2192 Existing Account Segments</span> field with a chip read-back \u2014 the Create Account Segments fields and the entire Exclude Segments section are never touched. Both phases use the Okta Verify login fix (persistent profile + local-network-access).</li>
   <li><strong>Promo window:</strong> typed date 00:00:00 \u2192 23:59:59 ET (single day). Playmaker bonus: 00:01 typed date \u2192 00:01 next day.</li>
-  <li><strong>Images:</strong> pulled from the local Daily Missions Google Drive folder. Filenames use underscores and a weekday prefix auto-derived from the date: <span style="color:#ffffff;">{Weekday}_Promo_Detail.png, {Weekday}_Masthead.png, {Weekday}_B{bet}_G{get}.png</span> (e.g. Tuesday_B125_G5.png). Set your path once via Edit Images.</li>
+  <li><strong>Images (v3.6 reward-scoped names):</strong> pulled from the local Daily Missions Google Drive folder. Masthead and Promo Detail now carry a reward token on every weekday: <span style="color:#ffffff;">{Weekday}_CC_Promo_Detail.png / {Weekday}_CC_Masthead.png</span> for Casino Credit and <span style="color:#ffffff;">{Weekday}_BS_Promo_Detail.png / {Weekday}_BS_Masthead.png</span> for Bonus Spins. Discover filenames are unchanged: <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span> (CC, e.g. Tuesday_B125_G5.png) / <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{value}V.png</span> (FS). \u26a0\ufe0f The pre-v3.6 un-suffixed Masthead/Promo Detail files must be renamed in Drive \u2014 pending pre-v3.6 scripts will fail pre-flight after the rename (fail-safe). Set your path once via Edit Images.</li>
   <li><strong>Button 2 (v3.5):</strong> filled on every promo, all tiers/days \u2014 <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissions</span>.</li>
   <li><strong>Copy:</strong> Title/Header = "{Weekday}'s Daily Mission". HIW and Ontario legal T&amp;Cs are baked in (CAS_CA_0019\u20130022 for CC days; promotional window Aug 17 \u2192 Dec 31, 2026). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
   <li><strong>Toast:</strong> always ON \u2014 "Mission Complete! You have been awarded $X Casino Credit".</li>
@@ -3082,9 +3124,28 @@ function renderAll() {
     } else if (isDMCA) {
       if (!days[i].dmcaOfferData) days[i].dmcaOfferData = DMCA_CC_TIERS.map(o => ({ ...o, active: false }));
       if (days[i].dmcaDaysToUseReward === undefined) days[i].dmcaDaysToUseReward = 7;
-      const dmcaInfo = dmcaInfoForDate(day.date);
-      const dmcaIsCC = dmcaInfo && dmcaInfo.isCC;
-      const dmcaIsFS = dmcaInfo && !dmcaInfo.isCC;
+      const dmcaInfo = dmcaSyncWeekday(i);
+      const dmcaReward = dmcaEffectiveReward(i, dmcaInfo);
+      const dmcaAllowed = dmcaAllowedRewards(dmcaInfo);
+      const dmcaIsFS = dmcaReward === 'FS';
+      const dmcaIsOverride = dmcaInfo && dmcaReward !== dmcaAllowed[0];
+      // v3.6 — reward selector: CC selectable on every day; Bonus Spins only where
+      // DMCA_DAY_REWARDS allows it (game + filed FS Terms IDs required per weekday).
+      const dmcaRewardSelectorHTML = dmcaInfo ? `
+        <div style="display:flex; align-items:center; gap:8px; margin:6px 0 10px;">
+          <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Reward</span>
+          ${[['CC','Casino Credit'],['FS','Bonus Spins']].map(([r, label]) => {
+            const allowed = dmcaAllowed.includes(r);
+            const sel = dmcaReward === r;
+            const style = sel
+              ? 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:1px solid var(--accent, #4a9eff); background:rgba(74,158,255,0.15); color:#ffffff;'
+              : allowed
+                ? 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted);'
+                : 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:not-allowed; border:1px dashed var(--border); background:transparent; color:var(--muted); opacity:0.45;';
+            return `<button type="button" ${allowed ? `onclick="dmcaSetReward(${i}, '${r}')"` : 'disabled'} title="${allowed ? '' : 'Bonus Spins can only run on Mon/Wed/Fri/Sun \u2014 those weekdays carry the per-day games and filed FS Terms IDs'}" style="${style}">${label}</button>`;
+          }).join('')}
+          ${dmcaIsOverride ? `<span style="font-size:11px; color:#a0d070; font-family:'SF Mono',ui-monospace,monospace;">override \u2014 ${dmcaInfo.weekday} defaults to ${dmcaAllowed[0] === 'FS' ? 'Bonus Spins' : 'Casino Credit'}</span>` : ''}
+        </div>` : '';
       let dmcaTiersHTML = '';
       if (dmcaIsFS) {
         if (!days[i].dmcaFSOfferData) days[i].dmcaFSOfferData = DMCA_FS_TIERS.map(o => ({ ...o, active: false }));
@@ -3107,10 +3168,10 @@ function renderAll() {
               oninput="days[${i}].dmcaDaysToUseReward = parseInt(this.value) || 7;" />
           </div>
           <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "Mission Complete! You have been awarded {spins} Bonus Spins to ${fsGame ? fsGame.name : ''}"</p>
-          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${dmcaInfo.weekday}_</span>Promo_Detail / Masthead / B{bet}_G{spins}S_{value}V.png</p>`;
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${dmcaInfo.weekday}_BS_</span>Promo_Detail / <span style="color:#ffffff;">${dmcaInfo.weekday}_BS_</span>Masthead / <span style="color:#ffffff;">${dmcaInfo.weekday}_</span>B{bet}_G{spins}S_{value}V.png (v3.6 reward-scoped names)</p>`;
       } else {
         dmcaTiersHTML = `
-          <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Get) \u2014 Tue/Thu/Sat shared terms</span>
+          <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Get) \u2014 shared terms, all days (CAS_CA_0019\u20130022)</span>
           ${days[i].dmcaOfferData.map((o, j) => `
             <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
               <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].dmcaOfferData[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
@@ -3123,7 +3184,7 @@ function renderAll() {
               oninput="days[${i}].dmcaDaysToUseReward = parseInt(this.value) || 7;" />
           </div>
           <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "Mission Complete! You have been awarded $X Casino Credit"</p>
-          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${dmcaInfo ? dmcaInfo.weekday + '_' : '{Weekday}_'}</span>Promo_Detail / Masthead / B{bet}_G{get}.png</p>`;
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${dmcaInfo ? dmcaInfo.weekday + '_CC_' : '{Weekday}_CC_'}</span>Promo_Detail / <span style="color:#ffffff;">${dmcaInfo ? dmcaInfo.weekday + '_CC_' : '{Weekday}_CC_'}</span>Masthead / <span style="color:#ffffff;">${dmcaInfo ? dmcaInfo.weekday + '_' : '{Weekday}_'}</span>B{bet}_G{get}.png (v3.6 reward-scoped names)</p>`;
       }
       card.innerHTML = `
         <div class="day-header">
@@ -3135,9 +3196,10 @@ function renderAll() {
         <div style="display:flex; align-items:center; margin-bottom:6px;">
           <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 120126" value="${day.date}"
             oninput="dmcaDateInput(${i}, this.value)" onchange="days[${i}].date = this.value.trim(); renderAll(); updateGenerateButton();" style="width: 120px;" />
-          <span id="dmca-pill-${i}">${dmcaPillHTML(dmcaInfo)}</span>
+          <span id="dmca-pill-${i}">${dmcaPillHTML(i, dmcaInfo)}</span>
         </div>
         <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:01 this date \u2192 00:01 next day.</p>
+        ${dmcaRewardSelectorHTML}
         ${dmcaTiersHTML}
       `;
     } else if (isBGRE) {
@@ -3582,6 +3644,8 @@ function resetDay(i) {
   days[i].dmcaOfferData = DMCA_CC_TIERS.map(o => ({ ...o, active: false }));
   days[i].dmcaFSOfferData = DMCA_FS_TIERS.map(o => ({ ...o, active: false }));
   days[i].dmcaDaysToUseReward = 7;
+  days[i].dmcaReward = null;          // v3.6 — back to the weekday default
+  days[i].dmcaLastWeekday = undefined;
   days[i].bgreRewardType = 'FC';
   days[i].bgreJurisdiction = 'US';
   days[i].bgreDaysToUseReward = 7;
@@ -5143,7 +5207,8 @@ function updateGenerateButton() {
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
-      const offers = info && info.isCC
+      const reward = dmcaEffectiveReward(i, info); // v3.6 — override-aware
+      const offers = reward === 'CC'
         ? (d.dmcaOfferData || []).filter(o => o.active)
         : (d.dmcaFSOfferData || []).filter(o => o.active);
       if (info && offers.length > 0) { ready = true; break; }
@@ -9969,13 +10034,16 @@ function buildDMCAScript(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada Auto-Generated Script
-Generated by NATS Bonus Creator v3.5
+Generated by NATS Bonus Creator v3.6
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
                                  The segment is attached via the "Existing Account Segments" field
                                  (the "Create Account Segments" field is never used as of v2.31).
 CC days (Tue/Thu/Sat) and FS days (Mon/Wed/Fri/Sun) are both supported as of v2.30.
+v3.6: any weekday may run Casino Credit via the per-card Reward override; each code's
+reward is baked into CODES below. Masthead / Promo Detail creatives are reward-scoped:
+{Weekday}_CC_Masthead.png / {Weekday}_BS_Masthead.png (same for _Promo_Detail).
 """
 
 import asyncio
@@ -10158,11 +10226,16 @@ def build_tc(c):
                                  end_date_long=TERMS_END_LONG)
 
 def image_files_for(c):
+    # v3.6 - Masthead / Promo Detail are reward-scoped ({Weekday}_CC_* / {Weekday}_BS_*)
+    # because any weekday may now run Casino Credit via the per-card Reward override
+    # and the two variants carry different creative elements. Discover filenames are
+    # already reward-distinct by shape and are unchanged.
     w = c["weekday"]
+    rtok = "BS" if c["reward"] == "FS" else "CC"
     if c["reward"] == "FS":
-        return [f"{w}_Promo_Detail.png", f"{w}_Masthead.png",
+        return [f"{w}_{rtok}_Promo_Detail.png", f"{w}_{rtok}_Masthead.png",
                 f"{w}_B{c['bet']}_G{c['spins']}S_{c['vtok']}.png"]
-    return [f"{w}_Promo_Detail.png", f"{w}_Masthead.png", f"{w}_B{c['bet']}_G{c['get']}.png"]
+    return [f"{w}_{rtok}_Promo_Detail.png", f"{w}_{rtok}_Masthead.png", f"{w}_B{c['bet']}_G{c['get']}.png"]
 
 def notify(message):
     subprocess.run(["osascript", "-e",
@@ -11015,7 +11088,15 @@ function generateScript() {
       //              FS: MMDDYY_CA_CAS_RET_BAU_BG_FS_T{n} (tier index; values live in the baked config)
       const DMCA_FS_TIER_INDEX = { '50': '1', '125': '2', '500': '3', '5000': '4' };
       const dmcaOverlong = [];
-      if (info.isCC) {
+      // v3.6 — the selected reward (weekday default unless overridden) drives the
+      // branch, not the weekday itself. Belt-and-braces: FS must be allowed for
+      // this weekday (the UI disables it elsewhere, but generation re-checks).
+      const dmcaReward = dmcaEffectiveReward(i, info);
+      if (dmcaReward === 'FS' && !dmcaAllowedRewards(info).includes('FS')) {
+        alert(`Day ${i + 1}: Bonus Spins is not available on ${info.weekday} (no per-day game / FS Terms IDs filed). Script generation is blocked.`);
+        return;
+      }
+      if (dmcaReward === 'CC') {
         const offers = (days[i].dmcaOfferData || []).filter(o => o.active);
         if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
         offers.forEach(o => {
