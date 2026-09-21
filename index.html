@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.6</title>
+  <title>NATS Bonus Creator v3.7</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -1453,6 +1453,83 @@ References to “you” or “your” throughout these Promotional Terms and Con
 Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law. 
 Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
 
+// v3.7 — LC-CHURN-DM VIP T&C. Single canonical template assembled verbatim from the four
+// CAS_9702-CAS_9705 legal filings with three stakeholder-approved normalizations:
+// (1) section 10 heading normalized to "10. Eligible Games" (CAS_9702 wording; 9703-9705
+// filed "Eligible Games/Markets/Events"), (2) the space inside "CAS_ 9703" in that filing's
+// title removed (the ID renders from {terms_id}), (3) trailing whitespace stripped. The title
+// line is the filings' own, verbatim — deliberately NOT prefixed "FANATICS CASINO - " (differs
+// from the VIPDM US precedent, per stakeholder direction). Section 2 dates (May 19 ->
+// November 30, 2026) are static legal copy. NOT modal-editable by design — changes are an
+// HTML edit (reach out to Adrian).
+const DEFAULT_TC_CHURNDM_VIP = `PROMOTIONAL TERMS AND CONDITIONS
+CASINO MI, NJ, PA, WV VIP {pct}% DEPOSIT MATCH UP TO {max_fmt} - (ID: {terms_id})
+
+1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC (“Fanatics Casino”). Select existing Fanatics Casino customers who deposit {min_fmt}+ cash in their Fanatics Casino account within 3 days of being presented this offer  (“Qualifying Deposit”) will receive a {pct}% deposit match, up to {max_fmt} in Casino Credit (“Rewards”). See below for more details.
+
+2. Promotional Period
+This “Promotion” begins at 12:00am ET on May 19, 2026, and ends at 11:59pm ET on November 30, 2026 (“Promotional Period”).
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Fanatics Casino account in MI, NJ, PA, or WV (“Account”). To participate in this Promotion, (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states to use your Account; and (iii) you must receive the invitation to participate in this Promotion directly from Fanatics Casino (this offer cannot be shared or forwarded). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis and could change week to week. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+To participate in this Promotion and qualify for the Rewards, you must: (i) opt in to this Promotion each time you are eligible to participate via the Discover or Promos page in the Fanatics Sportsbook and Casino App, the Fanatics Casino standalone app, or the Fanatics Casino website, where available (“App”); and (ii) make a Qualifying Deposit within 3 days of being presented this offer. Only your first Qualifying Deposit after opting in will be eligible for the Rewards. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit (up to {max_fmt} in Casino Credit) and will be added to your Account within 72 hours of making a Qualifying Deposit.
+
+5. Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available to use, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+As an example, if you have $20 in deposited funds (cash) and $10 in Casino Credit in your Account and you place a $10 wager that wins $8, the entire $10 Casino Credit will be applied to your wager (making your Casino Credit balance $0), and the $8 in winnings will be added to your cash balance (making it $28). Using the same example but with a $5 wager instead of $10, your Casino Credit balance will be $5, and your cash balance will be $28.
+Casino Credit can be combined with deposited funds (cash) to place a wager.
+As an example, if you have $20 in cash and $10 in Casino Credit in your Account and you wager $15 on a blackjack hand, $10 in Casino Credit and $5 in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $10 in Casino Credit and place a $2 wager, $2 of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you have and wager $5 in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $5 stake will be added to your cash balance).
+Casino Credit closest to expiration will be applied first.
+Casino Credit can be transferred between Fanatics Casino jurisdictions.
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Bets placed using Casino Credit will not earn FanCash.
+Casino Credit may not be exchanged, substituted, or transferred.
+
+6. Registration Procedures
+To qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees’, officers’ and directors’ immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+N/A
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Bonus Spin, select “Bonus Spin” in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire 7 days from the date of issuance (at 11:59 p.m. ET on the 7th day).
+
+11. Restrictions on Withdrawal
+Casino Credit, Bonus Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Bonus Spins.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+Michigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.
+Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+Participation in this Promotion is subject to Fanatics Sportsbook and Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+
 const DEFAULT_HIW_VIPDM = `1. Opt-in to the promotion
 2. Make a single deposit of {min_fmt} or more
 3. We'll instantly match your deposit {pct}%, up to {max_fmt} Casino Credit`;
@@ -2222,6 +2299,26 @@ const CHURNDM_TERMS_IDS = {
   'M50_50M200': 'CAS_9460',
 };
 
+// v3.7 — LC-CHURN-DM VIP tiers. Min-drop codes: MMDDYY_{JUR}_VCAS_LC_CHURN_DM_CC_{pct}M{max}
+// (36-37 chars — the full M{min}_ freeform would exceed the 40-char NATS limit under VCAS).
+// The $100 minimum deposit is NOT in the code; it is baked here and looked up per tier key
+// {pct}M{max} at runtime. Fixed set of four — no custom VIP tiers (+ Add stays standard-only).
+// US-only filings (MI/NJ/PA/WV, May 19 -> Nov 30 2026): generation blocks if a VIP row is
+// active while CA is selected. Terms ID keys keep the full M{min}_{pct}M{max} shape.
+const CHURNDM_VIP_OFFERS = [
+  { min: 100, pct: 25, max: 125,  active: false },
+  { min: 100, pct: 25, max: 250,  active: false },
+  { min: 100, pct: 25, max: 500,  active: false },
+  { min: 100, pct: 25, max: 2500, active: false },
+];
+
+const CHURNDM_VIP_TERMS_IDS = {
+  'M100_25M125':  'CAS_9702',
+  'M100_25M250':  'CAS_9703',
+  'M100_25M500':  'CAS_9704',
+  'M100_25M2500': 'CAS_9705',
+};
+
 // v2.23 — VIP Offer Library - Deposit Matches (CA — Canada only)
 // v3.3 — added the 20% → $10,000 and 20% → $20,000 tiers (CAS_CA_0092/0093,
 // filed with a 09/01/26 Terms start — see VIPDM_TERMS_START_OVERRIDES).
@@ -2677,6 +2774,9 @@ function onJurisdictionChange() {
   // v2.22 — RTC CC / v2.25 — VIPBG / v2.26 — VIPDM: switching region resets all
   // day-card values (dates, selected offers, toggles) so US and CA inputs never mix
   if (getOfferType() === 'RTC' || getOfferType() === 'VIPBG' || getOfferType() === 'VIPDM') resetAll();
+  // v3.7 — LC-CHURN-DM: no reset (values are region-agnostic), but re-render so the
+  // VIP section's US-only availability state tracks the selected jurisdiction
+  if (getOfferType() === 'CHURNDM') renderAll();
 }
 
 
@@ -2736,13 +2836,14 @@ const INFO_LCREACT = `<ul>
 
 const INFO_CHURNDM = `<ul>
   <li><strong>Offer Type:</strong> Lifecycle - Churn DM. Builds Segment, Promotion, and Bonus for each selected offer on each day card. Reward is paid in <span style="color:#ffffff;">Casino Credit</span>.</li>
-  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in Terms ID. <span style="color:#ffffff;">Offers that don't match a configured Terms ID will block script generation.</span></li>
+  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five standard defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in Terms ID. <span style="color:#ffffff;">Offers that don't match a configured Terms ID will block script generation.</span></li>
+  <li><strong>VIP tiers (v3.7):</strong> Four fixed VIP offers ($100 min / 25% / max $125, $250, $500, $2,500 &mdash; Terms IDs CAS_9702&ndash;CAS_9705) appear below the standard rows. Codes carry <span style="color:#ffffff;">VCAS</span> with the minimum deposit baked (not in the code); Series is <span style="color:#ffffff;">VIP</span>; a dedicated baked T&amp;C (May 19 &rarr; Nov 30, 2026) is used &mdash; not modal-editable. <span style="color:#ffffff;">US only</span>: VIP rows are unavailable and block generation when CA is selected. Fields are locked; the checkbox is the only control.</li>
   <li><strong>Promo &amp; Activation Window:</strong> 00:00:00 ET on the card date &rarr; exactly 10 days later at 00:00:00 ET.</li>
-  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Deposit and Get Casino Credit" for all offer sizes.</li>
-  <li><strong>Matched Deposit:</strong> <span style="color:#ffffff;">Always checked</span> on the bonus (inside the DEPOSIT entitlement panel) — as of v2.29.</li>
-  <li><strong>Voucher Code format:</strong> <code>CRLCDM{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
-  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>50M10.png</code>).</li>
-  <li><strong>Series:</strong> Other &nbsp;|&nbsp; <strong>Origin:</strong> Retention &nbsp;|&nbsp; <strong>Type:</strong> Lifecycle</li>
+  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Exclusive Deposit Match" for all offer sizes, standard and VIP (v3.7 &mdash; was "Deposit and Get Casino Credit").</li>
+  <li><strong>Matched Deposit:</strong> <span style="color:#ffffff;">Always checked</span> on the bonus (inside the DEPOSIT entitlement panel) &mdash; as of v2.29.</li>
+  <li><strong>Voucher Code format:</strong> <code>CRLCDM{MMDDYY}{XXX}</code> &mdash; 15 characters, random 3-char suffix at runtime (standard and VIP).</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code> (shared by all nine tiers), and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>50M10.png</code>; VIP: <code>25M125.png</code>, <code>25M250.png</code>, <code>25M500.png</code>, <code>25M2500.png</code> &mdash; watch the 25M250/25M2500 one-character near-collision).</li>
+  <li><strong>Series:</strong> Other (standard) / <span style="color:#ffffff;">VIP (VIP tiers)</span> &nbsp;|&nbsp; <strong>Origin:</strong> Retention &nbsp;|&nbsp; <strong>Type:</strong> Lifecycle</li>
   <li><strong>No confirmation modal</strong> after Bonus Save.</li>
 </ul>`;
 
@@ -3384,6 +3485,7 @@ function renderAll() {
           <button class="reset-btn" onclick="addChurnDMOffer(${i})">+ Add</button>
           <button class="reset-btn" onclick="selectAllChurnDMOffers(${i})">Select All</button>
         </div>
+        <div id="churndm-vip-${i}" style="margin-top: 14px;"></div>
         <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
           <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer;" onclick="days[${i}].churndmSendToXP = !days[${i}].churndmSendToXP; renderAll();">
             <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.churndmSendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
@@ -3570,7 +3672,7 @@ function renderAll() {
     container.appendChild(card);
     if (isBG) renderOffers(i);
     else if (isDM) renderDMOffers(i);
-    else if (isCHURNDM) renderChurnDMOffers(i);
+    else if (isCHURNDM) { renderChurnDMOffers(i); renderChurnDMVipOffers(i); }
     else if (isVIPDM) renderVIPDMOffers(i);
     else if (isVIPBG) renderVIPBGOffers(i);
     else if (isFS) renderFSOffers(i);
@@ -3674,6 +3776,7 @@ function resetDay(i) {
   days[i].lcreactDaysToSettlement = 3;
   days[i].lcreactSendToXP = true;
   days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o }));
+  days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
   days[i].vipdmOfferData = vipdmDefaultOffers();
   days[i].vipdmSendToXP = true;
   days[i].vipdmExternalBonus = false;
@@ -3795,6 +3898,7 @@ function renderChurnDMOffers(i) {
   if (!container) return;
   if (!days[i].churndmOfferData) {
     days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o }));
+    days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
   }
   container.innerHTML = '';
   days[i].churndmOfferData.forEach((offer, j) => {
@@ -3833,7 +3937,54 @@ function addChurnDMOffer(i) {
 function selectAllChurnDMOffers(i) {
   if (!days[i].churndmOfferData) days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o, active: true }));
   else days[i].churndmOfferData.forEach(o => o.active = true);
+  // v3.7 — Select All covers all nine rows (standard + VIP), except under CA,
+  // where the VIP tiers are unavailable (US-only filings) and stay unselected.
+  if (!days[i].churndmVipOfferData) days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
+  if (document.getElementById('jurisdiction-select').value !== 'CA') {
+    days[i].churndmVipOfferData.forEach(o => o.active = true);
+  }
   renderChurnDMOffers(i);
+  renderChurnDMVipOffers(i);
+}
+
+// v3.7 — LC-CHURN-DM VIP rows. Fixed four tiers (no + Add into this section); Min/%/Max
+// are display-only (min is baked, pct/max define the tier and its Terms ID) — the
+// checkbox is the only control. US-only: greyed out and unselectable while CA is selected.
+function renderChurnDMVipOffers(i) {
+  const container = document.getElementById(`churndm-vip-${i}`);
+  if (!container) return;
+  if (!days[i].churndmVipOfferData) days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
+  const jurSel = document.getElementById('jurisdiction-select');
+  const isCA = jurSel && jurSel.value === 'CA';
+  let html = `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+      <div style="flex:1; height:1px; background:#6a5217;"></div>
+      <span style="background:#412402; color:#fac775; font-size:10px; letter-spacing:0.12em; border:1px solid #854f0b; border-radius:12px; padding:3px 12px; font-family:'SF Mono',ui-monospace,monospace;">&#9733; VIP OFFERS</span>
+      <div style="flex:1; height:1px; background:#6a5217;"></div>
+    </div>
+    <p style="font-size:11px; color:#c9994a; margin:0 0 8px; font-family:'SF Mono',ui-monospace,monospace; line-height:1.5;">Series: VIP &middot; Copy: Exclusive Deposit Match &middot; Min baked at $100 &middot; fixed tiers${isCA ? ' &middot; <span style="color:#e24b4a;">US only — unavailable with CA selected</span>' : ' &middot; US only'}</p>`;
+  days[i].churndmVipOfferData.forEach((offer, j) => {
+    const key = `M${offer.min}_${offer.pct}M${offer.max}`;
+    const termsId = CHURNDM_VIP_TERMS_IDS[key] || '';
+    const activeOn = offer.active && !isCA;
+    html += `
+      <div style="border:${activeOn ? '1.5px solid #fac775' : '1px solid #6a5217'}; border-radius:8px; padding:7px 10px; margin-bottom:6px; background:${activeOn ? '#1c1910' : 'transparent'}; opacity:${isCA ? '0.35' : (activeOn ? '1' : '0.55')};">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#a08850; white-space:nowrap;">Min</span>
+          <input type="number" value="${offer.min}" readonly tabindex="-1" style="width:64px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; color:#8a7a4a; border-color:#4a3d14; background:#211d12; pointer-events:none;" />
+          <span style="font-size:12px; color:#a08850;">&rarr;</span>
+          <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#a08850; white-space:nowrap;">%</span>
+          <input type="number" value="${offer.pct}" readonly tabindex="-1" style="width:64px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; color:#eadfba; border-color:#4a3d14; background:#211d12; pointer-events:none;" />
+          <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#a08850; white-space:nowrap;">Max</span>
+          <input type="number" value="${offer.max}" readonly tabindex="-1" style="width:64px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; color:#eadfba; border-color:#4a3d14; background:#211d12; pointer-events:none;" />
+          <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:9px; color:#8a7a4a; white-space:nowrap;">${termsId}</span>
+          <input type="checkbox" ${offer.active && !isCA ? 'checked' : ''} ${isCA ? 'disabled' : ''} style="width:16px; height:16px; margin-left:auto; cursor:${isCA ? 'not-allowed' : 'pointer'}; accent-color:#fac775;"
+            onchange="days[${i}].churndmVipOfferData[${j}].active = this.checked; renderChurnDMVipOffers(${i});" />
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+  updateGenerateButton();
 }
 
 // v2.23 — VIP Offer Library - Deposit Matches offer rows
@@ -5217,7 +5368,8 @@ function updateGenerateButton() {
       if (offers.length > 0) { ready = true; break; }
     } else if (offerType === 'CHURNDM') {
       const offers = (d.churndmOfferData || []).filter(o => o.active);
-      if (offers.length > 0) { ready = true; break; }
+      const vipOffers = (d.churndmVipOfferData || []).filter(o => o.active);
+      if (offers.length > 0 || vipOffers.length > 0) { ready = true; break; }
     } else if (offerType === 'VIPDM') {
       const offers = (d.vipdmOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
@@ -7677,6 +7829,11 @@ if __name__ == "__main__":
 }
 
 function buildChurnDMScript(allNames, imagePath, hiwText, tcText) {
+  // v3.7 — VIP tiers: baked $100 minimum keyed by {pct}M{max}, and the dedicated VIP
+  // T&C template (never modal-edited; escaped the same way as tcText)
+  const vipMinMap = {};
+  CHURNDM_VIP_OFFERS.forEach(o => { vipMinMap[`${o.pct}M${o.max}`] = String(o.min); });
+  const vipTcText = DEFAULT_TC_CHURNDM_VIP.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
   const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
   const sendToXPLines      = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
   const externalBonusLines = allNames.map(n => `    ${n.externalBonus ? 'True' : 'False'},`).join('\n');
@@ -7735,7 +7892,7 @@ async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
 URL = "https://trading.1.betfanatics.com/"
 IMAGE_FOLDER = "${imagePath}"
 
-TITLE_HEADER_TEXT = "Deposit and Get Casino Credit"
+TITLE_HEADER_TEXT = "Exclusive Deposit Match"  # v3.7 - was "Deposit and Get Casino Credit"
 
 NAMES = [
 ${namesLines}
@@ -7773,25 +7930,46 @@ DO_BONUS = [
 ${doBonusLines}
 ]
 
-TERMS_IDS = ${JSON.stringify(CHURNDM_TERMS_IDS)}
+TERMS_IDS = ${JSON.stringify({ ...CHURNDM_TERMS_IDS, ...CHURNDM_VIP_TERMS_IDS })}
+
+# v3.7 - VIP tiers: the minimum deposit is NOT in a VCAS code (40-char budget);
+# it is looked up here by the {pct}M{max} tier key. Fail-loud on unknown keys.
+VIP_MIN_DEPOSITS = ${JSON.stringify(vipMinMap)}
 
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
+def is_vip(code):
+    """v3.7: VIP Churn DM tiers carry product token VCAS at position 2."""
+    return code.split("_")[2] == "VCAS"
+
 def parse_churn_dm(code):
-    """v3.0: freeform (everything after the 7th underscore) is M{min}_{pct}M{max},
-    with optional K-notation on min/max (e.g. M1K_50M2K). Returns expanded literal
-    strings so Terms ID keys and Discover filenames keep their current shapes."""
+    """v3.0: standard (CAS) freeform is M{min}_{pct}M{max}, with optional K-notation
+    on min/max (e.g. M1K_50M2K). v3.7: VIP (VCAS) freeform is {pct}M{max} - the minimum
+    deposit is baked in VIP_MIN_DEPOSITS, keyed {pct}M{max} (min-drop keeps the code
+    within the 40-char NATS limit). Returns expanded literal strings so Terms ID keys
+    and Discover filenames keep their current shapes."""
     parts = code.split("_")
     if len(parts) < 8:
         raise ValueError(f"code has fewer than 8 fields: {code}")
     if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
         raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
     freeform = "_".join(parts[7:])
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    if parts[2] == "VCAS":
+        m = re.fullmatch(r"(\\d+)M(\\d+K?)", freeform)
+        if not m:
+            raise ValueError(f"VIP Churn DM freeform is not {{pct}}M{{max}}: {freeform!r} in {code}")
+        pct, max_bonus = m.group(1), expand_k(m.group(2))
+        min_deposit = VIP_MIN_DEPOSITS.get(f"{pct}M{max_bonus}")
+        if min_deposit is None:
+            raise ValueError(f"VIP Churn DM tier {pct}M{max_bonus} has no baked minimum deposit: {code}")
+        return min_deposit, pct, max_bonus
+    if parts[2] != "CAS":
+        raise ValueError(f"unknown product token {parts[2]!r} (expected CAS or VCAS): {code}")
     m = re.fullmatch(r"M(\\d+K?)_(\\d+)M(\\d+K?)", freeform)
     if not m:
         raise ValueError(f"Churn DM freeform is not M{{min}}_{{pct}}M{{max}}: {freeform!r} in {code}")
-    def expand_k(tok):
-        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
     return expand_k(m.group(1)), m.group(2), expand_k(m.group(3))
 
 def parse_dates(code):
@@ -7830,6 +8008,10 @@ def format_tc(code):
     min_fmt = format_currency(min_deposit)
     max_fmt = format_currency(max_bonus)
     terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
+    if is_vip(code):
+        # v3.7 - dedicated VIP template (CAS_9702-CAS_9705 filings; May 19 -> Nov 30 2026
+        # static dates; title verbatim, no FANATICS CASINO prefix). Baked - never modal-edited.
+        return f"""${vipTcText}"""
     return f"""${tcText}"""
 
 def notify(message):
@@ -8160,9 +8342,20 @@ async def create_bonus(page, name, idx):
     series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
     await series_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
-    await page.keyboard.type("Other")
-    await page.wait_for_timeout(500)
-    await page.locator("div.ant-select-item-option-content", has_text="Other").click()
+    if is_vip(name):
+        # v3.7 - VIP tiers: Series = VIP. Anchored exact match scoped to the visible
+        # dropdown (same load-bearing pattern as VIPDM/VIPBG - the hidden Bonus Origin
+        # dropdown could otherwise match).
+        await page.keyboard.type("VIP")
+        await page.wait_for_timeout(500)
+        vip_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^VIP\$")).first
+        await vip_option.wait_for(state="visible", timeout=15000)
+        await vip_option.click()
+        print("    OK Series: VIP (VIP tier)")
+    else:
+        await page.keyboard.type("Other")
+        await page.wait_for_timeout(500)
+        await page.locator("div.ant-select-item-option-content", has_text="Other").click()
     await page.wait_for_timeout(500)
 
     type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
@@ -11285,12 +11478,25 @@ function generateScript() {
       });
     } else if (offerType === 'CHURNDM') {
       const offers = (days[i].churndmOfferData || []).filter(o => o.active);
-      if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      const vipOffers = (days[i].churndmVipOfferData || []).filter(o => o.active);
+      if (offers.length === 0 && vipOffers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
       for (const o of offers) {
         if (!o.min || !o.pct || !o.max) { alert(`Day ${i + 1}: every selected offer needs a Min, %, and Max value.`); return; }
         const key = `M${o.min}_${o.pct}M${o.max}`;
         if (!CHURNDM_TERMS_IDS[key]) {
           alert(`Day ${i + 1}: no Terms ID is configured for offer ${key} (Min $${o.min}, ${o.pct}% up to $${o.max}).\n\nScript generation is blocked. Please use one of the configured offers, or reach out to Adrian Van de Camp to add a Terms ID for this offer.`);
+          return;
+        }
+      }
+      // v3.7 — VIP tiers are US-only filings (MI/NJ/PA/WV); fail loud under CA
+      if (vipOffers.length > 0 && jurisdiction === 'CA') {
+        alert(`Day ${i + 1}: VIP Churn DM tiers are US-only (the CAS_9702\u2013CAS_9705 filings cover MI/NJ/PA/WV).\n\nScript generation is blocked. Deselect the VIP offers or switch the jurisdiction to US.`);
+        return;
+      }
+      for (const o of vipOffers) {
+        const key = `M${o.min}_${o.pct}M${o.max}`;
+        if (!CHURNDM_VIP_TERMS_IDS[key]) {
+          alert(`Day ${i + 1}: no Terms ID is configured for VIP offer ${key}.\n\nScript generation is blocked. Reach out to Adrian Van de Camp.`);
           return;
         }
       }
@@ -11306,6 +11512,23 @@ function generateScript() {
       const cdmOverlong = [];
       offers.forEach(o => {
         const code = `${date}_${jurisdiction}_CAS_LC_CHURN_DM_CC_M${o.min}_${o.pct}M${o.max}`;
+        if (code.length > 40) cdmOverlong.push(`${code} (${code.length})`);
+        allNames.push({
+          code: code,
+          sendToXP: cdmSendToXP,
+          externalBonus: cdmExternalBonus,
+          daysToOptin: cdmDaysToOptin,
+          daysToEntitlement: cdmDaysToEntitlement,
+          daysToSettlement: cdmDaysToSettlement,
+          doSegment: cdmDoSegment,
+          doPromo: cdmDoPromo,
+          doBonus: cdmDoBonus,
+        });
+      });
+      // v3.7 — VIP tiers: min-drop codes under VCAS ({pct}M{max} freeform; the $100 min
+      // is baked into the generated script's VIP_MIN_DEPOSITS map, not the code)
+      vipOffers.forEach(o => {
+        const code = `${date}_${jurisdiction}_VCAS_LC_CHURN_DM_CC_${o.pct}M${o.max}`;
         if (code.length > 40) cdmOverlong.push(`${code} (${code.length})`);
         allNames.push({
           code: code,
