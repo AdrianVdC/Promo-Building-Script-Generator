@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.7</title>
+  <title>NATS Bonus Creator v3.8</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -843,7 +843,7 @@
 <div class="modal-overlay" id="modal-hiw">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Edit How It Works</span>
+      <span class="modal-title" id="modal-hiw-title">Edit How It Works</span>
       <button class="modal-close" onclick="closeModal('hiw')">✕</button>
     </div>
     <div class="field-bar" id="hiw-field-bar">
@@ -1276,7 +1276,9 @@ function getImagePath() {
   if (t === 'FS') return localStorage.getItem('rtc_fs_image_path') || DEFAULT_FS_IMAGE_PATH;
   if (t === 'RAF') return localStorage.getItem('raf_image_path') || DEFAULT_RAF_IMAGE_PATH;
   if (t === 'LCREACT') return localStorage.getItem('lc_react_image_path') || DEFAULT_LCREACT_IMAGE_PATH;
-  if (t === 'CHURNDM') return localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH;
+  if (t === 'CHURNDM') return isChurnCanada()
+    ? (localStorage.getItem('lc_churn_dm_image_path_ca') || DEFAULT_CHURNDM_IMAGE_PATH_CA)
+    : (localStorage.getItem('lc_churn_dm_image_path') || DEFAULT_CHURNDM_IMAGE_PATH);  // v3.8 — region-aware
   if (t === 'VIPDM') return localStorage.getItem(vipdmKey('vcl_dm_image_path')) || (isVIPDMUS() ? DEFAULT_VIPDM_IMAGE_PATH_US : DEFAULT_VIPDM_IMAGE_PATH);
   if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_image_path')) || (isVIPBGUS() ? DEFAULT_VIPBG_IMAGE_PATH_US : DEFAULT_VIPBG_IMAGE_PATH);
   if (t === 'DMCA') return localStorage.getItem('daily_missions_image_path') || DEFAULT_DMCA_IMAGE_PATH;
@@ -1284,6 +1286,7 @@ function getImagePath() {
 }
 const DEFAULT_DMCA_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Daily Missions";
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
+const DEFAULT_CHURNDM_IMAGE_PATH_CA = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM - Canada";  // v3.8 — CA (Ontario) Churn DM creatives
 const DEFAULT_VIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Deposit Matches";
 const DEFAULT_VIPDM_IMAGE_PATH_US = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Deposit Matches";
 const DEFAULT_VIPBG_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Bet & Gets";
@@ -1529,6 +1532,77 @@ In the event of any inconsistency between these Promotional Terms and Conditions
 References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
 Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law.
 Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+
+// v3.8 — LC-CHURN-DM Canada (Ontario). One canonical baked HIW + T&C template serves all
+// nine CA tiers (five standard + four VIP) — unlike the US side, the CA VIP filings
+// (CAS_CA_0143-0146) are structurally identical to the CA standard filings (CAS_CA_0028-0032),
+// so no separate VIP template exists for CA. Static section-2 dates: October 1st, 2026 ->
+// December 31st, 2026 (all nine filings share one Promotional Period). Amounts render bare
+// in the HIW ($50, $2,500); the T&C carries the literal "+ CAD" / " CAD" suffixes in the
+// template text so one format_currency serves both. NOT modal-editable by design — the Edit
+// HIW / Edit T&Cs modals govern the US templates only; CA copy changes are an HTML edit
+// (reach out to Adrian). Byte-verified against the nine amended CA filings (v3.8 harness).
+const DEFAULT_HIW_CHURNDM_CA = `1. Opt in to this promotion
+2. Make a Qualifying Deposit of {min_fmt}+ within 3 days of being presented this offer
+3. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit (up to {max_fmt} in Casino Credit)
+
+See below for more details.`;
+
+const DEFAULT_TC_CHURNDM_CA = `PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) – DEPOSIT MATCH {pct}% IN CASINO CREDIT (UP TO {max_fmt} CAD) ({terms_id})
+
+1.   Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (“Fanatics Casino”). Select customers who make a cash deposit of {min_fmt}+ CAD into their Fanatics Casino account within 3 days of being presented this offer (“Qualifying Deposit”) will receive a reward equal to {pct}% of their Qualifying Deposit in Casino Credit, up to a maximum of {max_fmt} CAD in Casino Credit (“Rewards”). See below for more details. 
+2.   Promotional Period
+This “Promotion” begins at 12:00 a.m. ET on October 1st, 2026 and ends at 11:59 p.m. ET on December 31st, 2026 (“Promotional Period”).
+3.   Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (“Account”). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on a daily basis during the Promotional Period. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+4.   Action Required
+To participate in this Promotion and qualify for the Rewards, you must: (i) opt in via the Promos page each time you are eligible to participate; and (ii) make a Qualifying Deposit of {min_fmt}+ CAD within 3 days of being presented this offer. Only your first Qualifying Deposit after opting in will be eligible for the Rewards. YOU MUST OPT IN BEFORE MAKING YOUR QUALIFYING DEPOSIT TO BE ELIGIBLE FOR THE REWARD. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit, up to a maximum of {max_fmt} CAD in Casino Credit, and will be added to your Account within 72 hours of making a Qualifying Deposit.
+5.   Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+Casino Credit expires seven (7) days from issuance (at 11:59 p.m. ET).
+Casino Credit closest to expiration will be applied first.
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+Casino Credit can be combined with deposited funds (cash) to place a wager. As an example, if you have $20 CAD in cash and $2 CAD in Casino Credit in your Account and you wager $5 CAD on a blackjack hand, $2 CAD in Casino Credit and $3 CAD in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $2 CAD in Casino Credit and place a $1 CAD wager, $1 CAD of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you wager $2 CAD in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $2 CAD stake will be added to your cash balance).
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Casino Credit may not be exchanged, substituted, or transferred.
+6.   Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino’s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+7.   Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion, up to a maximum of {max_fmt} CAD in Casino Credit. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+8.   Wagering Requirements/Exclusions
+There are no wagering requirements to qualify for this Promotion. Your Qualifying Deposit can be played through on any games in the Fanatics Casino.
+9.   Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+10.   Eligible Games
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire 7 days from the date of issuance (at 11:59 p.m. ET on the 7th day). Qualifying Deposit can be played through on any games/markets in the Fanatics Casino. 
+11.   Restrictions on Withdrawal
+Your Qualifying Deposit must be played through one (1) time. Any attempt to withdraw any portion of your Qualifying Deposit without playing through the full amount one (1) time may disqualify you from participating in this Promotion, or any other Fanatics Sportsbook & Casino promotions, and may make you ineligible for the Rewards for this Promotion. Casino Credit or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+12.   Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+13.   Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+14.   Other
+Participation in this Promotion is subject to Fanatics Casino’s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control.`;
 
 const DEFAULT_HIW_VIPDM = `1. Opt-in to the promotion
 2. Make a single deposit of {min_fmt} or more
@@ -1879,6 +1953,10 @@ function openModal(type) {
     document.getElementById('hiw-textarea').value = '';
     document.getElementById('hiw-textarea').value = getHIW();
     renderFieldBar('hiw');
+    // v3.8 — LC-CHURN-DM: this modal reads/saves the US template only (lc_churn_dm_hiw);
+    // the CA HIW is baked (DEFAULT_HIW_CHURNDM_CA) — changes via Adrian.
+    const hiwTitle = document.getElementById('modal-hiw-title');
+    if (hiwTitle) hiwTitle.textContent = getOfferType() === 'CHURNDM' ? 'Edit How It Works — US — United States (CA copy is baked)' : 'Edit How It Works';
     document.getElementById('modal-hiw').classList.add('open');
   } else if (type === 'tc') {
     document.getElementById('tc-textarea').value = '';
@@ -1888,7 +1966,7 @@ function openModal(type) {
     const isVIPDM = getOfferType() === 'VIPDM';
     const isVIPBG = getOfferType() === 'VIPBG';
     const tcTitle = document.getElementById('modal-tc-title');
-    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? `Edit T&Cs — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : isVIPBG ? `Edit T&Cs — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : 'Edit T&Cs';
+    if (tcTitle) tcTitle.textContent = isRTC ? `Edit T&Cs — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : isVIPDM ? `Edit T&Cs — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : isVIPBG ? `Edit T&Cs — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : getOfferType() === 'CHURNDM' ? 'Edit T&Cs — US — United States (CA copy is baked)' : 'Edit T&Cs';
     document.getElementById('tc-terms-ids-bar').style.display = (isRTC || isVIPDM || isVIPBG) ? 'flex' : 'none';
     const termsBarBtn = document.getElementById('tc-terms-ids-btn');
     if (termsBarBtn) termsBarBtn.setAttribute('onclick', isVIPDM ? 'openVIPDMTermsModal()' : isVIPBG ? 'openVIPBGTermsModal()' : 'openTermsIDModal()');
@@ -1896,7 +1974,7 @@ function openModal(type) {
   } else if (type === 'images') {
     const lt = getOfferType();
     const imgTitle = document.getElementById('modal-images-title');
-    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : 'Edit Images';
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'CHURNDM' ? `Edit Images — Churn DM (${isChurnCanada() ? 'CA — Canada' : 'US — United States'})` : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -1904,7 +1982,9 @@ function openModal(type) {
       : lt === 'LCREACT'
       ? 'https://drive.google.com/drive/folders/1Xhk-3fKF3goNS_lL7M0bn2DrACKyFRds'
       : lt === 'CHURNDM'
-      ? 'https://drive.google.com/drive/folders/1KJfVtJVwBbGkJJTr8T-PGeWHm5c8qc-2'
+      ? (isChurnCanada()
+        ? 'https://drive.google.com/drive/folders/1xVDqWOqcqZL7Ii05sXDbxEC7lNzGgVv7'
+        : 'https://drive.google.com/drive/folders/1KJfVtJVwBbGkJJTr8T-PGeWHm5c8qc-2')
       : lt === 'VIPDM'
       ? (isVIPDMUS()
         ? 'https://drive.google.com/drive/folders/1W8GLxrZFBMotLP_WPzAE04KPPb__BxIX'
@@ -1938,7 +2018,7 @@ function saveModal(type) {
   } else if (type === 'tc') {
     localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? vipdmKey('vcl_dm_tc') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_tc') : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? 'lc_churn_dm_image_path' : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -2303,8 +2383,11 @@ const CHURNDM_TERMS_IDS = {
 // (36-37 chars — the full M{min}_ freeform would exceed the 40-char NATS limit under VCAS).
 // The $100 minimum deposit is NOT in the code; it is baked here and looked up per tier key
 // {pct}M{max} at runtime. Fixed set of four — no custom VIP tiers (+ Add stays standard-only).
-// US-only filings (MI/NJ/PA/WV, May 19 -> Nov 30 2026): generation blocks if a VIP row is
-// active while CA is selected. Terms ID keys keep the full M{min}_{pct}M{max} shape.
+// v3.8 — VIP tiers are now available in BOTH regions: US (CAS_9702-9705, MI/NJ/PA/WV,
+// May 19 -> Nov 30 2026) and CA (CAS_CA_0143-0146, Ontario, Oct 1st -> Dec 31st 2026).
+// The tier values (min/%/max) are identical in both regions, so this one offer table and
+// the shared $100 baked minimum serve both; only the Terms IDs and T&C template are
+// region-scoped. Terms ID keys keep the full M{min}_{pct}M{max} shape.
 const CHURNDM_VIP_OFFERS = [
   { min: 100, pct: 25, max: 125,  active: false },
   { min: 100, pct: 25, max: 250,  active: false },
@@ -2318,6 +2401,36 @@ const CHURNDM_VIP_TERMS_IDS = {
   'M100_25M500':  'CAS_9704',
   'M100_25M2500': 'CAS_9705',
 };
+
+// v3.8 — LC-CHURN-DM Canada (Ontario) Terms IDs. Same nine tiers as US (five standard +
+// four VIP; identical min/%/max values, paid in CAD). All nine CA filings share one
+// Promotional Period (October 1st, 2026 -> December 31st, 2026 — static in
+// DEFAULT_TC_CHURNDM_CA). Baked — no localStorage involvement.
+const CHURNDM_TERMS_IDS_CA = {
+  'M10_50M10':  'CAS_CA_0028',
+  'M20_50M25':  'CAS_CA_0029',
+  'M20_50M50':  'CAS_CA_0030',
+  'M50_50M100': 'CAS_CA_0031',
+  'M50_50M200': 'CAS_CA_0032',
+};
+
+const CHURNDM_VIP_TERMS_IDS_CA = {
+  'M100_25M125':  'CAS_CA_0143',
+  'M100_25M250':  'CAS_CA_0144',
+  'M100_25M500':  'CAS_CA_0145',
+  'M100_25M2500': 'CAS_CA_0146',
+};
+
+// v3.8 — LC-CHURN-DM region helpers. The jurisdiction selector is the single source of
+// truth (CHURNDM offers only US / CA — v3.1). The getters route every Terms ID lookup
+// (row rendering, generation-time validation, and the baked TERMS_IDS map in the
+// generated script) to the selected region's map.
+function isChurnCanada() {
+  const sel = document.getElementById('jurisdiction-select');
+  return getOfferType() === 'CHURNDM' && !!sel && sel.value === 'CA';
+}
+function getChurnDMTermsIDs()    { return isChurnCanada() ? CHURNDM_TERMS_IDS_CA     : CHURNDM_TERMS_IDS; }
+function getChurnDMVipTermsIDs() { return isChurnCanada() ? CHURNDM_VIP_TERMS_IDS_CA : CHURNDM_VIP_TERMS_IDS; }
 
 // v2.23 — VIP Offer Library - Deposit Matches (CA — Canada only)
 // v3.3 — added the 20% → $10,000 and 20% → $20,000 tiers (CAS_CA_0092/0093,
@@ -2766,7 +2879,8 @@ function updateRegionTheme() {
   // v2.26 — VIPDM: same cue (red CA / blue US)
   const vipbgCA = getOfferType() === 'VIPBG' && !isVIPBGUS();
   const vipdmCA = getOfferType() === 'VIPDM' && !isVIPDMUS();
-  document.body.classList.toggle('ca-region', isRTCCanada() || vipbgCA || vipdmCA);
+  // v3.8 — LC-CHURN-DM: same cue (red CA / blue US) now that CA has its own image folder
+  document.body.classList.toggle('ca-region', isRTCCanada() || vipbgCA || vipdmCA || isChurnCanada());
 }
 
 function onJurisdictionChange() {
@@ -2774,8 +2888,9 @@ function onJurisdictionChange() {
   // v2.22 — RTC CC / v2.25 — VIPBG / v2.26 — VIPDM: switching region resets all
   // day-card values (dates, selected offers, toggles) so US and CA inputs never mix
   if (getOfferType() === 'RTC' || getOfferType() === 'VIPBG' || getOfferType() === 'VIPDM') resetAll();
-  // v3.7 — LC-CHURN-DM: no reset (values are region-agnostic), but re-render so the
-  // VIP section's US-only availability state tracks the selected jurisdiction
+  // v3.7 — LC-CHURN-DM: no reset (values are region-agnostic), but re-render.
+  // v3.8 — the re-render now updates the inline Terms IDs (US / CA maps) and the VIP
+  // section caption; the VIP rows themselves are available in both regions.
   if (getOfferType() === 'CHURNDM') renderAll();
 }
 
@@ -2835,14 +2950,16 @@ const INFO_LCREACT = `<ul>
 </ul>`;
 
 const INFO_CHURNDM = `<ul>
-  <li><strong>Offer Type:</strong> Lifecycle - Churn DM. Builds Segment, Promotion, and Bonus for each selected offer on each day card. Reward is paid in <span style="color:#ffffff;">Casino Credit</span>.</li>
-  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five standard defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in Terms ID. <span style="color:#ffffff;">Offers that don't match a configured Terms ID will block script generation.</span></li>
-  <li><strong>VIP tiers (v3.7):</strong> Four fixed VIP offers ($100 min / 25% / max $125, $250, $500, $2,500 &mdash; Terms IDs CAS_9702&ndash;CAS_9705) appear below the standard rows. Codes carry <span style="color:#ffffff;">VCAS</span> with the minimum deposit baked (not in the code); Series is <span style="color:#ffffff;">VIP</span>; a dedicated baked T&amp;C (May 19 &rarr; Nov 30, 2026) is used &mdash; not modal-editable. <span style="color:#ffffff;">US only</span>: VIP rows are unavailable and block generation when CA is selected. Fields are locked; the checkbox is the only control.</li>
-  <li><strong>Promo &amp; Activation Window:</strong> 00:00:00 ET on the card date &rarr; exactly 10 days later at 00:00:00 ET.</li>
-  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Exclusive Deposit Match" for all offer sizes, standard and VIP (v3.7 &mdash; was "Deposit and Get Casino Credit").</li>
-  <li><strong>Matched Deposit:</strong> <span style="color:#ffffff;">Always checked</span> on the bonus (inside the DEPOSIT entitlement panel) &mdash; as of v2.29.</li>
-  <li><strong>Voucher Code format:</strong> <code>CRLCDM{MMDDYY}{XXX}</code> &mdash; 15 characters, random 3-char suffix at runtime (standard and VIP).</li>
-  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder. Use Edit Images to set the path. Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code> (shared by all nine tiers), and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>50M10.png</code>; VIP: <code>25M125.png</code>, <code>25M250.png</code>, <code>25M500.png</code>, <code>25M2500.png</code> &mdash; watch the 25M250/25M2500 one-character near-collision).</li>
+  <li><strong>Offer Type:</strong> Lifecycle - Churn DM. <span style="color:#ffffff;">Dual region (v3.8):</span> <span style="color:#ffffff;">US — United States</span> (default, USD rows) and <span style="color:#ffffff;">CA — Canada</span> (Ontario, CAD rows). Builds Segment, Promotion, and Bonus for each selected offer on each day card. Reward is paid in <span style="color:#ffffff;">Casino Credit</span> in both regions. <span style="color:#ffffff;">Switching Region does NOT reset the cards</span> (values are region-agnostic; only the Terms IDs, T&amp;C/HIW copy, platform tags, and image folder follow the region).</li>
+  <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five standard defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in region-scoped Terms ID (US: CAS_10620 / CAS_9457&ndash;9460; CA: CAS_CA_0028&ndash;0032). <span style="color:#ffffff;">Offers that don't match a configured Terms ID for the selected region will block script generation.</span></li>
+  <li><strong>VIP tiers (v3.7; CA added v3.8):</strong> Four fixed VIP offers ($100 min / 25% / max $125, $250, $500, $2,500) appear below the standard rows &mdash; Terms IDs <span style="color:#ffffff;">US: CAS_9702&ndash;9705 / CA: CAS_CA_0143&ndash;0146</span>. Codes carry <span style="color:#ffffff;">VCAS</span> with the minimum deposit baked (not in the code); Series is <span style="color:#ffffff;">VIP</span>. US uses a dedicated baked VIP T&amp;C (May 19 &rarr; Nov 30, 2026); <span style="color:#ffffff;">CA uses the single canonical CA template for standard and VIP alike</span>. Fields are locked; the checkbox is the only control.</li>
+  <li><strong>T&amp;C / HIW (v3.8):</strong> The Edit HIW / Edit T&amp;Cs modals govern the <span style="color:#ffffff;">US templates only</span>. The CA copy is fully baked (canonical template from the nine CA filings; static dates <span style="color:#ffffff;">October 1st &rarr; December 31st, 2026</span>; amounts render bare in the HIW and carry literal CAD suffixes in the T&amp;C) &mdash; CA copy changes are an HTML edit (reach out to Adrian).</li>
+  <li><strong>Promo &amp; Activation Window:</strong> 00:00:00 ET on the card date &rarr; exactly 10 days later at 00:00:00 ET (both regions).</li>
+  <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Exclusive Deposit Match" for all offer sizes, standard and VIP, both regions (v3.7 &mdash; was "Deposit and Get Casino Credit").</li>
+  <li><strong>Platforms (v3.8):</strong> US keeps the standard pattern (Web + STAC + COMBO: Casino). <span style="color:#ffffff;">CA removes all three COMBO tags &mdash; Web + STAC only</span> (matches CA VIPDM/VIPBG).</li>
+  <li><strong>Matched Deposit:</strong> <span style="color:#ffffff;">Always checked</span> on the bonus (inside the DEPOSIT entitlement panel) &mdash; as of v2.29 (both regions).</li>
+  <li><strong>Voucher Code format:</strong> <code>CRLCDM{MMDDYY}{XXX}</code> &mdash; 15 characters, random 3-char suffix at runtime (standard and VIP, both regions).</li>
+  <li><strong>Images:</strong> Pulled from a locally-synced Google Drive folder, <span style="color:#ffffff;">one per region (v3.8)</span>. Use Edit Images to set each path. Required filenames (identical in both folders): <code>Promo Detail.png</code>, <code>Masthead.png</code> (shared by all nine tiers), and a Discover image named <code>{pct}M{max}.png</code> (e.g. <code>50M10.png</code>; VIP: <code>25M125.png</code>, <code>25M250.png</code>, <code>25M500.png</code>, <code>25M2500.png</code> &mdash; watch the 25M250/25M2500 one-character near-collision in BOTH folders).</li>
   <li><strong>Series:</strong> Other (standard) / <span style="color:#ffffff;">VIP (VIP tiers)</span> &nbsp;|&nbsp; <strong>Origin:</strong> Retention &nbsp;|&nbsp; <strong>Type:</strong> Lifecycle</li>
   <li><strong>No confirmation modal</strong> after Bonus Save.</li>
 </ul>`;
@@ -3903,7 +4020,7 @@ function renderChurnDMOffers(i) {
   container.innerHTML = '';
   days[i].churndmOfferData.forEach((offer, j) => {
     const key = churnDMOfferKey(offer);
-    const hasTerms = !!CHURNDM_TERMS_IDS[key];
+    const hasTerms = !!getChurnDMTermsIDs()[key];  // v3.8 — region-aware (US / CA maps)
     const row = document.createElement('div');
     row.style.cssText = `border: ${offer.active ? (hasTerms ? '1.5px solid #ffffff' : '1.5px solid #e24b4a') : '0.5px solid var(--border)'}; border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; background: ${offer.active ? 'var(--surface2)' : 'transparent'}; opacity: ${offer.active ? '1' : '0.5'};`;
     row.innerHTML = `
@@ -3937,38 +4054,39 @@ function addChurnDMOffer(i) {
 function selectAllChurnDMOffers(i) {
   if (!days[i].churndmOfferData) days[i].churndmOfferData = DEFAULT_CHURNDM_OFFERS.map(o => ({ ...o, active: true }));
   else days[i].churndmOfferData.forEach(o => o.active = true);
-  // v3.7 — Select All covers all nine rows (standard + VIP), except under CA,
-  // where the VIP tiers are unavailable (US-only filings) and stay unselected.
+  // v3.7 — Select All covers all nine rows (standard + VIP).
+  // v3.8 — the VIP tiers are available in both regions (CA filings CAS_CA_0143-0146),
+  // so the CA exclusion is gone.
   if (!days[i].churndmVipOfferData) days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
-  if (document.getElementById('jurisdiction-select').value !== 'CA') {
-    days[i].churndmVipOfferData.forEach(o => o.active = true);
-  }
+  days[i].churndmVipOfferData.forEach(o => o.active = true);
   renderChurnDMOffers(i);
   renderChurnDMVipOffers(i);
 }
 
 // v3.7 — LC-CHURN-DM VIP rows. Fixed four tiers (no + Add into this section); Min/%/Max
 // are display-only (min is baked, pct/max define the tier and its Terms ID) — the
-// checkbox is the only control. US-only: greyed out and unselectable while CA is selected.
+// checkbox is the only control.
+// v3.8 — available in BOTH regions: the inline Terms ID follows the selected jurisdiction
+// (US: CAS_9702-9705 / CA: CAS_CA_0143-0146) and the CA greying/disable is gone.
 function renderChurnDMVipOffers(i) {
   const container = document.getElementById(`churndm-vip-${i}`);
   if (!container) return;
   if (!days[i].churndmVipOfferData) days[i].churndmVipOfferData = CHURNDM_VIP_OFFERS.map(o => ({ ...o }));
-  const jurSel = document.getElementById('jurisdiction-select');
-  const isCA = jurSel && jurSel.value === 'CA';
+  const isCA = isChurnCanada();
+  const vipIds = getChurnDMVipTermsIDs();
   let html = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
       <div style="flex:1; height:1px; background:#6a5217;"></div>
       <span style="background:#412402; color:#fac775; font-size:10px; letter-spacing:0.12em; border:1px solid #854f0b; border-radius:12px; padding:3px 12px; font-family:'SF Mono',ui-monospace,monospace;">&#9733; VIP OFFERS</span>
       <div style="flex:1; height:1px; background:#6a5217;"></div>
     </div>
-    <p style="font-size:11px; color:#c9994a; margin:0 0 8px; font-family:'SF Mono',ui-monospace,monospace; line-height:1.5;">Series: VIP &middot; Copy: Exclusive Deposit Match &middot; Min baked at $100 &middot; fixed tiers${isCA ? ' &middot; <span style="color:#e24b4a;">US only — unavailable with CA selected</span>' : ' &middot; US only'}</p>`;
+    <p style="font-size:11px; color:#c9994a; margin:0 0 8px; font-family:'SF Mono',ui-monospace,monospace; line-height:1.5;">Series: VIP &middot; Copy: Exclusive Deposit Match &middot; Min baked at $100 &middot; fixed tiers &middot; ${isCA ? 'CA \u2014 Canada (CAS_CA_0143\u20130146)' : 'US \u2014 United States (CAS_9702\u20139705)'}</p>`;
   days[i].churndmVipOfferData.forEach((offer, j) => {
     const key = `M${offer.min}_${offer.pct}M${offer.max}`;
-    const termsId = CHURNDM_VIP_TERMS_IDS[key] || '';
-    const activeOn = offer.active && !isCA;
+    const termsId = vipIds[key] || '';
+    const activeOn = offer.active;
     html += `
-      <div style="border:${activeOn ? '1.5px solid #fac775' : '1px solid #6a5217'}; border-radius:8px; padding:7px 10px; margin-bottom:6px; background:${activeOn ? '#1c1910' : 'transparent'}; opacity:${isCA ? '0.35' : (activeOn ? '1' : '0.55')};">
+      <div style="border:${activeOn ? '1.5px solid #fac775' : '1px solid #6a5217'}; border-radius:8px; padding:7px 10px; margin-bottom:6px; background:${activeOn ? '#1c1910' : 'transparent'}; opacity:${activeOn ? '1' : '0.55'};">
         <div style="display:flex; align-items:center; gap:6px;">
           <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#a08850; white-space:nowrap;">Min</span>
           <input type="number" value="${offer.min}" readonly tabindex="-1" style="width:64px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; color:#8a7a4a; border-color:#4a3d14; background:#211d12; pointer-events:none;" />
@@ -3978,7 +4096,7 @@ function renderChurnDMVipOffers(i) {
           <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:11px; color:#a08850; white-space:nowrap;">Max</span>
           <input type="number" value="${offer.max}" readonly tabindex="-1" style="width:64px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; color:#eadfba; border-color:#4a3d14; background:#211d12; pointer-events:none;" />
           <span style="font-family:'SF Mono',ui-monospace,monospace; font-size:9px; color:#8a7a4a; white-space:nowrap;">${termsId}</span>
-          <input type="checkbox" ${offer.active && !isCA ? 'checked' : ''} ${isCA ? 'disabled' : ''} style="width:16px; height:16px; margin-left:auto; cursor:${isCA ? 'not-allowed' : 'pointer'}; accent-color:#fac775;"
+          <input type="checkbox" ${offer.active ? 'checked' : ''} style="width:16px; height:16px; margin-left:auto; cursor:pointer; accent-color:#fac775;"
             onchange="days[${i}].churndmVipOfferData[${j}].active = this.checked; renderChurnDMVipOffers(${i});" />
         </div>
       </div>`;
@@ -4200,7 +4318,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -7831,9 +7949,35 @@ if __name__ == "__main__":
 function buildChurnDMScript(allNames, imagePath, hiwText, tcText) {
   // v3.7 — VIP tiers: baked $100 minimum keyed by {pct}M{max}, and the dedicated VIP
   // T&C template (never modal-edited; escaped the same way as tcText)
+  // v3.8 — dual region. Under CA the incoming hiwText/tcText (US modal-editable copy)
+  // are ignored: ONE baked canonical CA template (DEFAULT_HIW_CHURNDM_CA /
+  // DEFAULT_TC_CHURNDM_CA) serves all nine tiers, standard AND VIP — the CA VIP filings
+  // are structurally identical to the CA standard filings, so the generated script's
+  // is_vip() T&C branch resolves to the same CA template (kept so the Python shape stays
+  // identical between regions). Terms IDs come from the region maps; the $100 VIP minimum
+  // is shared (identical in both regions' filings). US output is byte-identical to v3.7.
+  const isCA = isChurnCanada();
+  const esc = s => s.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+  const effHiwText = isCA ? esc(DEFAULT_HIW_CHURNDM_CA) : hiwText;
+  const effTcText  = isCA ? esc(DEFAULT_TC_CHURNDM_CA)  : tcText;
   const vipMinMap = {};
   CHURNDM_VIP_OFFERS.forEach(o => { vipMinMap[`${o.pct}M${o.max}`] = String(o.min); });
-  const vipTcText = DEFAULT_TC_CHURNDM_VIP.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+  const vipTcText = isCA ? esc(DEFAULT_TC_CHURNDM_CA) : esc(DEFAULT_TC_CHURNDM_VIP);
+  const vipTcComment = isCA
+    ? `# v3.8 - CA: the VIP tiers share the single canonical CA template (CAS_CA_0143-CAS_CA_0146
+        # filings are structurally identical to the standard CAS_CA_0028-CAS_CA_0032 filings;
+        # Oct 1st -> Dec 31st 2026 static dates). Baked - never modal-edited.`
+    : `# v3.7 - dedicated VIP template (CAS_9702-CAS_9705 filings; May 19 -> Nov 30 2026
+        # static dates; title verbatim, no FANATICS CASINO prefix). Baked - never modal-edited.`;
+  const comboRemoveList = isCA
+    ? `["COMBO: Sportsbook", "COMBO: Sportsbook And Casino", "COMBO: Casino"]`
+    : `["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]`;
+  const comboComment = isCA
+    ? `    # v3.8 - CA: remove ALL THREE COMBO tags (Web + STAC only - matches CA VIPDM/VIPBG)\n`
+    : ``;
+  const termsIdsJson = JSON.stringify(isCA
+    ? { ...CHURNDM_TERMS_IDS_CA, ...CHURNDM_VIP_TERMS_IDS_CA }
+    : { ...CHURNDM_TERMS_IDS, ...CHURNDM_VIP_TERMS_IDS });
   const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
   const sendToXPLines      = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
   const externalBonusLines = allNames.map(n => `    ${n.externalBonus ? 'True' : 'False'},`).join('\n');
@@ -7930,7 +8074,7 @@ DO_BONUS = [
 ${doBonusLines}
 ]
 
-TERMS_IDS = ${JSON.stringify({ ...CHURNDM_TERMS_IDS, ...CHURNDM_VIP_TERMS_IDS })}
+TERMS_IDS = ${termsIdsJson}
 
 # v3.7 - VIP tiers: the minimum deposit is NOT in a VCAS code (40-char budget);
 # it is looked up here by the {pct}M{max} tier key. Fail-loud on unknown keys.
@@ -8001,7 +8145,7 @@ def format_hiw(code):
     min_fmt = format_currency(min_deposit)
     max_fmt = format_currency(max_bonus)
     terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
-    return f"""${hiwText}"""
+    return f"""${effHiwText}"""
 
 def format_tc(code):
     min_deposit, pct, max_bonus = parse_churn_dm(code)
@@ -8009,10 +8153,9 @@ def format_tc(code):
     max_fmt = format_currency(max_bonus)
     terms_id = TERMS_IDS.get(f"M{min_deposit}_{pct}M{max_bonus}", "")
     if is_vip(code):
-        # v3.7 - dedicated VIP template (CAS_9702-CAS_9705 filings; May 19 -> Nov 30 2026
-        # static dates; title verbatim, no FANATICS CASINO prefix). Baked - never modal-edited.
+        ${vipTcComment}
         return f"""${vipTcText}"""
-    return f"""${tcText}"""
+    return f"""${effTcText}"""
 
 def notify(message):
     subprocess.run(["osascript", "-e", f'display notification "{message}" with title "Churn DM Setup Script" sound name "Glass"'])
@@ -8188,7 +8331,7 @@ async def create_bonus(page, name, idx):
         await page.get_by_text("External Bonus", exact=True).click()
         await page.wait_for_timeout(500)
 
-    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
+${comboComment}    for value in ${comboRemoveList}:
         tag = page.locator(f".ant-select-selection-item[title='{value}']")
         await tag.locator(".ant-select-selection-item-remove").click()
         await page.wait_for_timeout(500)
@@ -11480,23 +11623,23 @@ function generateScript() {
       const offers = (days[i].churndmOfferData || []).filter(o => o.active);
       const vipOffers = (days[i].churndmVipOfferData || []).filter(o => o.active);
       if (offers.length === 0 && vipOffers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+      // v3.8 — Terms ID validation is region-scoped (US: CAS_* maps / CA: CAS_CA_* maps).
+      // The v3.7 VIP-under-CA block is gone: the CA VIP filings (CAS_CA_0143-0146) exist,
+      // so VIP tiers are valid in both regions.
+      const cdmStdIds = getChurnDMTermsIDs();
+      const cdmVipIds = getChurnDMVipTermsIDs();
       for (const o of offers) {
         if (!o.min || !o.pct || !o.max) { alert(`Day ${i + 1}: every selected offer needs a Min, %, and Max value.`); return; }
         const key = `M${o.min}_${o.pct}M${o.max}`;
-        if (!CHURNDM_TERMS_IDS[key]) {
-          alert(`Day ${i + 1}: no Terms ID is configured for offer ${key} (Min $${o.min}, ${o.pct}% up to $${o.max}).\n\nScript generation is blocked. Please use one of the configured offers, or reach out to Adrian Van de Camp to add a Terms ID for this offer.`);
+        if (!cdmStdIds[key]) {
+          alert(`Day ${i + 1}: no ${jurisdiction} Terms ID is configured for offer ${key} (Min $${o.min}, ${o.pct}% up to $${o.max}).\n\nScript generation is blocked. Please use one of the configured offers, or reach out to Adrian Van de Camp to add a Terms ID for this offer.`);
           return;
         }
       }
-      // v3.7 — VIP tiers are US-only filings (MI/NJ/PA/WV); fail loud under CA
-      if (vipOffers.length > 0 && jurisdiction === 'CA') {
-        alert(`Day ${i + 1}: VIP Churn DM tiers are US-only (the CAS_9702\u2013CAS_9705 filings cover MI/NJ/PA/WV).\n\nScript generation is blocked. Deselect the VIP offers or switch the jurisdiction to US.`);
-        return;
-      }
       for (const o of vipOffers) {
         const key = `M${o.min}_${o.pct}M${o.max}`;
-        if (!CHURNDM_VIP_TERMS_IDS[key]) {
-          alert(`Day ${i + 1}: no Terms ID is configured for VIP offer ${key}.\n\nScript generation is blocked. Reach out to Adrian Van de Camp.`);
+        if (!cdmVipIds[key]) {
+          alert(`Day ${i + 1}: no ${jurisdiction} Terms ID is configured for VIP offer ${key}.\n\nScript generation is blocked. Reach out to Adrian Van de Camp.`);
           return;
         }
       }
