@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.11</title>
+  <title>NATS Bonus Creator v3.12</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -1539,7 +1539,7 @@ Any questions relating to eligibility, these Promotional Terms and Conditions, o
 // v3.8 — LC-CHURN-DM Canada (Ontario). One canonical baked HIW + T&C template serves all
 // nine CA tiers (five standard + four VIP) — unlike the US side, the CA VIP filings
 // (CAS_CA_0143-0146) are structurally identical to the CA standard filings (CAS_CA_0028-0032),
-// so no separate VIP template exists for CA. Static section-2 dates: October 1st, 2026 ->
+// so no separate VIP template exists for CA. Static section-2 dates: October 1, 2026 ->
 // December 31st, 2026 (all nine filings share one Promotional Period). Amounts render bare
 // in the HIW ($50, $2,500); the T&C carries the literal "+ CAD" / " CAD" suffixes in the
 // template text so one format_currency serves both. NOT modal-editable by design — the Edit
@@ -1557,7 +1557,7 @@ FANATICS CASINO (CANADA) – DEPOSIT MATCH {pct}% IN CASINO CREDIT (UP TO {max_f
 1.   Description of Promotion
 This promotion is offered by FBG Enterprises Canada, Inc. (“Fanatics Casino”). Select customers who make a cash deposit of {min_fmt}+ CAD into their Fanatics Casino account within 3 days of being presented this offer (“Qualifying Deposit”) will receive a reward equal to {pct}% of their Qualifying Deposit in Casino Credit, up to a maximum of {max_fmt} CAD in Casino Credit (“Rewards”). See below for more details. 
 2.   Promotional Period
-This “Promotion” begins at 12:00 a.m. ET on October 1st, 2026 and ends at 11:59 p.m. ET on December 31st, 2026 (“Promotional Period”).
+This “Promotion” begins at 12:00 a.m. ET on October 1, 2026 and ends at 11:59 p.m. ET on December 31st, 2026 (“Promotional Period”).
 3.   Eligibility
 This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (“Account”). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on a daily basis during the Promotional Period. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
 Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
@@ -2408,7 +2408,7 @@ const CHURNDM_VIP_TERMS_IDS = {
 
 // v3.8 — LC-CHURN-DM Canada (Ontario) Terms IDs. Same nine tiers as US (five standard +
 // four VIP; identical min/%/max values, paid in CAD). All nine CA filings share one
-// Promotional Period (October 1st, 2026 -> December 31st, 2026 — static in
+// Promotional Period (October 1, 2026 -> December 31st, 2026 — static in
 // DEFAULT_TC_CHURNDM_CA). Baked — no localStorage involvement.
 const CHURNDM_TERMS_IDS_CA = {
   'M10_50M10':  'CAS_CA_0028',
@@ -2957,7 +2957,7 @@ const INFO_CHURNDM = `<ul>
   <li><strong>Offer Type:</strong> Lifecycle - Churn DM. <span style="color:#ffffff;">Dual region (v3.8):</span> <span style="color:#ffffff;">US — United States</span> (default, USD rows) and <span style="color:#ffffff;">CA — Canada</span> (Ontario, CAD rows). Builds Segment, Promotion, and Bonus for each selected offer on each day card. Reward is paid in <span style="color:#ffffff;">Casino Credit</span> in both regions. <span style="color:#ffffff;">Switching Region does NOT reset the cards</span> (values are region-agnostic; only the Terms IDs, T&amp;C/HIW copy, platform tags, and image folder follow the region).</li>
   <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max Casino Credit. Five standard defaults are provided ($10/50%/$10, $20/50%/$25, $20/50%/$50, $50/50%/$100, $50/50%/$200), each mapped to a baked-in region-scoped Terms ID (US: CAS_10620 / CAS_9457&ndash;9460; CA: CAS_CA_0028&ndash;0032). <span style="color:#ffffff;">Offers that don't match a configured Terms ID for the selected region will block script generation.</span></li>
   <li><strong>VIP tiers (v3.7; CA added v3.8):</strong> Four fixed VIP offers ($100 min / 25% / max $125, $250, $500, $2,500) appear below the standard rows &mdash; Terms IDs <span style="color:#ffffff;">US: CAS_9702&ndash;9705 / CA: CAS_CA_0143&ndash;0146</span>. Codes carry <span style="color:#ffffff;">VCAS</span> with the minimum deposit baked (not in the code); Series is <span style="color:#ffffff;">VIP</span>. US uses a dedicated baked VIP T&amp;C (May 19 &rarr; Nov 30, 2026); <span style="color:#ffffff;">CA uses the single canonical CA template for standard and VIP alike</span>. Fields are locked; the checkbox is the only control.</li>
-  <li><strong>T&amp;C / HIW (v3.8):</strong> The Edit HIW / Edit T&amp;Cs modals govern the <span style="color:#ffffff;">US templates only</span>. The CA copy is fully baked (canonical template from the nine CA filings; static dates <span style="color:#ffffff;">October 1st &rarr; December 31st, 2026</span>; amounts render bare in the HIW and carry literal CAD suffixes in the T&amp;C) &mdash; CA copy changes are an HTML edit (reach out to Adrian).</li>
+  <li><strong>T&amp;C / HIW (v3.8):</strong> The Edit HIW / Edit T&amp;Cs modals govern the <span style="color:#ffffff;">US templates only</span>. The CA copy is fully baked (canonical template from the nine CA filings; static dates <span style="color:#ffffff;">October 1 &rarr; December 31st, 2026</span>; amounts render bare in the HIW and carry literal CAD suffixes in the T&amp;C) &mdash; CA copy changes are an HTML edit (reach out to Adrian).</li>
   <li><strong>Promo &amp; Activation Window:</strong> 00:00:00 ET on the card date &rarr; exactly 10 days later at 00:00:00 ET (both regions).</li>
   <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "Exclusive Deposit Match" for all offer sizes, standard and VIP, both regions (v3.7 &mdash; was "Deposit and Get Casino Credit").</li>
   <li><strong>Platforms (v3.8):</strong> US keeps the standard pattern (Web + STAC + COMBO: Casino). <span style="color:#ffffff;">CA removes all three COMBO tags &mdash; Web + STAC only</span> (matches CA VIPDM/VIPBG).</li>
