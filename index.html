@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.8</title>
+  <title>NATS Bonus Creator v3.11</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -755,6 +755,7 @@
           <option value="VIPDM">VIP Offer Library - Deposit Matches</option>
           <option value="VIPBG">VIP Offer Library - Bet &amp; Gets</option>
           <option value="DMCA">Daily Missions - Canada</option>
+          <option value="USVIPBGPM">US VIP Offer Library - Bet &amp; Gets (Playmaker)</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -1282,8 +1283,10 @@ function getImagePath() {
   if (t === 'VIPDM') return localStorage.getItem(vipdmKey('vcl_dm_image_path')) || (isVIPDMUS() ? DEFAULT_VIPDM_IMAGE_PATH_US : DEFAULT_VIPDM_IMAGE_PATH);
   if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_image_path')) || (isVIPBGUS() ? DEFAULT_VIPBG_IMAGE_PATH_US : DEFAULT_VIPBG_IMAGE_PATH);
   if (t === 'DMCA') return localStorage.getItem('daily_missions_image_path') || DEFAULT_DMCA_IMAGE_PATH;
+  if (t === 'USVIPBGPM') return localStorage.getItem('vcl_bg_pm_image_path') || DEFAULT_USVIPBGPM_IMAGE_PATH;  // v3.9
   return localStorage.getItem(rtcKey('rtc_image_path')) || (isRTCCanada() ? DEFAULT_IMAGE_PATH_CA : DEFAULT_IMAGE_PATH);
 }
+const DEFAULT_USVIPBGPM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Offer Library Bet & Get - 3 Day Windows";  // v3.9
 const DEFAULT_DMCA_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Daily Missions";
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_CHURNDM_IMAGE_PATH_CA = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM - Canada";  // v3.8 — CA (Ontario) Churn DM creatives
@@ -1974,7 +1977,7 @@ function openModal(type) {
   } else if (type === 'images') {
     const lt = getOfferType();
     const imgTitle = document.getElementById('modal-images-title');
-    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'CHURNDM' ? `Edit Images — Churn DM (${isChurnCanada() ? 'CA — Canada' : 'US — United States'})` : 'Edit Images';
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'CHURNDM' ? `Edit Images — Churn DM (${isChurnCanada() ? 'CA — Canada' : 'US — United States'})` : lt === 'USVIPBGPM' ? 'Edit Images — US VIP B&G (Playmaker)' : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -2018,7 +2021,7 @@ function saveModal(type) {
   } else if (type === 'tc') {
     localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? vipdmKey('vcl_dm_tc') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_tc') : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : t2 === 'USVIPBGPM' ? 'vcl_bg_pm_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -2314,7 +2317,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA') ? 3 : (t === 'VIPDM' || t === 'VIPBG') ? 1 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA' || t === 'USVIPBGPM') ? 3 : (t === 'VIPDM' || t === 'VIPBG') ? 1 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -2324,6 +2327,7 @@ function initDays() {
     fsJurisdiction: fsJurisdictionDefaults[i] || 'MI',
     fsOfferData: getFSPresets('TCE'),
     dmcaOfferData: DMCA_CC_TIERS.map(o => ({ ...o, active: false })),
+    usvipbgpmOfferData: USVIPBGPM_TIERS.map(o => ({ ...o, active: false })),
     dmcaDaysToUseReward: 7,
     dmcaReward: null, // v3.6 — null = weekday default (see DMCA_DAY_REWARDS)
     fsSendToXP: true,
@@ -3034,18 +3038,158 @@ const INFO_FS = `<ul>
   <li><strong>Game:</strong> Select the game from the dropdown. Each game has pre-configured aggregator, provider, deeplink, and available spin values. <span style="color:#ffffff;">To add a new game, please reach out to Adrian Van de Camp.</span></li>
 </ul>`;
 
+const INFO_USVIPBGPM = `<ul>
+  <li><strong>Offer Type:</strong> US VIP Offer Library - Bet &amp; Gets (Playmaker). <span style="color:#ffffff;">Three-phase (v3.10), all production:</span> Phase 1 NATS builds the Segment; Phase 2 Playmaker builds the bet-and-get bonus by clone, toggles it <span style="color:#ffffff;">Active</span>, and clicks Save Bonus (which auto-creates a NATS promotion named after the bonus); Phase 3 NATS finds that promotion, opens it via the row's edit icon, and finishes it (dates, images, copy, Button 2). Unlike the NATS-side VIPBG, the wager requirement, contribution rates, and game exclusions live <span style="color:#ffffff;">in the Playmaker bonus itself</span>.</li>
+  <li><strong>Clone-based build (v3.9):</strong> the Playmaker bonus is created by <span style="color:#ffffff;">cloning the expired bonus ${USVIPBGPM_SOURCE_CODE}</span>, which carries the offer's ${USVIPBGPM_EXCLUSIONS.length} game-exclusion chips and the Slots 100% / Tables 40% contribution config. <span style="color:#ffffff;">Games are never typed</span> \u2014 the generated script verifies the carried chips byte-exactly against the baked set and fails loudly on any drift (e.g. if the source bonus is ever edited or deleted). The script overrides everything else per tier: name, dates, segment, wagering amount, settlement (FanCash \u2192 Casino Credit), days to use (7), promotion, and toast.</li>
+  <li><strong>Dates:</strong> must be a <span style="color:#ffffff;">Tuesday or Friday</span> (filed 3-day Promo Periods: Tue\u2192Thu, Fri\u2192Sun). NATS promo window: typed date 00:00 \u2192 +3 days 00:00 ET. Playmaker bonus: 00:01 \u2192 +3 days 00:01 ET. Playmaker jurisdictions are left untouched \u2014 targeting is enforced entirely by the NATS segment.</li>
+  <li><strong>Tiers:</strong> fixed set of four \u2014 $1K\u2192$100, $5K\u2192$500, $20K\u2192$1K, $100K\u2192$5K Casino Credit (Terms IDs CAS_15117\u201315120, baked).</li>
+  <li><strong>How it Works &amp; T&amp;Cs:</strong> baked, not modal-editable (DMCA model). <span style="color:#ffffff;">\u26a0\ufe0f The canonical T&amp;C template is PENDING \u2014 generation is blocked until it is baked in. Reach out to Adrian Van de Camp.</span></li>
+  <li><strong>Images:</strong> pulled from a locally-synced Google Drive folder. Use Edit Images to set the path (saved once per machine, key <code>vcl_bg_pm_image_path</code>). Required filenames: <code>Promo Detail.png</code>, <code>Masthead.png</code>, and per-tier Discovers <code>B1000_G100.png</code>, <code>B5000_G500.png</code>, <code>B20000_G1000.png</code>, <code>B100000_G5000.png</code> (6 files, pre-flight-checked before login).</li>
+  <li><strong>No Promotion Tile, no voucher, no NATS bonus, no Display promotion picker</strong> \u2014 the bonus is Playmaker-side, and the clone flow's Display step has no promotion selector: <span style="color:#ffffff;">Playmaker auto-creates a copy of the SOURCE bonus's promotion on save, named after this bonus</span> (the script verifies the notice quotes the code before saving). That auto-created promotion <span style="color:#ffffff;">is THE promo</span> \u2014 Phase 3 edits it in NATS (its carried dates/header/title/Button-2 label are overridden; Type/Layout/Bonus Tile are verified as carried; images and copy are filled fresh).</li>
+</ul>`;
+
+
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : type === 'USVIPBGPM' ? INFO_USVIPBGPM : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
-  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA') ? 'none' : '';
-  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA') ? 'none' : '';
-  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA') ? 'none' : '';
+  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
+  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
+  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
   updateJurisdictionOptions(type);
   initDays();
   renderAll();
   document.getElementById('script-area').style.display = 'none';
   document.getElementById('images-path').value = getImagePath();
 }
+
+
+// ═══ v3.9 — US VIP Offer Library - Bet & Gets (Playmaker) ═══════════════════════
+// Two-phase (DMCA model): NATS segments + promos, Playmaker bonuses built by
+// CLONING the expired source bonus below. The clone carries the offer's game
+// exclusions (55 chips) and contribution config; games are NEVER typed - the
+// generated script verifies the carried chips against the baked set and fails
+// loudly on any drift (source edited / wrong bonus cloned). Dry-run-verified in
+// PROD Sep 24, 2026 (dryrun_usvipbg_clone_v0_2 through v0_6).
+const USVIPBGPM_SOURCE_CODE = '090226_US_CAS_RET_OCR_BG_LV3_5_FC';
+
+// Fixed four-tier set (filings CAS_15117-15120, supplied Sep 24, 2026).
+const USVIPBGPM_TIERS = [
+  { bet: '1000',   get: '100',  k: 'B1K_G100',   tid: 'CAS_15117' },
+  { bet: '5000',   get: '500',  k: 'B5K_G500',   tid: 'CAS_15118' },
+  { bet: '20000',  get: '1000', k: 'B20K_G1K',   tid: 'CAS_15119' },
+  { bet: '100000', get: '5000', k: 'B100K_G5K',  tid: 'CAS_15120' },
+];
+
+// Canonical exclusion set - PROD-captured from the source bonus Sep 24, 2026
+// (stakeholder-confirmed; supersedes the retired 28-entry spec transcription).
+// VERIFICATION ONLY: the generated script never types these. \u2122 is part of
+// the Jacks or Better catalog names. 55 entries.
+const USVIPBGPM_EXCLUSIONS = [
+  'Baccarat (MI | EVONET)',
+  'Baccarat (MI | IGT)',
+  'Baccarat (NJ | EVONET)',
+  'Baccarat (ON | IGT)',
+  'Baccarat (PA | EVONET)',
+  'Baccarat (PA | IGT)',
+  'Baccarat (WV | IGT)',
+  'Craps (MI | EVONET)',
+  'Craps (NJ | EVONET)',
+  'Craps (ON | EVONET)',
+  'Craps (PA | EVONET)',
+  'Game King Video Poker (MI | IGT)',
+  'Game King Video Poker (NJ | IGT)',
+  'Game King Video Poker (ON | IGT)',
+  'Game King Video Poker (PA | IGT)',
+  'Game King Video Poker (WV | IGT)',
+  'Game King Video Poker High Limit (MI | IGT)',
+  'Game King Video Poker High Limit (NJ | IGT)',
+  'Game King Video Poker High Limit (PA | IGT)',
+  'Game King Video Poker High Limit (WV | IGT)',
+  'Game King Video Poker Jackpot (MI | IGT)',
+  'Game King Video Poker Jackpot (NJ | IGT)',
+  'Game King Video Poker Jackpot (PA | IGT)',
+  'Game King Video Poker Jackpot (WV | IGT)',
+  'Jacks or Better\u2122 Video Poker (MI | EVONET)',
+  'Jacks or Better\u2122 Video Poker (NJ | EVONET)',
+  'Jacks or Better\u2122 Video Poker (WV | EVONET)',
+  'Stock Market (MI | EVONET)',
+  'Stock Market (NJ | EVONET)',
+  'Stock Market (ON | EVONET)',
+  'Stock Market (PA | EVONET)',
+  'Super Times Pay Five Play Video Poker (MI | IGT)',
+  'Super Times Pay Five Play Video Poker (NJ | IGT)',
+  'Super Times Pay Five Play Video Poker (ON | IGT)',
+  'Super Times Pay Five Play Video Poker (PA | IGT)',
+  'Super Times Pay Five Play Video Poker (WV | IGT)',
+  'Super Times Pay Five Play Video Poker High Limit (MI | IGT)',
+  'Super Times Pay Five Play Video Poker High Limit (NJ | IGT)',
+  'Super Times Pay Five Play Video Poker High Limit (PA | IGT)',
+  'Super Times Pay Ten Play Video Poker (MI | IGT)',
+  'Super Times Pay Ten Play Video Poker (NJ | IGT)',
+  'Super Times Pay Ten Play Video Poker (ON | IGT)',
+  'Super Times Pay Ten Play Video Poker (PA | IGT)',
+  'Super Times Pay Ten Play Video Poker (WV | IGT)',
+  'Super Times Pay Ten Play Video Poker High Limit (MI | IGT)',
+  'Super Times Pay Ten Play Video Poker High Limit (NJ | IGT)',
+  'Super Times Pay Ten Play Video Poker High Limit (PA | IGT)',
+  'Super Times Pay Triple Play Video Poker (MI | IGT)',
+  'Super Times Pay Triple Play Video Poker (NJ | IGT)',
+  'Super Times Pay Triple Play Video Poker (ON | IGT)',
+  'Super Times Pay Triple Play Video Poker (PA | IGT)',
+  'Super Times Pay Triple Play Video Poker (WV | IGT)',
+  'Super Times Pay Triple Play Video Poker High Limit (MI | IGT)',
+  'Super Times Pay Triple Play Video Poker High Limit (NJ | IGT)',
+  'Super Times Pay Triple Play Video Poker High Limit (PA | IGT)',
+];
+
+// Baked HIW (spec v0.2 par.10 - final, stakeholder-approved; "instantly" deliberate).
+// Dynamic f-string fields: {bet_fmt}, {get_fmt} (and {terms_id} available).
+const DEFAULT_HIW_USVIPBGPM = `How It Works:
+1. Opt-in to the promotion
+2. Wager {bet_fmt}+ on any of your favorite games
+3. We'll instantly give you {get_fmt} in Casino Credit
+
+Contribution Rates:
+
+* Slot games contribute 100% towards wager requirement (every $1 wagered on slot games counts as $1 toward the wagering requirement)
+* Table games contribute 40% towards wager requirement (every $2.50 wagered on table games counts as $1 toward the wagering requirement)`;
+
+// Baked canonical T&C - verbatim transcription of the four CAS_15117-15120
+// filings (supplied Sep 24, 2026; structurally identical, only the three values
+// vary). Normalizations: numbered headings 1-14 (matches the body's own
+// "Section 4" references), whitespace-normalized (single blank line between
+// sections). Static Promotional Period Oct 2, 2026 -> Apr 2, 2027. Dynamic
+// f-string fields: {bet_fmt} (x3), {get_fmt} (x2), {terms_id} (title). Changes
+// are an HTML edit (reach out to Adrian). Byte-verified per tier by the v3.9
+// harness against tc_template.txt.
+const DEFAULT_TC_USVIPBGPM = "PROMOTIONAL TERMS AND CONDITIONS\nFANATICS ONE CASINO - BET {bet_fmt} GET {get_fmt} CASINO CREDIT - {terms_id}\n\n1.   Description of Promotion\nThis promotion is offered by FBG Enterprises Opco, LLC (\u201cFanatics Casino\u201d). Select Fanatics Casino customers who opt in and place {bet_fmt}+ in cumulative weighted cash wagers (calculated in accordance with Section 4, \u201cAction Required,\u201d below) within 3 days of being presented this offer on eligible games in the Fanatics Casino can earn {get_fmt} in Casino Credit (\u201cRewards\u201d). See below for details.\n\n2.   Promotional Period\nThis \u201cPromotion\u201d is available during two Promo Periods each week: (i) from 12:00 a.m. ET each Tuesday to 11:59 p.m. ET each Thursday; and (ii) from 12:00 a.m. ET each Friday to 11:59 p.m. ET each Sunday, beginning October 2, 2026 and ending April 2, 2027 (the \u201cPromotional Period\u201d). Each such Tuesday-to-Thursday window and each Friday-to-Sunday window is a \u201cPromo Period.\u201d\n\n3.   Eligibility\nThis Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Casino account (\u201cAccount\u201d). To participate in this Promotion: (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states during the Promotional Period; and (iii) you must receive an invitation to participate in this Promotion directly from Fanatics Casino (offer cannot be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.\n\n4.   Action Required\nTo participate in this Promotion and be eligible for the Rewards, each time you are eligible to participate, you must: (i) opt in via the Promos page in the Fanatics Sportsbook and Casino App, the Fanatics Casino standalone app, or the Fanatics Casino website, where available (\u201cApp\u201d); and (ii) place {bet_fmt}+ in cumulative weighted cash wagers, calculated in accordance with the game contribution rates set forth below in this Section, within 3 days of being presented this offer, during that Promo Period. You must satisfy the cumulative wager requirement within 72 hours of opting in to this offer. To count towards the wager requirement, bets must be placed with cash and not Bonus Spins, Casino Credit, or any other promotional credit.\n\nGame Contribution Rates: Different games contribute towards the wagering requirement of this Promotion at different rates, based on the game type wagered on, as follows:\nSlots: Cash wagers placed on slots games count at 100% of the amount wagered (i.e., dollar-for-dollar) towards the cumulative wagering requirement.\nTable Games: Cash wagers placed on table games (including, without limitation, blackjack, roulette, and other table-style games) count at 40% of the amount wagered towards the cumulative wagering requirement.\nOnly the weighted portion of a wager, calculated in accordance with this Section, will count towards satisfying the wagering requirement of this Promotion \u2014 for example, a $10 cash wager on a table game contributes $4.00 towards the requirement, while a $10 cash wager on a slots game contributes the full $10.00. Contribution rates apply only to cash wagers; wagers placed using Casino Credit, Bonus Spins, or any other promotional credit do not count towards the wagering requirement regardless of game type.\n\n5.   Claiming Promotional Offer\nRewards will be added to eligible Accounts within 72 hours of satisfying the cumulative wager requirement.\nCasino Credit (Rewards) Terms:\nCasino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).\nCasino Credit expires seven (7) days from issuance (at 11:59 p.m. ET). Casino Credit closest to expiration will be applied first.\nIf you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).\nCasino Credit can be combined with deposited funds (cash) to place a wager. For example, if you have $20 in cash and $2 in Casino Credit in your Account and you wager $5, $2 in Casino Credit and $3 in cash will be applied to that wager.\nCasino Credit must be played through one time. Any payouts from bets placed with Casino Credit will be added to your cash balance.\nCasino Credit cannot be redeemed for or withdrawn as cash at any time.\nUse of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.\nCasino Credit may not be exchanged, substituted, or transferred, except in Fanatics Sportsbook & Casino\u2019s sole discretion.\n\n6.   Registration Procedures\nTo qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino\u2019s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.\n\n7.   Limitations on Participation\nLimit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino\u2019s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees\u2019, officers\u2019 and directors\u2019 immediate family members and/or those living in the same household (whether legally related or not).\n\n8.   Wagering Requirements/Exclusions\nBets must be placed with cash. Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement. Not all cash wagers count equally towards the wagering requirement of this Promotion; wagers are weighted by game type as set forth in Section 4 (\u201cAction Required\u201d) above.\n\n9.   Order of Funds Used for Wagering\nIf you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Bonus Spin, select \u201cBonus Spin\u201d in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash). Only wagers placed with deposited funds (cash) are eligible to count, at the applicable weighted contribution rate set forth in Section 4, towards the wagering requirement of this Promotion.\n\n10.   Eligible Games\nCash wagers placed on any game in the Fanatics Casino will count towards the cumulative wagering requirement, subject to the applicable game contribution rate set forth in Section 4 (\u201cAction Required\u201d) above. Craps, Stock Market Live, and Video Poker are not Eligible Games and do not count towards the wagering requirement of this Promotion. Fanatics Casino may designate additional games as ineligible for this Promotion at any time, as reflected within the App.\n\n11.   Restrictions on Withdrawal\nCasino Credit, Bonus Spins, Bonus Bets, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with Casino Credit, Bonus Spins, or Bonus Bets can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Bonus Spins.\n\n12.   Cancellation\nTo cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.\n\n13.   Responsible Gaming\nFanatics Casino aims to care for our customers and promote responsible gambling practices consistently.\nMichigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.\nPennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.\n\n14.   Other\nParticipation in this Promotion is subject to Fanatics Sportsbook and Casino\u2019s Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook & Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino\u2019s Privacy Policy.\nIn the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino\u2019s Terms of Service, these Promotional Terms and Conditions will prevail.\nReferences to \u201cyou\u201d or \u201cyour\u201d throughout these Promotional Terms and Conditions are to the participants in this Promotion.\nRewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards\u2019 value may be reported for tax purposes as required by law.\nAny questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.";
+
+function usvipbgpmInfoForDate(dateStr) {
+  if (!dateStr || !/^\d{6}$/.test(dateStr)) return null;
+  const mm = parseInt(dateStr.slice(0,2), 10), dd = parseInt(dateStr.slice(2,4), 10), yy = 2000 + parseInt(dateStr.slice(4,6), 10);
+  const dt = new Date(yy, mm - 1, dd);
+  if (dt.getMonth() !== mm - 1 || dt.getDate() !== dd) return null;
+  const names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const weekday = names[dt.getDay()];
+  return { weekday, isValid: (dt.getDay() === 2 || dt.getDay() === 5) };  // Tuesday / Friday
+}
+function usvipbgpmFmtMoney(v) {
+  const n = parseInt(v, 10);
+  return n >= 1000 ? '$' + n.toLocaleString('en-US') : '$' + n;
+}
+function usvipbgpmPillHTML(i, info) {
+  if (!info) return '';
+  if (info.isValid) return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(160,208,112,0.12); color:#a0d070; border:1px solid rgba(160,208,112,0.4);">${info.weekday} \u2022 3-day window</span>`;
+  return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(255,107,107,0.10); color:#ff6b6b; border:1px solid rgba(255,107,107,0.4);">${info.weekday} \u2014 must be a Tuesday or Friday</span>`;
+}
+function usvipbgpmDateInput(i, val) {
+  days[i].date = val.trim();
+  updateGenerateButton();
+  const pill = document.getElementById('usvipbgpm-pill-' + i);
+  if (pill) pill.innerHTML = usvipbgpmPillHTML(i, usvipbgpmInfoForDate(days[i].date));
+}
+// ═══ end v3.9 USVIPBGPM block ═══════════════════════════════════════════════════
+
 
 function stepBadgesHTML(i) {
   const seg = days[i].doSegment !== false;
@@ -3082,6 +3226,7 @@ function renderAll() {
   const isVIPDM = getOfferType() === 'VIPDM';
   const isVIPBG = getOfferType() === 'VIPBG';
   const isDMCA = getOfferType() === 'DMCA';
+  const isUSVIPBGPM = getOfferType() === 'USVIPBGPM';
   if (isBG || isDM || isBGRE || isCHURNDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
@@ -3419,6 +3564,37 @@ function renderAll() {
         <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:01 this date \u2192 00:01 next day.</p>
         ${dmcaRewardSelectorHTML}
         ${dmcaTiersHTML}
+      `;
+
+    } else if (isUSVIPBGPM) {
+      if (!days[i].usvipbgpmOfferData) days[i].usvipbgpmOfferData = USVIPBGPM_TIERS.map(o => ({ ...o, active: false }));
+      const uvInfo = usvipbgpmInfoForDate(days[i].date);
+      const uvTiersHTML = `
+          <span class="field-label" style="margin-top:12px;">Tiers (Bet \u2192 Get CC) \u2014 fixed set, CAS_15117\u201315120</span>
+          ${days[i].usvipbgpmOfferData.map((o, j) => `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
+              <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].usvipbgpmOfferData[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
+              <span style="flex:1;">Bet ${usvipbgpmFmtMoney(o.bet)} \u2192 Get ${usvipbgpmFmtMoney(o.get)} CC</span>
+              <span style="font-size:11px; color:#a0d070;">${o.tid}</span>
+            </div>`).join('')}
+          <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Badges: <span style="color:#ffffff;">Segment</span> = NATS build \u00b7 <span style="color:#ffffff;">Bonus</span> = Playmaker clone build (saved ACTIVE; auto-creates the promotion) \u00b7 <span style="color:#ffffff;">Promo</span> = the Phase 3 NATS EDIT of that auto-created promotion (needs the bonus saved first).</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Playmaker bonus is <span style="color:#ffffff;">CLONED</span> from expired <span style="color:#ffffff;">${USVIPBGPM_SOURCE_CODE}</span> \u2014 its ${USVIPBGPM_EXCLUSIONS.length} exclusion chips + contribution config carry over (verified byte-exact at runtime; games are never typed). Slots 100% / Tables 40%. Days to Use Reward: 7 (T&amp;C).</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "You've Earned Casino Credit! {get} Casino Credit is now in your account"</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images: shared <span style="color:#ffffff;">Promo Detail.png</span> / <span style="color:#ffffff;">Masthead.png</span> + Discover <span style="color:#ffffff;">B{bet}_G{get}.png</span> (literal, e.g. B1000_G100.png)</p>`;
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY \u2014 Tuesday or Friday)</span>
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 100226" value="${day.date}"
+            oninput="usvipbgpmDateInput(${i}, this.value)" onchange="days[${i}].date = this.value.trim(); renderAll(); updateGenerateButton();" style="width: 120px;" />
+          <span id="usvipbgpm-pill-${i}">${usvipbgpmPillHTML(i, uvInfo)}</span>
+        </div>
+        <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo: this date 00:00 \u2192 +3 days 00:00 ET. Bonus: 00:01 \u2192 +3 days 00:01 ET.</p>
+        ${uvTiersHTML}
       `;
     } else if (isBGRE) {
       if (!days[i].bgreOfferData) days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
@@ -4318,7 +4494,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','vcl_bg_pm_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -5474,6 +5650,10 @@ function updateGenerateButton() {
     } else if (offerType === 'BGRE') {
       const offers = (d.bgreOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'USVIPBGPM') {
+      const uvInfo = usvipbgpmInfoForDate(date);
+      const uvOffers = (d.usvipbgpmOfferData || []).filter(o => o.active);
+      if (uvInfo && uvInfo.isValid && uvOffers.length > 0) { ready = true; break; }
     } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
       const reward = dmcaEffectiveReward(i, info); // v3.6 — override-aware
@@ -11299,6 +11479,1150 @@ asyncio.run(main())
 `;
 }
 
+function buildUSVIPBGPMScript(allNames, imagePath) {
+  // v3.9 — US VIP Offer Library - Bet & Gets (Playmaker). Two-phase (DMCA model):
+  // NATS segments + promos, then Playmaker bonuses built by CLONING the expired
+  // source bonus (its exclusion chips are the offer's exclusion list — games are
+  // never typed; the baked EXPECTED_EXCLUSIONS set is verified against the clone).
+  const codesStr = allNames.map(n => `    {
+        "code_name":  "${n.code}",
+        "bet":        "${n.bet}",
+        "get":        "${n.get}",
+        "terms_id":   "${n.termsId}",
+        "do_segment": ${n.doSegment !== false ? 'True' : 'False'},
+        "do_promo":   ${n.doPromo !== false ? 'True' : 'False'},
+        "do_bonus":   ${n.doBonus !== false ? 'True' : 'False'},
+    },`).join('\n');
+  const exclusionsStr = USVIPBGPM_EXCLUSIONS.map(g => `    ${JSON.stringify(g)},`).join('\n');
+  const hiwText = DEFAULT_HIW_USVIPBGPM.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+  const tcText = DEFAULT_TC_USVIPBGPM.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+
+  return `"""
+US VIP Offer Library - Bet & Gets (Playmaker) Auto-Generated Script
+Generated by NATS Bonus Creator v3.11
+
+Phase 1 (NATS, production):      builds Account Segments ONLY (promotions are
+                                 NOT built by hand - see Phase 3)
+Phase 2 (Playmaker, production): builds bet-and-get bonuses by CLONING the expired
+                                 source bonus ${USVIPBGPM_SOURCE_CODE}
+                                 (Save Bonus IS clicked). The clone carries the
+                                 offer's exclusion chips and contribution config;
+                                 the script verifies them against the baked
+                                 55-entry set and NEVER types a game name.
+                                 The NATS segment is attached via the
+                                 "Existing Account Segments" field (v2.31 model).
+                                 The bonus is toggled Not Active -> ACTIVE before
+                                 Save Bonus (v3.10). Saving auto-creates a NATS
+                                 promotion named after the bonus.
+Phase 3 (NATS, production):      searches the Promos list for each auto-created
+                                 promotion (Playmaker -> NATS sync poll), opens it
+                                 via the row's edit icon, and finishes it: promo
+                                 window dates (00:00), the three images, From Your
+                                 VIP Host header/title, Button 2, HIW + T&C - then
+                                 saves. Name/Type/Layout/Bonus Tile are verified
+                                 as carried, not re-set.
+Dates must be Tuesdays or Fridays (3-day Promo Periods per the filed T&C).
+"""
+
+import asyncio
+import os
+import re
+import subprocess
+import sys
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+NATS_URL      = "https://trading.1.betfanatics.com/"
+PLAYMAKER_URL = "https://playmaker-internal.1.betfanatics.com/home"
+
+IMAGE_FOLDER = "${imagePath}"
+
+TITLE_HEADER_TEXT = "From Your VIP Host"
+BUTTON2_LABEL = "Play Now!"
+BUTTON2_LINK  = "/docs/usered/casgenericgamelist"
+TOAST_TITLE   = "You've Earned Casino Credit!"
+
+# The expired Playmaker bonus whose clone seeds every build (exclusions +
+# contribution config). If this bonus is ever deleted or edited, the
+# EXPECTED_EXCLUSIONS verification below fails loudly before any save.
+SOURCE_CODE = "${USVIPBGPM_SOURCE_CODE}"
+
+EXPECTED_SLOT      = "100"   # read-only: WARN if the clone differs, never modified
+TABLE_CONTRIBUTION = "40"    # clear-and-filled if the clone differs; hard-fail if it won't stick
+DAYS_TO_FULFILL    = "7"     # T&C: 7-day Casino Credit expiry
+
+CODES = [
+${codesStr}
+]
+
+# ── Canonical exclusion set (55 entries, PROD-captured from the source bonus
+# Sep 24, 2026; stakeholder-confirmed). VERIFICATION ONLY — never typed.
+# \\u2122 on the Jacks or Better entries is part of the catalog name.
+EXPECTED_EXCLUSIONS = [
+${exclusionsStr}
+]
+assert len(EXPECTED_EXCLUSIONS) == ${USVIPBGPM_EXCLUSIONS.length} and len(set(EXPECTED_EXCLUSIONS)) == len(EXPECTED_EXCLUSIONS)
+
+# ── v3.0 positional parsing ────────────────────────────────────────────────────
+
+def _norm_ws(s):
+    return re.sub(r"\\s+", " ", (s or "")).strip()
+
+def parse_usvipbgpm(code):
+    """Fail-loud v3.0 parse. Shape: MMDDYY_US_VCAS_RET_OL_BG_CC_B{bet}_G{get}
+    (K-notation allowed). Returns (bet, get) as expanded literal strings.
+    The date must be a Tuesday or a Friday (filed 3-day Promo Periods)."""
+    if len(code) > 40:
+        raise ValueError(f"code exceeds the 40-character NATS limit: {code} ({len(code)})")
+    parts = code.split("_")
+    if len(parts) < 9:
+        raise ValueError(f"code has fewer than 9 fields: {code}")
+    expected = ["US", "VCAS", "RET", "OL", "BG", "CC"]
+    for pos, want in enumerate(expected, start=1):
+        if parts[pos] != want:
+            raise ValueError(f"field {pos} must be {want!r}, got {parts[pos]!r} in {code}")
+    date_part = parts[0]
+    if not re.fullmatch(r"\\d{6}", date_part):
+        raise ValueError(f"bad date field {date_part!r} in {code}")
+    dt = datetime.strptime(date_part, "%m%d%y")
+    if dt.weekday() not in (1, 4):
+        raise ValueError(f"date {date_part} is a {dt.strftime('%A')} — this offer runs on Tuesdays and Fridays only: {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"B(\\d+K?)_G(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"freeform is not B{{bet}}_G{{get}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return expand_k(m.group(1)), expand_k(m.group(2))
+
+def parse_promo_dates(code):
+    """NATS promo window: typed date 00:00:00 ET -> typed date +3 days 00:00:00 ET."""
+    date_part = code.split("_")[0]
+    mm, dd, yy = int(date_part[0:2]), int(date_part[2:4]), int("20" + date_part[4:6])
+    dt_start = datetime(yy, mm, dd, 0, 0, 0, tzinfo=EASTERN)
+    dt_end = dt_start + timedelta(days=3)
+    return dt_start.astimezone().strftime('%d-%m-%Y %H:%M:%S'), dt_end.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+
+def format_currency(amount_str):
+    amount = int(float(amount_str))
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def terms_id_for(code):
+    tid = next((c["terms_id"] for c in CODES if c["code_name"] == code), None)
+    if not tid:
+        raise ValueError(f"no Terms ID baked for {code} - refusing to render legal copy with an empty ID")
+    return tid
+
+def format_hiw(code):
+    bet, get = parse_usvipbgpm(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    terms_id = terms_id_for(code)
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    bet, get = parse_usvipbgpm(code)
+    bet_fmt = format_currency(bet)
+    get_fmt = format_currency(get)
+    terms_id = terms_id_for(code)
+    return f"""${tcText}"""
+
+def image_files_for(c):
+    bet, get = parse_usvipbgpm(c["code_name"])
+    return ["Promo Detail.png", "Masthead.png", f"B{bet}_G{get}.png"]
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "US VIP B&G (Playmaker) Setup Script" sound name "Glass"'])
+
+async def clear_and_fill(element, value):
+    await element.click(click_count=3)
+    await element.fill(value)
+
+async def dump_element_html(handle, header, limit=3000):
+    try:
+        html = await handle.evaluate("el => el.outerHTML")
+        print(f"    ---- {header} ----")
+        print("    " + html[:limit].replace("\\n", "\\n    "))
+        if len(html) > limit:
+            print(f"    ... ({len(html) - limit} more chars)")
+        print("    ----")
+    except Exception as e:
+        print(f"    WARN could not dump {header}: {type(e).__name__}: {e}")
+
+# ── NATS: navigation ───────────────────────────────────────────────────────────
+
+async def nav_to_segments(page):
+    print("  Navigating to Account Segments...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id\$='-segments']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Account Segments", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Account Segments page")
+            return
+        print(f"  WARN Account Segments menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id\$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Promos page")
+            return
+        print(f"  WARN Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+# ── NATS: segment ──────────────────────────────────────────────────────────────
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Segment done: {name}")
+
+# ── NATS: promo ────────────────────────────────────────────────────────────────
+
+async def clear_image_row(page, row, label_title):
+    """v3.11 - the auto-copied promo's image rows can CARRY the source's images
+    (PROD, Oct 6 run: two edit pencils resolved in one row). A carried image must
+    be DELETED before Add works. State-aware: rows that arrive empty no-op."""
+    for _ in range(4):  # cap; each pass removes one carried image
+        del_icons = row.locator(".anticon-delete")
+        n = await del_icons.count()
+        if n == 0:
+            return
+        print(f"    -- {label_title}: carried image found ({n} delete icon(s)) - deleting")
+        await del_icons.first.click()
+        await page.wait_for_timeout(800)
+        # Ant popconfirm, if one appears
+        for sel in [".ant-popover-buttons .ant-btn-primary", ".ant-popover button.ant-btn-primary",
+                    ".ant-modal-footer .ant-btn-primary"]:
+            btn = page.locator(sel).last
+            try:
+                if await btn.count() > 0 and await btn.is_visible():
+                    await btn.click()
+                    await page.wait_for_timeout(800)
+                    break
+            except Exception:
+                continue
+        await page.wait_for_timeout(700)
+    if await row.locator(".anticon-delete").count() > 0:
+        raise Exception(f"{label_title}: carried image would not delete - refusing to upload on top of it")
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await clear_image_row(page, row, label_title)
+    add_link = row.get_by_text("Add")
+    await add_link.wait_for(state="visible", timeout=8000)
+    await add_link.click()
+    await page.wait_for_timeout(1000)
+    pencils = row.locator(".anticon-edit")
+    n_pencils = await pencils.count()
+    if n_pencils != 1:
+        raise Exception(f"{label_title}: expected exactly 1 edit pencil after Add, found {n_pencils} - a carried image may remain; refusing an ambiguous upload")
+    await pencils.first.click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    OK Image uploaded: {display_name or filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Rich text filled: {label_title}")
+
+async def find_promo_row(page, code):
+    """v3.10 - search 'Filter Promos' for the code and poll ~60s for the row whose
+    td.ant-table-cell text is EXACTLY the code (the promotion is auto-created by
+    Playmaker on Save Bonus; Playmaker -> NATS sync may lag)."""
+    search = page.locator("input[placeholder='Filter Promos']")
+    await search.wait_for(state="visible", timeout=15000)
+    for attempt in range(1, 13):
+        await search.click()
+        await search.fill("")
+        await search.fill(code)
+        await page.keyboard.press("Enter")
+        await page.wait_for_timeout(2500)
+        cells = page.locator("td.ant-table-cell", has_text=code)
+        n = await cells.count()
+        exact = None
+        for i in range(n):
+            if _norm_ws(await cells.nth(i).inner_text()) == code:
+                exact = cells.nth(i)
+                break
+        if exact is not None:
+            row = exact.locator("xpath=ancestor::tr[1]")
+            print(f"    OK promo row found (attempt {attempt}/12)")
+            return row
+        print(f"    WARN promo not in list yet (attempt {attempt}/12) - waiting for Playmaker -> NATS sync...")
+        await page.wait_for_timeout(2500)
+    raise Exception(f"Promotion {code!r} never appeared in the Promos list - was its clone bonus SAVED in Playmaker?")
+
+async def edit_promo(page, c):
+    """v3.10 Phase 3 - open the Playmaker-auto-created promotion and finish it.
+    PROD-recon'd carried state (Sep 24, 2026): name/Type/Layout correct and
+    Bonus Tile ON (verified, not touched); dates carry the BONUS window (00:01,
+    overridden to the promo window 00:00); Header Text carries the code and
+    Title carries the source's title (overridden to From Your VIP Host);
+    Button 2 label carries 'Play' (overridden); image rows MAY carry the
+    source's images (observed both ways in PROD) - carried images are deleted
+    first, then all three are uploaded fresh; T&C carries the source's copy
+    (select-all-paste replaces)."""
+    name = c["code_name"]
+    print(f"\\n  Editing auto-created promotion: {name}")
+    row = await find_promo_row(page, name)
+    edit_icon = row.locator(".anticon-edit")
+    if await edit_icon.count() == 0:
+        raise Exception(f"No edit (pencil) icon in the promo row for {name}")
+    await edit_icon.first.click()
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    name_input = page.locator("input[placeholder=\\"Promotion's internal name\\"]")
+    await name_input.wait_for(state="visible", timeout=15000)
+    opened_name = await name_input.input_value()
+    if opened_name != name:
+        raise Exception(f"Edit form opened the WRONG promotion ({opened_name!r}, wanted {name!r}) - refusing to edit")
+    print(f"    OK edit form opened and verified: {name}")
+    # Type / Layout must already be correct on the copy - verify, never click
+    for label, want in [("Type", "Image only CTA"), ("Layout Type", "Overlay")]:
+        row_l = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label}']"))
+        sel = row_l.locator(".ant-select-selection-item")
+        got = _norm_ws(await sel.first.inner_text()) if await sel.count() > 0 else "(empty)"
+        if got != want:
+            raise Exception(f"Copied promo's {label} is {got!r}, expected {want!r} - the source promotion may have changed; refusing to edit")
+    print("    OK Type / Layout verified (carried correctly)")
+    # Dates: carried the bonus window (00:01) - override to the promo window (00:00)
+    start_date, end_date = parse_promo_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    print(f"    OK Promo Dates: {start_date} -> {end_date} (typed date 00:00 -> +3 days 00:00 ET)")
+    # Images: recon confirmed the copy carries NONE (rows in 'Add' state)
+    bet, get = parse_usvipbgpm(name)
+    discover_filename = f"B{bet}_G{get}.png"
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
+    # Header/Title: carried the code / the source's title - replace
+    await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
+    await page.locator("input[placeholder='Title']").fill(TITLE_HEADER_TEXT)
+    print(f"    OK Header Text + Title: {TITLE_HEADER_TEXT}")
+    # Bonus Tile: carried ON - state-aware (a blind click would turn it OFF)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    tile_switch = bonus_tile_row.locator(".ant-switch").first
+    tile_cls = (await tile_switch.get_attribute("class")) or ""
+    if "ant-switch-checked" not in tile_cls:
+        await tile_switch.click()
+        await page.wait_for_timeout(500)
+        tile_cls = (await tile_switch.get_attribute("class")) or ""
+        if "ant-switch-checked" not in tile_cls:
+            raise Exception("Bonus Tile switch did not turn ON")
+        print("    OK Bonus Tile: turned ON")
+    else:
+        print("    OK Bonus Tile: already ON (carried)")
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill(BUTTON2_LABEL)
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill(BUTTON2_LINK)
+    print(f"    OK Button 2: {BUTTON2_LABEL} -> {BUTTON2_LINK}")
+    # HIW empty on the copy, T&C carries the source's ~10k chars - both replaced
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Promotion edited and saved: {name}")
+
+# ── Playmaker: top stepper (clone screen — the Create-flow 'Step N:' buttons
+# do not exist here; the stepper carries no active-state attribute, so arrival
+# is verified only by a step-specific anchor mounting) ─────────────────────────
+
+STEP_ORDER = ["Setup", "Eligibility", "Entitlement", "Settlement", "Display", "Review"]
+STEP_ANCHORS = {
+    "Setup": "input[name='name']",
+    "Eligibility": "input[cmdk-input]",
+    "Entitlement": "input[name='wageringAmount']",
+    "Settlement": "input[name='settlementAmount']",
+    "Display": "#toastEnabled",
+    "Review": "button:has-text('Save Bonus')",
+}
+
+async def find_step_button(page, step_name):
+    primary = f"button:has(span._icasino-font-medium:text-is('{step_name}'))"
+    el = await page.query_selector(primary)
+    if el and await el.is_visible():
+        return el, f"{step_name} (primary selector)"
+    pattern = re.compile(
+        r"^(?:step\\s*)?(?:\\d+\\s*[.:\\-)]?\\s*)?" + re.escape(step_name) + r"$",
+        re.IGNORECASE,
+    )
+    candidates = []
+    for cand in await page.query_selector_all("button, [role='tab'], a"):
+        if not await cand.is_visible():
+            continue
+        txt = _norm_ws(await cand.text_content())
+        if txt and pattern.match(txt):
+            box = await cand.bounding_box()
+            candidates.append((cand, txt, box["y"] if box else 1e9))
+    if not candidates:
+        return None, None
+    candidates.sort(key=lambda c: c[2])
+    return candidates[0][0], f"{candidates[0][1]} (fallback matcher)"
+
+async def click_step(page, step_name):
+    async def _try_one(name):
+        btn, label = await find_step_button(page, name)
+        if not btn:
+            return False
+        print(f"    clicking top stepper: {label}")
+        await btn.click()
+        await page.wait_for_timeout(1500)
+        anchor = STEP_ANCHORS.get(name)
+        if not anchor:
+            return True
+        try:
+            await page.wait_for_selector(anchor, timeout=8000)
+            return True
+        except Exception:
+            return False
+
+    if await _try_one(step_name):
+        print(f"    OK on step: {step_name}")
+        return
+    print(f"    direct jump to {step_name!r} did not land - walking steps in order")
+    target_idx = STEP_ORDER.index(step_name)
+    for name in STEP_ORDER[1:target_idx + 1]:
+        ok = await _try_one(name)
+        if not ok and name == step_name:
+            raise Exception(f"Could not reach step {step_name!r} via top stepper")
+    print(f"    OK on step: {step_name} (via walk)")
+
+# ── Playmaker: Step 1 dates & times ────────────────────────────────────────────
+
+async def set_calendar_date(page, picker_index, target_date):
+    """DMCA calendar widget with BIDIRECTIONAL month nav (a fresh clone's
+    pickers read 'Pick a date'; generality kept for any carried date)."""
+    pickers = await page.query_selector_all("button.dc-w-\\\\[280px\\\\]")
+    if picker_index >= len(pickers):
+        raise Exception(f"Expected date picker index {picker_index}, found only {len(pickers)} pickers")
+    await pickers[picker_index].click()
+    await page.wait_for_timeout(1000)
+    target_str = target_date.strftime("%B %Y")
+    for _ in range(36):
+        header = await page.query_selector("div[aria-live='polite']")
+        header_text = await header.inner_text() if header else ""
+        if target_str in header_text:
+            break
+        try:
+            shown = datetime.strptime(_norm_ws(header_text), "%B %Y")
+            direction = "next-month" if shown < target_date.replace(day=1) else "previous-month"
+        except ValueError:
+            direction = "next-month"
+        nav_btn = await page.query_selector(f"button[name='{direction}']")
+        if not nav_btn:
+            raise Exception(f"Calendar {direction} button not found (header: {header_text!r})")
+        await nav_btn.click()
+        await page.wait_for_timeout(400)
+    else:
+        raise Exception(f"Could not navigate calendar to {target_str}")
+    day_btns = await page.query_selector_all("button[name='day']")
+    for btn in day_btns:
+        cls = await btn.get_attribute("class") or ""
+        if "dc-day-outside" in cls:
+            continue
+        txt = (await btn.inner_text()).strip()
+        if txt == str(target_date.day):
+            await btn.click()
+            await page.wait_for_timeout(300)
+            return
+    raise Exception(f"Day {target_date.day} not found in calendar for {target_str}")
+
+async def set_time_0001(page, nth, label):
+    field = page.get_by_role("textbox", name="Time").nth(nth)
+    el = await field.element_handle()
+    if el is None:
+        raise Exception(f"{label} Time field not found")
+    await page.evaluate("""el => {
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype, 'value').set;
+        nativeInputValueSetter.call(el, '00:01');
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+    }""", el)
+    await page.wait_for_timeout(400)
+    _val = await field.input_value()
+    if "00:01" not in _val and "12:01 AM" not in _val:
+        print(f"    WARN {label} Time native-setter did not stick (reads {_val!r}) - retrying via keyboard")
+        await field.click()
+        await field.click(click_count=3)
+        await page.keyboard.type("00:01", delay=50)
+        await page.keyboard.press("Enter")
+        await page.wait_for_timeout(400)
+        _val = await field.input_value()
+        if "00:01" not in _val and "12:01 AM" not in _val:
+            await field.fill("00:01")
+            await page.keyboard.press("Tab")
+            await page.wait_for_timeout(400)
+            _val = await field.input_value()
+    _ok = "00:01" in _val or "12:01 AM" in _val
+    print(f"    {'OK' if _ok else 'WARN'} {label} Time now reads: {_val!r}")
+
+# ── Playmaker: Step 2 segment attach (v2.31 DMCA machinery, verbatim) ──────────
+
+async def find_existing_segment_input(page):
+    """Locate the input for 'Existing Account Segments' inside the INCLUDE
+    Segments section (never Create, never Exclude); label-anchored primary,
+    hardened parent-walk fallback, placeholder-asserted on both paths."""
+    handle = await page.evaluate_handle("""() => {
+        const sectionOf = (el) => {
+            let n = el.parentElement;
+            for (let i = 0; i < 12 && n; i++) {
+                const t = n.innerText || '';
+                const inc = t.includes('Include Segments');
+                const exc = t.includes('Exclude Segments');
+                if (inc && !exc) return 'include';
+                if (exc && !inc) return 'exclude';
+                if (inc && exc) return 'both';
+                n = n.parentElement;
+            }
+            return 'none';
+        };
+        const labels = Array.from(document.querySelectorAll('label'))
+            .filter(l => (l.innerText || '').trim() === 'Existing Account Segments');
+        for (const l of labels) {
+            if (sectionOf(l) !== 'include') continue;
+            const forId = l.getAttribute('for');
+            const container = forId ? document.getElementById(forId) : null;
+            if (container) {
+                if (container.matches && container.matches('input[cmdk-input]')) return container;
+                const inp = container.querySelector('input[cmdk-input]');
+                if (inp) return inp;
+            }
+            let n = l.parentElement;
+            for (let i = 0; i < 4 && n; i++) {
+                const inp = n.querySelector("input[cmdk-input][placeholder='Search...']");
+                if (inp && sectionOf(inp) === 'include') return inp;
+                n = n.parentElement;
+            }
+        }
+        return null;
+    }""")
+    seg_input = handle.as_element() if handle else None
+    if seg_input:
+        ph = (await seg_input.get_attribute("placeholder")) or ""
+        if "Type and press Enter" in ph:
+            print(f"    WARN label-anchored lookup landed on a Create-style field (placeholder {ph!r}) - rejected")
+            seg_input = None
+        else:
+            print("    OK Existing field located (label-anchored, Include section)")
+            return seg_input
+    candidates = await page.query_selector_all("input[cmdk-input], input[role='combobox'], input[type='text'], input:not([type])")
+    for inp in candidates:
+        try:
+            verdict = await inp.evaluate("""el => {
+                let n = el.parentElement;
+                let field = 'none';
+                for (let i = 0; i < 8 && n; i++) {
+                    const t = n.innerText || '';
+                    const hasE = t.includes('Existing Account Segments');
+                    const hasC = t.includes('Create Account Segments');
+                    if (hasE && !hasC) { field = 'existing'; break; }
+                    if (hasE && hasC) { field = 'both'; break; }
+                    n = n.parentElement;
+                }
+                if (field !== 'existing') return false;
+                n = el.parentElement;
+                for (let i = 0; i < 12 && n; i++) {
+                    const t = n.innerText || '';
+                    const inc = t.includes('Include Segments');
+                    const exc = t.includes('Exclude Segments');
+                    if (inc && !exc) return true;
+                    if (exc || (inc && exc)) return false;
+                    n = n.parentElement;
+                }
+                return false;
+            }""")
+        except Exception:
+            continue
+        if verdict:
+            ph = (await inp.get_attribute("placeholder")) or ""
+            if "Type and press Enter" in ph:
+                continue
+            print("    OK Existing field located (parent-walk fallback, Include section)")
+            return inp
+    return None
+
+async def verify_segment_chip(page, name):
+    for _ in range(10):
+        ok = await page.evaluate("""(name) => {
+            const sectionOf = (el) => {
+                let n = el.parentElement;
+                for (let i = 0; i < 12 && n; i++) {
+                    const t = n.innerText || '';
+                    const inc = t.includes('Include Segments');
+                    const exc = t.includes('Exclude Segments');
+                    if (inc && !exc) return 'include';
+                    if (exc && !inc) return 'exclude';
+                    if (inc && exc) return 'both';
+                    n = n.parentElement;
+                }
+                return 'none';
+            };
+            const fieldOf = (el) => {
+                let n = el.parentElement;
+                for (let i = 0; i < 10 && n; i++) {
+                    const t = n.innerText || '';
+                    const hasE = t.includes('Existing Account Segments');
+                    const hasC = t.includes('Create Account Segments');
+                    if (hasE && !hasC) return 'existing';
+                    if (hasC && !hasE) return 'create';
+                    if (hasE && hasC) return 'both';
+                    n = n.parentElement;
+                }
+                return 'none';
+            };
+            return Array.from(document.querySelectorAll('span'))
+                .filter(sp => (sp.innerText || '').trim() === name)
+                .some(sp => sectionOf(sp) === 'include' && fieldOf(sp) === 'existing');
+        }""", name)
+        if ok:
+            return True
+        await page.wait_for_timeout(500)
+    return False
+
+async def dump_step2_fields(page):
+    print("    Step 2 field dump (for selector capture):")
+    for b in await page.query_selector_all("button[role='combobox']"):
+        label = (await b.get_attribute("aria-label")) or ""
+        txt = ((await b.inner_text()) or "").strip().replace("\\n", " | ")
+        print(f"      combobox aria-label={label!r} text={txt!r}")
+    for inp in await page.query_selector_all("input"):
+        ph = (await inp.get_attribute("placeholder")) or ""
+        cm = await inp.get_attribute("cmdk-input")
+        print(f"      input placeholder={ph!r} cmdk={'yes' if cm is not None else 'no'}")
+
+async def attach_existing_segment(page, name):
+    """Attach the NATS-built segment via INCLUDE -> Existing Account Segments,
+    with ~60s NATS->Playmaker sync poll, exact-match option click (never Enter),
+    and chip read-back. Fails closed."""
+    for attempt in range(1, 13):
+        seg_input = await find_existing_segment_input(page)
+        if seg_input is None:
+            print(f"    WARN Include/Existing Account Segments field not found (attempt {attempt}/12)")
+        else:
+            await seg_input.click()
+            await seg_input.fill("")
+            await seg_input.type(name, delay=30)
+            await page.wait_for_timeout(1500)
+            options = await page.query_selector_all("[cmdk-item], [role='option']")
+            texts = []
+            hit = None
+            for o in options:
+                txt = ((await o.inner_text()) or "").strip()
+                texts.append(txt)
+                if txt == name and hit is None:
+                    hit = o
+            if hit:
+                await hit.click()
+                await page.wait_for_timeout(500)
+                if await verify_segment_chip(page, name):
+                    print(f"    OK Existing segment attached and chip verified: {name}")
+                    return
+                await dump_step2_fields(page)
+                raise Exception(f"Clicked segment option {name!r} but no chip rendered in the Include/Existing field - refusing to continue on an unverified attach")
+            shown = ", ".join(t for t in texts if t) or "(none)"
+            print(f"    WARN segment not in Existing list yet (attempt {attempt}/12) - options: {shown}")
+            await seg_input.fill("")
+        await page.wait_for_timeout(5000)
+    await dump_step2_fields(page)
+    raise Exception(f"Segment {name!r} never appeared in the Include/Existing Account Segments field - refusing to fall back to Create Account Segments (would duplicate the NATS segment)")
+
+# ── Playmaker: Step 3 exclusion-chip verification (clone-carried, never typed) ─
+
+async def find_games_cmdk_input(page):
+    candidates = await page.query_selector_all("input[cmdk-input]")
+    visible = [inp for inp in candidates if await inp.is_visible()]
+    print(f"    Games field lookup - {len(candidates)} cmdk input(s), {len(visible)} visible")
+    if len(visible) != 1:
+        for inp in visible:
+            await dump_element_html(inp, "visible cmdk input candidate", limit=800)
+        raise Exception(f"Expected exactly 1 visible cmdk input on Entitlement, found {len(visible)}")
+    return visible[0]
+
+async def games_container(games_input):
+    handle = await games_input.evaluate_handle("""el => {
+        let node = el.parentElement, depth = 0, best = el.parentElement;
+        const chipSpans = n => [...n.querySelectorAll('span')]
+            .filter(s => !s.closest('[role="listbox"], [cmdk-list]'))
+            .map(s => s.textContent.replace(/\\\\s+/g, ' ').trim())
+            .filter(t => t.length > 3 && t.length < 90);
+        while (node && depth < 6) {
+            if (chipSpans(node).length > 0) { best = node; break; }
+            node = node.parentElement; depth++;
+        }
+        return best;
+    }""")
+    return handle.as_element()
+
+async def chips_in(container):
+    texts = await container.evaluate("""el => [...el.querySelectorAll('span')]
+        .filter(s => !s.closest('[role="listbox"], [cmdk-list]'))
+        .map(s => s.textContent.replace(/\\\\s+/g, ' ').trim())
+        .filter(t => t.length > 3 && t.length < 90)""")
+    seen, out = set(), []
+    for t in texts:
+        if t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
+async def verify_exclusion_chips(page, when):
+    """The clone's chips must equal the baked 55-entry set byte-exactly
+    (whitespace-normalized). Any drift means the source bonus was edited or
+    the wrong bonus was cloned - refuse to save a bonus that contradicts the
+    filed exclusions."""
+    games_input = await find_games_cmdk_input(page)
+    container = await games_container(games_input)
+    chips = [_norm_ws(c) for c in await chips_in(container)]
+    wanted = [_norm_ws(g) for g in EXPECTED_EXCLUSIONS]
+    missing = [g for g in wanted if g not in set(chips)]
+    extra = [c for c in chips if c not in set(wanted)]
+    if missing or extra:
+        for g in missing:
+            print(f"      MISSING - {g}")
+        for c in extra:
+            print(f"      EXTRA   + {c!r}")
+        await dump_element_html(container, f"games container ({when}, diff nonzero)", limit=6000)
+        raise Exception(f"Cloned exclusion chips do not match the baked {len(wanted)}-entry set ({when}): {len(missing)} missing, {len(extra)} extra - the source bonus may have been edited; refusing to save")
+    print(f"    OK all {len(wanted)} exclusion chips verified byte-exact ({when})")
+
+# ── Playmaker: navigation + clone ──────────────────────────────────────────────
+
+async def nav_to_bonus_setup(page):
+    await page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+    await page.wait_for_timeout(2000)
+    icasino = await page.wait_for_selector("h3:has-text('iCasino')", timeout=15000)
+    await icasino.click()
+    await page.wait_for_timeout(2000)
+    bonus_setup = await page.wait_for_selector("[data-testid='bonus-setup-navItem']", timeout=15000)
+    await bonus_setup.click()
+    await page.wait_for_timeout(2000)
+
+async def clone_source_bonus(page):
+    """Expired tab -> search the source code -> click its code-scoped Clone
+    button -> land on the Setup screen. PROD-verified Sep 24, 2026: no
+    confirmation modal appears; the clone opens /bonus-setup/new with an
+    empty name and nothing persisted server-side before Save Bonus."""
+    expired_tab = await page.wait_for_selector("button[role='tab']:has-text('Expired')", timeout=15000)
+    state = await expired_tab.get_attribute("data-state")
+    if state != "active":
+        await expired_tab.click()
+        await page.wait_for_timeout(1500)
+        state = await expired_tab.get_attribute("data-state")
+    if state != "active" and await expired_tab.get_attribute("aria-selected") != "true":
+        await dump_element_html(expired_tab, "Expired tab (did not activate)")
+        raise Exception("Expired tab did not reach data-state=active")
+    print("    OK Expired tab active")
+    search = await page.wait_for_selector("input[placeholder='Filter by Name, Code or ID']", timeout=15000)
+    await search.click()
+    await search.fill(SOURCE_CODE)
+    clone_btn = await page.wait_for_selector(f"button[aria-label='Clone {SOURCE_CODE}']", timeout=30000)
+    await clone_btn.click()
+    await page.wait_for_timeout(1500)
+    for label in ("Clone", "Confirm", "Yes"):
+        try:
+            modal_btn = await page.wait_for_selector(
+                f"div[role='dialog'] button:has-text('{label}')", timeout=2500)
+            if modal_btn and await modal_btn.is_visible():
+                txt = _norm_ws(await modal_btn.text_content())
+                if txt.lower() in (label.lower(), f"{label.lower()} bonus"):
+                    await modal_btn.click()
+                    print(f"    OK confirmation modal - clicked {txt!r}")
+                    await page.wait_for_timeout(1500)
+                    break
+        except Exception:
+            pass
+    await page.wait_for_selector("input[name='name']", timeout=20000)
+    print(f"    OK cloned {SOURCE_CODE} - Setup screen mounted")
+
+# ── Playmaker: Step 5 display ──────────────────────────────────────────────────
+
+async def verify_display_promo_note(page, name):
+    """v3.9.1 - the CLONE flow's Display step has NO promotion picker (PROD run,
+    Sep 24, 2026): Playmaker auto-creates a copy of the SOURCE bonus's promotion
+    when you save, named after this bonus. Verify the notice quotes this bonus's
+    exact name - a mismatch means the Setup rename didn't stick; refuse to save."""
+    await page.wait_for_selector("#toastEnabled", timeout=15000)
+    for _ in range(10):
+        body = await page.evaluate("() => document.body.innerText || ''")
+        if name in body:
+            print(f"    OK Display auto-copy notice references this bonus: {name}")
+            print("    -- Promotion: Playmaker will auto-create a copy of the source's promotion on save (no picker on the clone flow)")
+            return
+        await page.wait_for_timeout(500)
+    raise Exception(f"Display step does not reference {name!r} in the auto-copied-promotion notice - the Setup name may not have stuck; refusing to save")
+
+async def set_toast(page, get):
+    toast_cb = await page.wait_for_selector("#toastEnabled", timeout=15000)
+    if not await toast_cb.is_checked():
+        await toast_cb.click()
+        await page.wait_for_timeout(500)
+    title_input = await page.wait_for_selector("input[name='toastTitle']", timeout=15000)
+    await clear_and_fill(title_input, TOAST_TITLE)
+    desc_input = await page.wait_for_selector("input[name='toastDescription']", timeout=15000)
+    await clear_and_fill(desc_input, f"{format_currency(get)} Casino Credit is now in your account")
+    print("    OK Toast set")
+
+# ── Playmaker: the clone-based bonus build ─────────────────────────────────────
+
+async def create_pm_bonus(page, c):
+    name = c["code_name"]
+    bet, get = parse_usvipbgpm(name)
+    print(f"\\n  Creating Playmaker bonus (clone-based): {name}")
+
+    await nav_to_bonus_setup(page)
+    await clone_source_bonus(page)
+
+    print("  --- Setup")
+    bonus_name_input = await page.wait_for_selector("input[name='name']", timeout=15000)
+    await bonus_name_input.click(click_count=3)
+    await bonus_name_input.fill(name)
+    print(f"    OK Bonus Name: {name}")
+    print("    -- Jurisdictions: UNTOUCHED (targeting is enforced by the NATS segment; the filings restrict to MI/NJ/PA/WV via segment)")
+    code_date = name.split("_")[0]
+    start_date = datetime.strptime(code_date, "%m%d%y")
+    end_date   = start_date + timedelta(days=3)
+    await set_calendar_date(page, 0, start_date)
+    print("    OK Start Date set")
+    await set_calendar_date(page, 1, end_date)
+    print("    OK End Date set")
+    await set_time_0001(page, 0, "Start")
+    await set_time_0001(page, 1, "End")
+
+    print("  --- Eligibility")
+    await click_step(page, "Eligibility")
+    await attach_existing_segment(page, name)
+
+    print("  --- Entitlement")
+    await click_step(page, "Entitlement")
+    await verify_exclusion_chips(page, "on arrival (carried from clone)")
+    cfg_radio = await page.wait_for_selector("button[role='radio'][value='configure']", timeout=15000)
+    if await cfg_radio.get_attribute("aria-checked") != "true":
+        await cfg_radio.click()
+        await page.wait_for_timeout(800)
+    if await cfg_radio.get_attribute("aria-checked") != "true":
+        raise Exception("Configure Contribution radio did not reach aria-checked=true")
+    print("    OK Configure Contribution selected")
+    slot_input = await page.wait_for_selector("input[name='slotContribution']", timeout=15000)
+    slot_val = await slot_input.input_value()
+    if slot_val != EXPECTED_SLOT:
+        print(f"    WARN SLOT Contribution reads {slot_val!r}, expected {EXPECTED_SLOT!r} - NOT modifying (investigate)")
+    else:
+        print(f"    OK SLOT Contribution (%): {slot_val} (untouched)")
+    table_input = await page.wait_for_selector("input[name='tableContribution']", timeout=15000)
+    table_before = await table_input.input_value()
+    if table_before != TABLE_CONTRIBUTION:
+        await clear_and_fill(table_input, TABLE_CONTRIBUTION)
+        await page.wait_for_timeout(300)
+    table_after = await table_input.input_value()
+    if table_after != TABLE_CONTRIBUTION:
+        raise Exception(f"Table Contribution did not stick (was {table_before!r}, now reads {table_after!r})")
+    print(f"    OK Table Contribution (%): {table_before} -> {table_after}")
+    excl_radio = await page.wait_for_selector("button[role='radio'][value='exclude']", timeout=15000)
+    if await excl_radio.get_attribute("aria-checked") != "true":
+        raise Exception("Exclude Games mode is not active on the clone - the source bonus may have been edited; refusing to continue")
+    print("    OK Exclude Games mode active (carried)")
+    wagering_input = await page.wait_for_selector("input[name='wageringAmount']", timeout=15000)
+    await clear_and_fill(wagering_input, bet)
+    print(f"    OK Wagering Amount: {bet}")
+    await verify_exclusion_chips(page, "after Entitlement edits")
+
+    print("  --- Settlement")
+    await click_step(page, "Settlement")
+    cc_radio = await page.wait_for_selector("button[role='radio'][value='casino_credit']", timeout=15000)
+    if await cc_radio.get_attribute("aria-checked") != "true":
+        await cc_radio.click()
+        await page.wait_for_timeout(800)
+    if await cc_radio.get_attribute("aria-checked") != "true":
+        raise Exception("Casino Credit radio did not reach aria-checked=true (clone carries FanCash)")
+    print("    OK Reward Type: Casino Credit")
+    settlement_input = await page.wait_for_selector("input[name='settlementAmount']", timeout=15000)
+    await clear_and_fill(settlement_input, get)
+    print(f"    OK Settlement Amount: {get}")
+    days_input = await page.wait_for_selector("input[name='daysToFulfill']", timeout=15000)
+    if await days_input.input_value() != DAYS_TO_FULFILL:
+        await clear_and_fill(days_input, DAYS_TO_FULFILL)
+    print(f"    OK Days to Use Reward: {DAYS_TO_FULFILL}")
+
+    print("  --- Display")
+    await click_step(page, "Display")
+    await verify_display_promo_note(page, name)
+    await set_toast(page, get)  # clone carries the source's toast pre-checked + pre-filled; clear-and-fill replaces it
+
+    print("  --- Review")
+    await click_step(page, "Review")
+    await ensure_bonus_active(page)
+    save_btn = await page.wait_for_selector("button:has-text('Save Bonus')", timeout=15000)
+    await save_btn.click()
+    await page.wait_for_timeout(3000)
+    print(f"  OK Playmaker bonus done: {name}")
+
+async def ensure_bonus_active(page):
+    """v3.10 - the clone header carries a Not Active toggle that must be flipped
+    before Save Bonus. The toggle's own HTML does not change state
+    (stakeholder-confirmed), so the ADJACENT TEXT LABEL is the state signal:
+    click only while 'Not Active' shows, then poll until the header reads
+    'Active'. Fail loud with a switch dump if it will not flip."""
+    def _vis_texts_js():
+        return """() => {
+            const vis = el => el.getClientRects().length &&
+                getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden';
+            const out = { notActive: false, active: false };
+            document.querySelectorAll('span, div, label, p').forEach(el => {
+                if (!vis(el)) return;
+                const t = (el.innerText || '').trim();
+                if (t === 'Not Active') out.notActive = true;
+                else if (t === 'Active') out.active = true;
+            });
+            return out;
+        }"""
+    state = await page.evaluate(_vis_texts_js())
+    if state["active"] and not state["notActive"]:
+        print("    OK bonus already Active")
+        return
+    if not state["notActive"]:
+        raise Exception("Neither 'Active' nor 'Not Active' label found near the toggle - header layout may have changed; refusing to save an inactive bonus")
+    switches = [s for s in await page.query_selector_all("button[role='switch'], [role='switch']") if await s.is_visible()]
+    if not switches:
+        # fallback: the clickable element inside the container that holds the 'Not Active' text
+        handle = await page.evaluate_handle("""() => {
+            const els = [...document.querySelectorAll('span, div, label, p')]
+                .filter(el => (el.innerText || '').trim() === 'Not Active');
+            for (const el of els) {
+                let n = el.parentElement;
+                for (let i = 0; i < 4 && n; i++) {
+                    const b = n.querySelector('button');
+                    if (b) return b;
+                    n = n.parentElement;
+                }
+            }
+            return null;
+        }""")
+        sw = handle.as_element() if handle else None
+        if sw is None:
+            raise Exception("'Not Active' label found but no toggle/switch near it - refusing to save an inactive bonus")
+        switches = [sw]
+    await switches[0].click()
+    for _ in range(10):
+        await page.wait_for_timeout(500)
+        state = await page.evaluate(_vis_texts_js())
+        if state["active"] and not state["notActive"]:
+            print("    OK bonus toggled: Not Active -> Active")
+            return
+    await dump_element_html(switches[0], "activation toggle (did not flip)")
+    raise Exception("Toggle clicked but the header still reads 'Not Active' - refusing to save an inactive bonus")
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+async def main():
+    # Fail-loud parse of every code before any PROD write (v3.0 discipline)
+    for c in CODES:
+        b, g = parse_usvipbgpm(c["code_name"])
+        if (b, g) != (c["bet"], c["get"]):
+            raise ValueError(f"baked bet/get {c['bet']}/{c['get']} disagree with parsed {b}/{g} for {c['code_name']}")
+
+    segment_codes = [c for c in CODES if c["do_segment"]]
+    promo_codes   = [c for c in CODES if c["do_promo"]]
+    bonus_codes   = [c for c in CODES if c["do_bonus"]]
+
+    missing = []
+    for c in promo_codes:
+        for f in image_files_for(c):
+            p = os.path.join(IMAGE_FOLDER, f)
+            if not os.path.exists(p) and f not in missing:
+                missing.append(f)
+    if missing:
+        print("ABORT - missing image file(s) in the Offer Library B&G folder:")
+        for f in missing:
+            print(f"   - {f}")
+        print(f"Folder: {IMAGE_FOLDER}")
+        sys.exit(1)
+
+    async with async_playwright() as p:
+        # Okta Verify (FastPass) login fix - persistent profile + local-network-access
+        user_data_dir = os.path.expanduser("~/.dm_canada_pw_profile")
+        context = await p.chromium.launch_persistent_context(
+            user_data_dir,
+            headless=False,
+            args=["--disable-features=LocalNetworkAccessChecks"],
+            permissions=["clipboard-read", "clipboard-write"],
+        )
+        try:
+            await context.grant_permissions(
+                ["local-network-access"], origin="https://betfanatics.okta.com")
+            await context.grant_permissions(["local-network-access"])
+            print("  OK local-network-access permission granted")
+        except Exception as e:
+            print(f"  WARN could not grant local-network-access ({type(e).__name__}) - relying on feature flag")
+
+        nats_logged_in = False
+        if segment_codes:
+            print("\\n" + "=" * 60)
+            print("  PHASE 1 - NATS: Build Segments")
+            print("=" * 60)
+            nats_page = context.pages[0] if context.pages else await context.new_page()
+            await nats_page.goto(NATS_URL, wait_until="domcontentloaded")
+            print("\\n>> Please log in to NATS in the browser window.")
+            input("   Once logged in and on the dashboard, press ENTER here...\\n")
+            nats_logged_in = True
+            await nats_page.wait_for_timeout(2000)
+            await nav_to_segments(nats_page)
+            print(f"\\n--- Creating {len(segment_codes)} Segment(s) ---")
+            for c in segment_codes:
+                await create_segment(nats_page, c["code_name"])
+                await nats_page.wait_for_timeout(1000)
+            print("\\nOK Phase 1 complete.")
+        else:
+            print("\\nSkipping Phase 1 (no codes with Segment enabled)")
+
+        results = {}
+        if bonus_codes:
+            print("\\n" + "=" * 60)
+            print("  PHASE 2 - Playmaker: Clone-Based Bonuses")
+            print(f"  Source (expired): {SOURCE_CODE}")
+            print("=" * 60)
+            pm_page = await context.new_page()
+            await pm_page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+            print("\\n>> Please log in to Playmaker via SSO in the browser window.")
+            input("   Once on the Playmaker dashboard, press ENTER here...\\n")
+            await pm_page.wait_for_timeout(2000)
+            print(f"\\n--- Creating {len(bonus_codes)} Playmaker Bonus(es) ---")
+            for c in bonus_codes:
+                try:
+                    await create_pm_bonus(pm_page, c)
+                    results[c["code_name"]] = True
+                except Exception as e:
+                    print(f"  FAILED {c['code_name']}: {type(e).__name__}: {e}")
+                    results[c["code_name"]] = False
+                await pm_page.wait_for_timeout(1000)
+            print("\\nPhase 2 results:")
+            for k, v in results.items():
+                print(f"   {'SAVED ' if v else 'FAILED'} {k}")
+            if all(results.values()):
+                print("OK Phase 2 complete - all Playmaker bonuses created.")
+            else:
+                print("WARN Phase 2 finished with failures - see list above.")
+        else:
+            print("\\nSkipping Phase 2 (no codes with Bonus enabled)")
+
+        if promo_codes:
+            print("\\n" + "=" * 60)
+            print("  PHASE 3 - NATS: Edit the Playmaker-Created Promotions")
+            print("=" * 60)
+            nats3_page = await context.new_page()
+            await nats3_page.goto(NATS_URL, wait_until="domcontentloaded")
+            if not nats_logged_in:
+                print("\\n>> Please log in to NATS in the new browser tab.")
+                input("   Once logged in and on the dashboard, press ENTER here...\\n")
+            else:
+                print("  (Reusing the NATS session from Phase 1 in a new tab.)")
+            await nats3_page.wait_for_timeout(2000)
+            await nav_to_promos(nats3_page)
+            print(f"\\n--- Editing {len(promo_codes)} Promotion(s) ---")
+            for c in promo_codes:
+                code = c["code_name"]
+                if c["do_bonus"] and results.get(code) is False:
+                    print(f"\\n  SKIP {code}: its Playmaker bonus FAILED this run, so no auto-created promotion exists")
+                    results[code + " (promo edit)"] = False
+                    continue
+                try:
+                    await edit_promo(nats3_page, c)
+                    results[code + " (promo edit)"] = True
+                except Exception as e:
+                    print(f"  FAILED {code} (promo edit): {type(e).__name__}: {e}")
+                    results[code + " (promo edit)"] = False
+                    try:
+                        await nats3_page.goto(NATS_URL, wait_until="domcontentloaded")
+                        await nats3_page.wait_for_timeout(2000)
+                        await nav_to_promos(nats3_page)
+                    except Exception:
+                        pass
+                await nats3_page.wait_for_timeout(1000)
+            print("\\nPhase 3 results:")
+            for k, v in results.items():
+                if k.endswith("(promo edit)"):
+                    print(f"   {'SAVED ' if v else 'FAILED'} {k}")
+        else:
+            print("\\nSkipping Phase 3 (no codes with Promo enabled)")
+
+        n_failed = sum(1 for v in results.values() if not v)
+        if n_failed:
+            notify(f"US VIP B&G (Playmaker): FINISHED WITH {n_failed} FAILURE(S) - see terminal.")
+            print(f"\\nFinished with {n_failed} FAILURE(S) - see the Phase 2 results above.")
+            print("   (A bonus that never reached Save Bonus persists nothing in Playmaker - just close its tab.)")
+        else:
+            notify(f"US VIP B&G (Playmaker) complete! {len(CODES)} code(s) done.")
+            print("\\nAll done!")
+        print(f"   Codes: {[c['code_name'] for c in CODES]}")
+        input("\\nPress ENTER to close the browser...")
+        await context.close()
+
+asyncio.run(main())
+`;
+}
+
 function generateScript() {
   try {
   // Sync all date inputs to days array first
@@ -11413,7 +12737,35 @@ function generateScript() {
     const date = days[i].date;
     if (!date) continue;
     if (date.length !== 6) { alert(`Day ${i + 1}: please enter a valid 6-digit date (MMDDYY).`); return; }
-    if (offerType === 'DMCA') {
+
+    if (offerType === 'USVIPBGPM') {
+      // v3.9 - US VIP Offer Library B&G (Playmaker). Codes:
+      // MMDDYY_US_VCAS_RET_OL_BG_CC_{B..._G...} (K-notation; 35-36 chars).
+      if (!DEFAULT_TC_USVIPBGPM) {
+        alert('US VIP B&G (Playmaker): the canonical T&C template (CAS_15117\u201315120) has not been baked into the tool yet \u2014 script generation is blocked. Reach out to Adrian Van de Camp.');
+        return;
+      }
+      const uvInfo = usvipbgpmInfoForDate(date);
+      if (!uvInfo) { alert(`Day ${i + 1}: invalid date.`); return; }
+      if (!uvInfo.isValid) { alert(`Day ${i + 1}: ${date} is a ${uvInfo.weekday}. This offer runs on Tuesdays and Fridays only (filed 3-day Promo Periods). Script generation is blocked.`); return; }
+      const uvOffers = (days[i].usvipbgpmOfferData || []).filter(o => o.active);
+      if (uvOffers.length === 0) { alert(`Day ${i + 1} has a date but no tiers selected.`); return; }
+      const uvOverlong = [];
+      uvOffers.forEach(o => {
+        const code = `${date}_US_VCAS_RET_OL_BG_CC_${o.k}`;
+        if (code.length > 40) uvOverlong.push(`${code} (${code.length})`);
+        allNames.push({
+          code: code,
+          bet: o.bet,
+          get: o.get,
+          termsId: o.tid,
+          doSegment: days[i].doSegment !== false,
+          doPromo: days[i].doPromo !== false,
+          doBonus: days[i].doBonus !== false,
+        });
+      });
+      if (uvOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + uvOverlong.join('\n')); return; }
+    } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
       if (!info) { alert(`Day ${i + 1}: invalid date.`); return; }
       const dmcaDoSegment = days[i].doSegment !== false;
@@ -11866,6 +13218,8 @@ function generateScript() {
     script = buildBGREScript(allNames, bgreImagesStr);
   } else if (offerType === 'DMCA') {
     script = buildDMCAScript(allNames, imagePath);
+  } else if (offerType === 'USVIPBGPM') {
+    script = buildUSVIPBGPMScript(allNames, imagePath);
   } else if (offerType === 'DM') {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText);
   } else if (offerType === 'CHURNDM') {
@@ -12377,7 +13731,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPBGPM' ? `vcl_bg_pm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
