@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.12</title>
+  <title>NATS Bonus Creator v3.13</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -756,6 +756,7 @@
           <option value="VIPBG">VIP Offer Library - Bet &amp; Gets</option>
           <option value="DMCA">Daily Missions - Canada</option>
           <option value="USVIPBGPM">US VIP Offer Library - Bet &amp; Gets (Playmaker)</option>
+          <option value="USVIPDM">US VIP Offer Library - Deposit Matches</option>
         </select>
       </div>
       <div id="global-region-row" style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
@@ -1284,9 +1285,11 @@ function getImagePath() {
   if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_image_path')) || (isVIPBGUS() ? DEFAULT_VIPBG_IMAGE_PATH_US : DEFAULT_VIPBG_IMAGE_PATH);
   if (t === 'DMCA') return localStorage.getItem('daily_missions_image_path') || DEFAULT_DMCA_IMAGE_PATH;
   if (t === 'USVIPBGPM') return localStorage.getItem('vcl_bg_pm_image_path') || DEFAULT_USVIPBGPM_IMAGE_PATH;  // v3.9
+  if (t === 'USVIPDM') return localStorage.getItem('vcl_dm_us_image_path') || DEFAULT_USVIPDM_IMAGE_PATH;  // v3.13
   return localStorage.getItem(rtcKey('rtc_image_path')) || (isRTCCanada() ? DEFAULT_IMAGE_PATH_CA : DEFAULT_IMAGE_PATH);
 }
 const DEFAULT_USVIPBGPM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Offer Library Bet & Get - 3 Day Windows";  // v3.9
+const DEFAULT_USVIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Deposit Matches";  // v3.13 — USVIPDM (same USA folder as old US VIPDM; creative replaced by the user)
 const DEFAULT_DMCA_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Daily Missions";
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_CHURNDM_IMAGE_PATH_CA = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM - Canada";  // v3.8 — CA (Ontario) Churn DM creatives
@@ -1977,7 +1980,7 @@ function openModal(type) {
   } else if (type === 'images') {
     const lt = getOfferType();
     const imgTitle = document.getElementById('modal-images-title');
-    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'CHURNDM' ? `Edit Images — Churn DM (${isChurnCanada() ? 'CA — Canada' : 'US — United States'})` : lt === 'USVIPBGPM' ? 'Edit Images — US VIP B&G (Playmaker)' : 'Edit Images';
+    if (imgTitle) imgTitle.textContent = lt === 'RTC' ? `Edit Images — ${isRTCCanada() ? 'CA — Canada' : 'US — United States'}` : lt === 'VIPBG' ? `Edit Images — VIP Offer Library B&G (${isVIPBGUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'VIPDM' ? `Edit Images — VIP Offer Library (${isVIPDMUS() ? 'US — United States' : 'CA — Canada'})` : lt === 'CHURNDM' ? `Edit Images — Churn DM (${isChurnCanada() ? 'CA — Canada' : 'US — United States'})` : lt === 'USVIPBGPM' ? 'Edit Images — US VIP B&G (Playmaker)' : lt === 'USVIPDM' ? 'Edit Images — US VIP Offer Library DM' : 'Edit Images';
     document.getElementById('drive-link').href = lt === 'BG'
       ? 'https://drive.google.com/drive/folders/1SPudEPr9jjRoNliBRaDATkEmbplCGapS'
       : lt === 'DM'
@@ -1998,6 +2001,8 @@ function openModal(type) {
         : 'https://drive.google.com/drive/folders/1tkMs1dx-gszSGzlBHxgMYvOYv2l-2UjO')
       : lt === 'DMCA'
       ? 'https://drive.google.com/drive/folders/1w-o2bP7em8fkT86lwOtCu66jO57igRLh'
+      : lt === 'USVIPDM'
+      ? 'https://drive.google.com/drive/folders/1W8GLxrZFBMotLP_WPzAE04KPPb__BxIX'
       : isRTCCanada()
       ? 'https://drive.google.com/drive/folders/1W6ulHKv3ted9ZLNKzPgEbRoNCK_wFz6O'
       : 'https://drive.google.com/drive/folders/1Dlpa3xZTHjzlwHgayPSS-MZJ8-DQTmhh';
@@ -2021,7 +2026,7 @@ function saveModal(type) {
   } else if (type === 'tc') {
     localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? vipdmKey('vcl_dm_tc') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_tc') : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : t2 === 'USVIPBGPM' ? 'vcl_bg_pm_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : t2 === 'USVIPBGPM' ? 'vcl_bg_pm_image_path' : t2 === 'USVIPDM' ? 'vcl_dm_us_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -2317,7 +2322,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA' || t === 'USVIPBGPM') ? 3 : (t === 'VIPDM' || t === 'VIPBG') ? 1 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA' || t === 'USVIPBGPM') ? 3 : (t === 'VIPDM' || t === 'VIPBG' || t === 'USVIPDM') ? 1 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -2328,6 +2333,12 @@ function initDays() {
     fsOfferData: getFSPresets('TCE'),
     dmcaOfferData: DMCA_CC_TIERS.map(o => ({ ...o, active: false })),
     usvipbgpmOfferData: USVIPBGPM_TIERS.map(o => ({ ...o, active: false })),
+    usvipdmOfferData: USVIPDM_TIERS.map(o => ({ ...o, active: false })),
+    usvipdmSendToXP: true,
+    usvipdmExternalBonus: false,
+    usvipdmDaysToOptin: 3,
+    usvipdmDaysToEntitlement: 3,
+    usvipdmDaysToSettlement: 7,
     dmcaDaysToUseReward: 7,
     dmcaReward: null, // v3.6 — null = weekday default (see DMCA_DAY_REWARDS)
     fsSendToXP: true,
@@ -2842,7 +2853,7 @@ function updateJurisdictionOptions(type) {
   const current = sel.value;
   sel.innerHTML = '';
   const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
-  const vipdmRegions = ['US','CA'];  // v2.26 — VIP Offer Library - Deposit Matches is US / CA (US: FanCash; CA: Casino Credit)
+  const vipdmRegions = ['CA'];  // v3.13 — VIP Offer Library - Deposit Matches is CA-only (region visible-locked; the US flow is retired — US branch preserved unreachable; USVIPDM is the US successor)
   const vipbgRegions = ['US','CA'];  // v2.25 — VIP Offer Library - Bet & Gets is US / CA (US: FanCash; CA: Casino Credit)
   const churnRegions = ['US','CA'];  // v3.1 — LC-CHURN-DM restricted to US / CA (state codes + the v3.1 state suffix would exceed the 40-char NATS limit)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
@@ -2862,9 +2873,9 @@ function updateJurisdictionOptions(type) {
   } else if (type === 'RTC') {
     sel.value = rtcOnly.includes(current) ? current : 'US';
   } else if (type === 'VIPDM') {
-    // v2.26 — defaults to US — United States whenever the offer type is
-    // selected (per stakeholder direction); CA remains selectable
-    sel.value = 'US';
+    // v3.13 — locked to CA — Canada (the sole option); the month-anchored
+    // US flow is retired and old US VIPDM scripts are dead as of v3.13
+    sel.value = 'CA';
   } else if (type === 'VIPBG') {
     // v2.25 — keep the current region if valid, otherwise default to CA (the original region)
     sel.value = vipbgRegions.includes(current) ? current : 'CA';
@@ -3038,6 +3049,14 @@ const INFO_FS = `<ul>
   <li><strong>Game:</strong> Select the game from the dropdown. Each game has pre-configured aggregator, provider, deeplink, and available spin values. <span style="color:#ffffff;">To add a new game, please reach out to Adrian Van de Camp.</span></li>
 </ul>`;
 
+const INFO_USVIPDM = `<ul>
+  <li><strong>Offer Type (v3.13):</strong> US VIP Offer Library - Deposit Matches. <span style="color:#ffffff;">NATS-only</span> \u2014 builds Segment, Promotion, and Bonus for each selected tier (no Playmaker). US only (region row hidden); MI/NJ/PA/WV targeting is enforced entirely by the NATS segment. Reward is <span style="color:#ffffff;">Casino Credit</span> (USD rows \u2014 currency follows jurisdiction).</li>
+  <li><strong>Dates \u2014 Tuesday or Friday only:</strong> the filed T&amp;C defines two weekly Promo Periods (Tue 12:00 a.m. \u2192 Thu 11:59 p.m. ET; Fri 12:00 a.m. \u2192 Sun 11:59 p.m. ET). The promo &amp; bonus window is <span style="color:#ffffff;">fixed: code date 00:00:00 \u2192 +2 days 23:59:59 ET</span>. The Days to Opt In / Entitlement / Settlement fields fill the bonus form only \u2014 <span style="color:#ffffff;">they never move dates</span> (a deliberate change from VIPDM).</li>
+  <li><strong>Tiers:</strong> 16 fixed tiers, Terms IDs <span style="color:#ffffff;">CAS_15100\u2013CAS_15116 (CAS_15104 skipped by the filer)</span> \u2014 all baked, no custom rows, no Edit HIW / T&amp;Cs / Terms modals. Promotional period Oct 2, 2026 \u2192 Apr 2, 2027 (static). CAS_15102's filed wording differs by one word (\u201cduring\u201d omitted) \u2014 baked verbatim. Copy changes require a release (reach out to Adrian Van de Camp).</li>
+  <li><strong>Copy:</strong> Title / Promo Header / Bonus Description = "From Your VIP Host". Button 2: "Deposit" \u2192 /auth/account/deposit. <strong>Voucher:</strong> <code>VRDMCC{MMDDYY}{XXX}</code> (deliberately shares the CA VIPDM prefix). <strong>Series:</strong> VIP | <strong>Origin:</strong> Opt-In Bonus | <strong>Type:</strong> Retention. <strong>Platforms:</strong> standard US pattern (Web + STAC + COMBO: Casino). <strong>Matched Deposit:</strong> always checked.</li>
+  <li><strong>Images:</strong> pulled from the USA Deposit Matches folder (key <code>vcl_dm_us_image_path</code>; set once via Edit Images). Required (18 files): <code>Promo Detail.png</code>, <code>Masthead.png</code>, and per-tier Discovers <code>{pct}M{max}.png</code> (literal, e.g. <code>10M1000.png</code>) \u2014 pre-flight-checked before login. \u26a0\ufe0f One-character near-collisions: 10M500/10M5000, 20M500/20M5000, 100M500/10M500, 100M1000/10M1000, 20M1000/20M2000, 25M1000/20M1000, 25M5000/20M5000 \u2014 double-check the creatives.</li>
+</ul>`;
+
 const INFO_USVIPBGPM = `<ul>
   <li><strong>Offer Type:</strong> US VIP Offer Library - Bet &amp; Gets (Playmaker). <span style="color:#ffffff;">Three-phase (v3.10), all production:</span> Phase 1 NATS builds the Segment; Phase 2 Playmaker builds the bet-and-get bonus by clone, toggles it <span style="color:#ffffff;">Active</span>, and clicks Save Bonus (which auto-creates a NATS promotion named after the bonus); Phase 3 NATS finds that promotion, opens it via the row's edit icon, and finishes it (dates, images, copy, Button 2). Unlike the NATS-side VIPBG, the wager requirement, contribution rates, and game exclusions live <span style="color:#ffffff;">in the Playmaker bonus itself</span>.</li>
   <li><strong>Clone-based build (v3.9):</strong> the Playmaker bonus is created by <span style="color:#ffffff;">cloning the expired bonus ${USVIPBGPM_SOURCE_CODE}</span>, which carries the offer's ${USVIPBGPM_EXCLUSIONS.length} game-exclusion chips and the Slots 100% / Tables 40% contribution config. <span style="color:#ffffff;">Games are never typed</span> \u2014 the generated script verifies the carried chips byte-exactly against the baked set and fails loudly on any drift (e.g. if the source bonus is ever edited or deleted). The script overrides everything else per tier: name, dates, segment, wagering amount, settlement (FanCash \u2192 Casino Credit), days to use (7), promotion, and toast.</li>
@@ -3050,11 +3069,11 @@ const INFO_USVIPBGPM = `<ul>
 
 
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : type === 'USVIPBGPM' ? INFO_USVIPBGPM : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : type === 'USVIPBGPM' ? INFO_USVIPBGPM : type === 'USVIPDM' ? INFO_USVIPDM : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
-  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
-  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
-  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM') ? 'none' : '';
+  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM') ? 'none' : '';
+  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM') ? 'none' : '';
+  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM') ? 'none' : '';
   updateJurisdictionOptions(type);
   initDays();
   renderAll();
@@ -3190,6 +3209,80 @@ function usvipbgpmDateInput(i, val) {
 }
 // ═══ end v3.9 USVIPBGPM block ═══════════════════════════════════════════════════
 
+// ═══ v3.13 USVIPDM block — US VIP Offer Library - Deposit Matches ═════════════
+// NATS-only VIPDM variant with USVIPBGPM's date discipline (Tue/Fri only,
+// fixed Tue->Thu / Fri->Sun window). 16 baked tiers, filing sequence
+// CAS_15100–CAS_15116 with CAS_15104 skipped by the filer (confirmed: skipped
+// as a T&C ID, not a missing tier). `key`/`discover` are the literal expanded
+// M{min}_{pct}M{max} shapes; `k` is the rendered (K-notated) code freeform.
+const USVIPDM_TIERS = [
+  { key: 'M100_50M250', tid: 'CAS_15100', min: 100, pct: 50, max: 250, k: 'M100_50M250', discover: '50M250.png' },
+  { key: 'M100_100M250', tid: 'CAS_15101', min: 100, pct: 100, max: 250, k: 'M100_100M250', discover: '100M250.png' },
+  { key: 'M250_10M500', tid: 'CAS_15102', min: 250, pct: 10, max: 500, k: 'M250_10M500', discover: '10M500.png' },
+  { key: 'M250_10M1000', tid: 'CAS_15103', min: 250, pct: 10, max: 1000, k: 'M250_10M1K', discover: '10M1000.png' },
+  { key: 'M250_10M2500', tid: 'CAS_15105', min: 250, pct: 10, max: 2500, k: 'M250_10M2500', discover: '10M2500.png' },
+  { key: 'M250_10M5000', tid: 'CAS_15106', min: 250, pct: 10, max: 5000, k: 'M250_10M5K', discover: '10M5000.png' },
+  { key: 'M250_20M500', tid: 'CAS_15107', min: 250, pct: 20, max: 500, k: 'M250_20M500', discover: '20M500.png' },
+  { key: 'M250_20M1000', tid: 'CAS_15108', min: 250, pct: 20, max: 1000, k: 'M250_20M1K', discover: '20M1000.png' },
+  { key: 'M250_20M2000', tid: 'CAS_15109', min: 250, pct: 20, max: 2000, k: 'M250_20M2K', discover: '20M2000.png' },
+  { key: 'M250_20M5000', tid: 'CAS_15110', min: 250, pct: 20, max: 5000, k: 'M250_20M5K', discover: '20M5000.png' },
+  { key: 'M100_25M1000', tid: 'CAS_15111', min: 100, pct: 25, max: 1000, k: 'M100_25M1K', discover: '25M1000.png' },
+  { key: 'M250_25M5000', tid: 'CAS_15112', min: 250, pct: 25, max: 5000, k: 'M250_25M5K', discover: '25M5000.png' },
+  { key: 'M100_50M500', tid: 'CAS_15113', min: 100, pct: 50, max: 500, k: 'M100_50M500', discover: '50M500.png' },
+  { key: 'M100_50M1000', tid: 'CAS_15114', min: 100, pct: 50, max: 1000, k: 'M100_50M1K', discover: '50M1000.png' },
+  { key: 'M100_100M500', tid: 'CAS_15115', min: 100, pct: 100, max: 500, k: 'M100_100M500', discover: '100M500.png' },
+  { key: 'M100_100M1000', tid: 'CAS_15116', min: 100, pct: 100, max: 1000, k: 'M100_100M1K', discover: '100M1000.png' }
+];
+
+// Baked HIW (US, no modal). Per-tier f-string substitutions: {min_fmt} /
+// {pct} / {max_fmt}; {end_day} resolves per code from the typed date —
+// Tuesday card -> Thursday, Friday card -> Sunday.
+const DEFAULT_HIW_USVIPDM = "1. Opt-in to the promotion\n2. Make a single deposit of {min_fmt} or more before {end_day} at 11:59pm ET\n3. We'll instantly match your deposit {pct}%, up to {max_fmt} in Casino Credit";
+
+// Baked canonical T&C. Chain of custody: paste-verified from the filed
+// documents supplied in the v3.13 spec conversation — FILINGS UNATTACHED
+// (weaker than the v3.12 attached-filings standard; see Known Limitations).
+// Per-tier f-string substitutions in exactly five places: {min_fmt}, {pct},
+// {max_fmt} (title, Description, Action Required x2, Limitations) plus
+// {terms_id} (title). {during} carries the one filed textual variance:
+// CAS_15102's Promotional Period sentence omits the word "during" (genuine
+// filed wording); every other tier renders with it. Static period Oct 2,
+// 2026 -> Apr 2, 2027. Byte-verified per tier by the v3.13 harness against
+// tc_template_usvipdm.txt. Changes are an HTML edit (reach out to Adrian).
+const DEFAULT_TC_USVIPDM = "PROMOTIONAL TERMS AND CONDITIONS\n{min_fmt}+ DEPOSIT, {pct}% MATCH IN CASINO CREDIT (MAX {max_fmt}) {terms_id}\n\nDescription of Promotion\nThis promotion is offered by FBG Enterprises Opco, LLC (\u201cFanatics Casino\u201d). Select existing Fanatics Casino customers who opt in and deposit {min_fmt}+ within 3 days of being presented this offer (\u201cQualifying Deposit\u201d) will receive a {pct}% deposit match in Casino Credit (up to a maximum of {max_fmt} in Casino Credit) (\u201cRewards\u201d). See below for more details.\n\nPromotional Period\nThis \u201cPromotion\u201d is available {during}two Promo Periods each week: (i) from 12:00 a.m. ET each Tuesday to 11:59 p.m. ET each Thursday; and (ii) from 12:00 a.m. ET each Friday to 11:59 p.m. ET each Sunday, beginning October 2, 2026 and ending April 2, 2027 (the \u201cPromotional Period\u201d). Each such Tuesday-to-Thursday window and each Friday-to-Sunday window is a \u201cPromo Period.\u201d\n\nEligibility\nThis Promotion is only available to select customers with an active and verified Fanatics Casino account in MI, NJ, PA, or WV (\u201cAccount\u201d). To participate in this Promotion, (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states to use your Account; and (iii) you must receive the invitation to participate in this Promotion directly from Fanatics Casino (this offer cannot be shared or forwarded). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis and could change week to week. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.\n\nAction Required\nTo participate in this Promotion and be eligible for the Rewards, each time you are eligible to participate, you must opt in via the Promos page in the Fanatics Sportsbook and Casino App, the Fanatics Casino standalone app, or the Fanatics Casino website, where available (\u201cApp\u201d), and (ii) make a Qualifying Deposit of {min_fmt}+ during that Promo Period. You must opt in and make a Qualifying Deposit within 3 days of being presented this offer. Only your first Qualifying Deposit after opting in during that Promo Period will be eligible for the Rewards. Rewards will equal {pct}% of your Qualifying Deposit in Casino Credit (up to a maximum of {max_fmt} in Casino Credit) and will be added to your Account within 72 hours of making a Qualifying Deposit.\n\nClaiming Promotional Offer\nCasino Credit (Rewards) Terms:\nCasino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).\nCasino Credit expires seven (7) days from issuance (at 11:59 p.m. ET). Casino Credit closest to expiration will be applied first.\nIf you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).\nCasino Credit can be combined with deposited funds (cash) to place a wager. For example, if you have $20 in cash and $2 in Casino Credit in your Account and you wager $5, $2 in Casino Credit and $3 in cash will be applied to that wager.\nCasino Credit must be played through one time. Any payouts from bets placed with Casino Credit will be added to your cash balance.\nCasino Credit cannot be redeemed for or withdrawn as cash at any time.\nUse of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.\nCasino Credit may not be exchanged, substituted, or transferred, except in Fanatics Sportsbook & Casino\u2019s sole discretion.\n\nRegistration Procedures\nTo qualify for this Promotion, you must have an active and verified Account. To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino\u2019s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.\n\nLimitations on Participation\nLimit one (1) Reward per customer each time you are eligible to participate in this Promotion, up to a maximum of {max_fmt} in Casino Credit per Promo Period. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino\u2019s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees\u2019, officers\u2019 and directors\u2019 immediate family members and/or those living in the same household (whether legally related or not).\n\nWagering Requirements/Exclusions\nN/A\n\nOrder of Funds Used for Wagering\nIf you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). To place a bet using a Bonus Spin, select \u201cBonus Spin\u201d in the slots game. If you do not have Casino Credit in your Account, or if you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash).\n\nEligible Games/Markets/Events\nDoes not apply.\n\nRestrictions on Withdrawal\nCasino Credit, Bonus Spins, Bonus Bets, FanCash, or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time. There are no playthrough requirements on Bonus Spins.\n\nCancellation\nTo cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.\n\nResponsible Gaming\nFanatics Casino aims to consistently care for our customers and promote responsible gambling practices.\nMichigan, New Jersey, and West Virginia Customers: Gambling Problem? Call or Text 1-800-GAMBLER or visit www.1800gambler.net.\nPennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.\n\nOther\nParticipation in this Promotion is subject to Fanatics Sportsbook and Casino\u2019s Terms of Service, House Rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Sportsbook, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook and Casino\u2019s Privacy Policy.\nIn the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook and Casino\u2019s Terms of Service, these Promotional Terms and Conditions will prevail.\nReferences to \u201cyou\u201d or \u201cyour\u201d throughout these Promotional Terms and Conditions are to the participants in this Promotion.\nRewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards\u2019 value may be reported for tax purposes as required by law.\nAny questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.";
+
+function usvipdmInfoForDate(dateStr) {
+  if (!dateStr || !/^\d{6}$/.test(dateStr)) return null;
+  const mm = parseInt(dateStr.slice(0,2), 10), dd = parseInt(dateStr.slice(2,4), 10), yy = 2000 + parseInt(dateStr.slice(4,6), 10);
+  const dt = new Date(yy, mm - 1, dd);
+  if (dt.getMonth() !== mm - 1 || dt.getDate() !== dd) return null;
+  const names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const weekday = names[dt.getDay()];
+  return { weekday, isValid: (dt.getDay() === 2 || dt.getDay() === 5) };  // Tuesday / Friday
+}
+function usvipdmFmtMoney(v) {
+  const n = parseInt(v, 10);
+  return n >= 1000 ? '$' + n.toLocaleString('en-US') : '$' + n;
+}
+function usvipdmPillHTML(i, info) {
+  if (!info) return '';
+  if (info.isValid) return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(160,208,112,0.12); color:#a0d070; border:1px solid rgba(160,208,112,0.4);">${info.weekday} \u2022 3-day window</span>`;
+  return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(255,107,107,0.10); color:#ff6b6b; border:1px solid rgba(255,107,107,0.4);">${info.weekday} \u2014 must be a Tuesday or Friday</span>`;
+}
+function usvipdmDateInput(i, val) {
+  days[i].date = val.trim();
+  updateGenerateButton();
+  const pill = document.getElementById('usvipdm-pill-' + i);
+  if (pill) pill.innerHTML = usvipdmPillHTML(i, usvipdmInfoForDate(days[i].date));
+}
+function selectAllUSVIPDMOffers(i) {
+  if (!days[i].usvipdmOfferData) days[i].usvipdmOfferData = USVIPDM_TIERS.map(o => ({ ...o, active: true }));
+  else days[i].usvipdmOfferData.forEach(o => o.active = true);
+  renderAll();
+  updateGenerateButton();
+}
+// ═══ end v3.13 USVIPDM block ═══════════════════════════════════════════════════
+
 
 function stepBadgesHTML(i) {
   const seg = days[i].doSegment !== false;
@@ -3227,10 +3320,11 @@ function renderAll() {
   const isVIPBG = getOfferType() === 'VIPBG';
   const isDMCA = getOfferType() === 'DMCA';
   const isUSVIPBGPM = getOfferType() === 'USVIPBGPM';
+  const isUSVIPDM = getOfferType() === 'USVIPDM';
   if (isBG || isDM || isBGRE || isCHURNDM) { container.classList.add('bg-layout'); }
   else { container.classList.remove('bg-layout'); }
   if (isFS) { container.style.gridTemplateColumns = 'repeat(4, 1fr)'; }
-  else if (isRAF || isSUO || isVIPDM || isVIPBG) { container.style.gridTemplateColumns = '1fr'; }
+  else if (isRAF || isSUO || isVIPDM || isVIPBG || isUSVIPDM) { container.style.gridTemplateColumns = '1fr'; }
   else if (isBG || isDM || isBGRE || isCHURNDM) { container.style.gridTemplateColumns = ''; }
   else { container.style.gridTemplateColumns = ''; }
 
@@ -3595,6 +3689,69 @@ function renderAll() {
         </div>
         <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo: this date 00:00 \u2192 +3 days 00:00 ET. Bonus: 00:01 \u2192 +3 days 00:01 ET.</p>
         ${uvTiersHTML}
+      `;
+    } else if (isUSVIPDM) {
+      if (!days[i].usvipdmOfferData) days[i].usvipdmOfferData = USVIPDM_TIERS.map(o => ({ ...o, active: false }));
+      const udInfo = usvipdmInfoForDate(days[i].date);
+      const udTiersHTML = `
+          <span class="field-label" style="margin-top:12px;">Tiers (Min \u2192 % \u2192 Max CC) \u2014 fixed set, CAS_15100\u201315116 (15104 skipped by the filer)</span>
+          ${days[i].usvipdmOfferData.map((o, j) => `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
+              <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].usvipdmOfferData[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
+              <span style="flex:1;">Min ${usvipdmFmtMoney(o.min)} \u2192 ${o.pct}% \u2192 Max ${usvipdmFmtMoney(o.max)} CC</span>
+              <span style="font-size:11px; color:#a0d070;">${o.tid}</span>
+            </div>`).join('')}
+          <div class="add-row" style="margin-top:8px;">
+            <button class="reset-btn" onclick="selectAllUSVIPDMOffers(${i})">Select All</button>
+          </div>
+          <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer;" onclick="days[${i}].usvipdmSendToXP = !days[${i}].usvipdmSendToXP; renderAll();">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.usvipdmSendToXP !== false ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+                ${day.usvipdmSendToXP !== false ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+              </span>
+              Send to XP
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer;" onclick="days[${i}].usvipdmExternalBonus = !days[${i}].usvipdmExternalBonus; renderAll();">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; border:1.5px solid #3a3a3f; background:${day.usvipdmExternalBonus === true ? '#185FA5' : '#0e0e0f'}; flex-shrink:0;">
+                ${day.usvipdmExternalBonus === true ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+              </span>
+              External Bonus
+            </label>
+          </div>
+          <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Opt In</span>
+              <input type="number" min="0" value="${day.usvipdmDaysToOptin !== undefined ? day.usvipdmDaysToOptin : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[${i}].usvipdmDaysToOptin = parseInt(this.value) || 0;" />
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Entitlement</span>
+              <input type="number" min="0" value="${day.usvipdmDaysToEntitlement !== undefined ? day.usvipdmDaysToEntitlement : 3}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[${i}].usvipdmDaysToEntitlement = parseInt(this.value) || 0;" />
+              <span style="font-size:11px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">form-fill only \u2014 never moves dates</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Settlement</span>
+              <input type="number" min="0" value="${day.usvipdmDaysToSettlement !== undefined ? day.usvipdmDaysToSettlement : 7}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+                oninput="days[${i}].usvipdmDaysToSettlement = parseInt(this.value) || 0;" />
+            </div>
+          </div>
+          <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images: shared <span style="color:#ffffff;">Promo Detail.png</span> / <span style="color:#ffffff;">Masthead.png</span> + Discover <span style="color:#ffffff;">{pct}M{max}.png</span> (literal, e.g. 10M1000.png) \u2014 pre-flight-checked before login</p>`;
+      card.style.maxWidth = '620px';
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">US VIP Offer Library \u2014 Deposit Matches</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY \u2014 Tuesday or Friday)</span>
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 100626" value="${day.date}"
+            oninput="usvipdmDateInput(${i}, this.value)" onchange="days[${i}].date = this.value.trim(); renderAll(); updateGenerateButton();" style="width: 120px;" />
+          <span id="usvipdm-pill-${i}">${usvipdmPillHTML(i, udInfo)}</span>
+        </div>
+        <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo &amp; bonus window: this date 00:00:00 \u2192 +2 days 23:59:59 ET (Tue\u2192Thu / Fri\u2192Sun). Fixed \u2014 the Days fields never move it.</p>
+        ${udTiersHTML}
       `;
     } else if (isBGRE) {
       if (!days[i].bgreOfferData) days[i].bgreOfferData = DEFAULT_BGRE_OFFERS.map(o => ({ ...o }));
@@ -4076,6 +4233,12 @@ function resetDay(i) {
   days[i].vipdmDaysToOptin = 3;
   days[i].vipdmDaysToEntitlement = 3;
   days[i].vipdmDaysToSettlement = 7;
+  days[i].usvipdmOfferData = USVIPDM_TIERS.map(o => ({ ...o, active: false }));
+  days[i].usvipdmSendToXP = true;
+  days[i].usvipdmExternalBonus = false;
+  days[i].usvipdmDaysToOptin = 3;
+  days[i].usvipdmDaysToEntitlement = 3;
+  days[i].usvipdmDaysToSettlement = 7;
   days[i].vipbgOfferData = vipbgDefaultOffers();
   days[i].vipbgDaysToOptin = 3;
   days[i].vipbgDaysToEntitlement = 3;
@@ -4494,7 +4657,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','vcl_bg_pm_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','vcl_bg_pm_image_path','vcl_dm_us_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -5654,6 +5817,10 @@ function updateGenerateButton() {
       const uvInfo = usvipbgpmInfoForDate(date);
       const uvOffers = (d.usvipbgpmOfferData || []).filter(o => o.active);
       if (uvInfo && uvInfo.isValid && uvOffers.length > 0) { ready = true; break; }
+    } else if (offerType === 'USVIPDM') {
+      const udInfo = usvipdmInfoForDate(date);
+      const udOffers = (d.usvipdmOfferData || []).filter(o => o.active);
+      if (udInfo && udInfo.isValid && udOffers.length > 0) { ready = true; break; }
     } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
       const reward = dmcaEffectiveReward(i, info); // v3.6 — override-aware
@@ -9400,6 +9567,661 @@ asyncio.run(main())
 `;
 }
 
+function buildUSVIPDMScript(allNames, imagePath) {
+  // v3.13 — US VIP Offer Library - Deposit Matches. NATS-only (segment /
+  // promotion / bonus — no Playmaker). VIPDM's NATS machinery (Promotion Tile
+  // retry, voucher, currency-row fill, AMELCO segment flow, Series/Type
+  // scoping) with USVIPBGPM's date discipline: Tuesday/Friday only, fixed
+  // Tue->Thu / Fri->Sun 00:00:00 -> 23:59:59 ET window. Everything is baked
+  // (tiers, Terms IDs, HIW, canonical T&C incl. the CAS_15102 filed variance).
+  const codesStr = allNames.map(n => `    {
+        "code_name":            "${n.code}",
+        "min_deposit":          "${n.min}",
+        "pct":                  "${n.pct}",
+        "max_cc":               "${n.max}",
+        "terms_id":             "${n.termsId}",
+        "send_to_xp":           ${n.sendToXP ? 'True' : 'False'},
+        "external_bonus":       ${n.externalBonus ? 'True' : 'False'},
+        "days_to_optin":        ${n.daysToOptin},
+        "days_to_entitlement":  ${n.daysToEntitlement},
+        "days_to_settlement":   ${n.daysToSettlement},
+        "do_segment":           ${n.doSegment !== false ? 'True' : 'False'},
+        "do_promo":             ${n.doPromo !== false ? 'True' : 'False'},
+        "do_bonus":             ${n.doBonus !== false ? 'True' : 'False'},
+    },`).join('\n');
+  const termsIdsStr = USVIPDM_TIERS.map(t => `    "${t.key}": "${t.tid}",`).join('\n');
+  const hiwText = DEFAULT_HIW_USVIPDM.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+  const tcText = DEFAULT_TC_USVIPDM.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+
+  return `"""
+US VIP Offer Library - Deposit Matches Auto-Generated Script
+Generated by NATS Bonus Creator v3.13
+
+NATS-only (production): builds Account Segments, Promotions, and Bonuses.
+Dates must be Tuesdays or Fridays (filed 3-day Promo Periods). The promo and
+bonus window is FIXED: code date 00:00:00 ET -> code date +2 days 23:59:59 ET
+(Tue->Thu / Fri->Sun). Days to Opt In / Entitlement / Settlement fill their
+bonus-form fields only — they never participate in date arithmetic.
+"""
+
+import asyncio
+import os
+import random
+import re
+import string
+import subprocess
+import sys
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+# --- v3.0: positional code parsing (MMDDYY_JUR_PRODUCT_LIFECYCLE_SUBCATEGORY_MECHANIC_AWARDTYPE_FREEFORM) ---
+USD_JURISDICTIONS = {"US", "MI", "WV", "PA", "NJ"}
+CANADIAN_JURISDICTIONS = {"ON", "AB", "CA"}
+
+def currency_for(name):
+    """v3.0: jurisdiction is always the second underscore-delimited field. GBP is never used."""
+    jur = name.split("_")[1]
+    if jur in CANADIAN_JURISDICTIONS:
+        return "CAD"
+    if jur in USD_JURISDICTIONS:
+        return "USD"
+    raise ValueError(f"unknown jurisdiction {jur!r} in code {name}")
+
+async def fill_currency_amount(page, name, value, scope=None, label="Amount"):
+    """Fill an amount table that may now contain one row per currency
+    (tr[data-row-key='USD'|'GBP'|'CAD']). Fills only this jurisdiction's
+    currency row; falls back to the legacy single input if no currency
+    rows are present."""
+    root = scope if scope is not None else page
+    currency = currency_for(name)
+    cur_row = root.locator(f"tr[data-row-key='{currency}']")
+    if await cur_row.count() > 0:
+        inp = cur_row.locator("input.ant-input-number-input").first
+        suffix = f" ({currency})"
+    else:
+        inp = root.locator(".ant-table-cell.center .ant-input-number-input").first
+        suffix = " (legacy input)"
+    await inp.wait_for(state="visible", timeout=5000)
+    await inp.click()
+    await inp.fill(value)
+    await page.wait_for_timeout(500)
+    print(f"    OK {label}{suffix}: {value}")
+
+
+URL = "https://trading.1.betfanatics.com/"
+IMAGE_FOLDER = "${imagePath}"
+
+# v3.13 — US VIP Offer Library - Deposit Matches (US only; MI/NJ/PA/WV targeting
+# is enforced entirely by the NATS segment). Reward paid in Casino Credit
+# (USD currency row — currency follows jurisdiction, not reward).
+TITLE_HEADER_TEXT = "From Your VIP Host"
+BUTTON2_LABEL = "Deposit"
+BUTTON2_LINK = "/auth/account/deposit"
+
+CODES = [
+${codesStr}
+]
+
+# Baked Terms IDs — filing sequence CAS_15100–CAS_15116 (CAS_15104 skipped by
+# the filer; it is not a missing tier). Keys are the literal expanded
+# M{min}_{pct}M{max} shapes (K-notation exists only inside the code string).
+TERMS_IDS = {
+${termsIdsStr}
+}
+assert len(TERMS_IDS) == ${USVIPDM_TIERS.length}
+
+# ── Parsing ───────────────────────────────────────────────────────────────────
+
+def parse_usvipdm(code):
+    """Fail-loud v3.0 parse. Shape: MMDDYY_US_VCAS_RET_OL_DM_CC_M{min}_{pct}M{max}
+    (K-notation allowed on min/max). Returns (min, pct, max) as expanded literal
+    strings so Terms ID keys and Discover filenames keep their literal shapes.
+    The date must be a Tuesday or a Friday (filed 3-day Promo Periods)."""
+    if len(code) > 40:
+        raise ValueError(f"code exceeds the 40-character NATS limit: {code} ({len(code)})")
+    parts = code.split("_")
+    if len(parts) < 8:
+        raise ValueError(f"code has fewer than 8 fields: {code}")
+    expected = ["US", "VCAS", "RET", "OL", "DM", "CC"]
+    for pos, want in enumerate(expected, start=1):
+        if parts[pos] != want:
+            raise ValueError(f"field {pos} must be {want!r}, got {parts[pos]!r} in {code}")
+    date_part = parts[0]
+    if not re.fullmatch(r"\\d{6}", date_part):
+        raise ValueError(f"bad date field {date_part!r} in {code}")
+    dt = datetime.strptime(date_part, "%m%d%y")
+    if dt.weekday() not in (1, 4):
+        raise ValueError(f"date {date_part} is a {dt.strftime('%A')} — this offer runs on Tuesdays and Fridays only: {code}")
+    freeform = "_".join(parts[7:])
+    m = re.fullmatch(r"M(\\d+K?)_(\\d+)M(\\d+K?)", freeform)
+    if not m:
+        raise ValueError(f"USVIPDM freeform is not M{{min}}_{{pct}}M{{max}}: {freeform!r} in {code}")
+    def expand_k(tok):
+        return str(int(tok[:-1]) * 1000) if tok.endswith("K") else tok
+    return expand_k(m.group(1)), m.group(2), expand_k(m.group(3))
+
+def parse_dates(code):
+    """Fixed 3-day window: typed code date 00:00:00 ET -> typed code date
+    +2 days 23:59:59 ET (Tue->Thu / Fri->Sun). No -1-day start, no month
+    anchor, no entitlement extension."""
+    date_part = code.split("_")[0]
+    mm, dd, yy = int(date_part[0:2]), int(date_part[2:4]), int("20" + date_part[4:6])
+    dt_start = datetime(yy, mm, dd, 0, 0, 0, tzinfo=EASTERN)
+    dt_end = datetime(yy, mm, dd, 23, 59, 59, tzinfo=EASTERN) + timedelta(days=2)
+    start = dt_start.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    end = dt_end.astimezone().strftime('%d-%m-%Y %H:%M:%S')
+    return start, end
+
+def generate_suffix():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=3))
+
+def parse_voucher(code):
+    date_part = code.split("_")[0]
+    mmddyy = date_part[0:6]
+    suffix = generate_suffix()
+    return f"VRDMCC{mmddyy}{suffix}"
+
+def format_currency(amount_str):
+    amount = int(float(amount_str))
+    return f"\${amount:,}" if amount >= 1000 else f"\${amount}"
+
+def terms_id_for(code):
+    min_deposit, pct, max_cc = parse_usvipdm(code)
+    key = f"M{min_deposit}_{pct}M{max_cc}"
+    tid = TERMS_IDS.get(key)
+    if not tid:
+        raise ValueError(f"no Terms ID baked for tier {key} - refusing to render legal copy with an empty ID: {code}")
+    baked = next((c["terms_id"] for c in CODES if c["code_name"] == code), tid)
+    if baked != tid:
+        raise ValueError(f"Terms ID drift for {code}: CODES says {baked!r}, TERMS_IDS says {tid!r}")
+    return tid
+
+def end_day_for(code):
+    """Tuesday card -> Thursday; Friday card -> Sunday (parse guarantees Tue/Fri)."""
+    dt = datetime.strptime(code.split("_")[0], "%m%d%y")
+    return "Thursday" if dt.weekday() == 1 else "Sunday"
+
+def format_hiw(code):
+    min_deposit, pct, max_cc = parse_usvipdm(code)
+    min_fmt = format_currency(min_deposit)
+    max_fmt = format_currency(max_cc)
+    end_day = end_day_for(code)
+    return f"""${hiwText}"""
+
+def format_tc(code):
+    min_deposit, pct, max_cc = parse_usvipdm(code)
+    min_fmt = format_currency(min_deposit)
+    max_fmt = format_currency(max_cc)
+    terms_id = terms_id_for(code)
+    # CAS_15102's filed Promotional Period sentence omits the word "during"
+    # (genuine filed wording, confirmed) — every other filing carries it.
+    during = "" if terms_id == "CAS_15102" else "during "
+    return f"""${tcText}"""
+
+def image_files_for(code):
+    min_deposit, pct, max_cc = parse_usvipdm(code)
+    return ["Promo Detail.png", "Masthead.png", f"{pct}M{max_cc}.png"]
+
+def notify(message):
+    subprocess.run(["osascript", "-e", f'display notification "{message}" with title "US VIP Offer Library DM Setup Script" sound name "Glass"'])
+
+# ── Shared helpers ────────────────────────────────────────────────────────────
+
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    OK Image uploaded: {display_name or filepath.split('/')[-1]}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Rich text filled: {label_title}")
+
+# ── Navigation ────────────────────────────────────────────────────────────────
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Promos page")
+            return
+        print(f"  WARN Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def nav_to_bonus(page):
+    print("  Navigating to Bonus Manager...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-bonuses']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Bonus Manager", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Bonus Manager page")
+            return
+        print(f"  WARN Bonus Manager menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Bonus Manager from sidebar after 5 attempts")
+
+# ── Segment ───────────────────────────────────────────────────────────────────
+
+async def create_segment(page, name):
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Segment done: {name}")
+
+# ── Promo ─────────────────────────────────────────────────────────────────────
+
+async def create_promo(page, name):
+    print(f"\\n  Creating promotion: {name}")
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    print(f"    OK Promo Dates: {start_date} -> {end_date} (fixed Tue->Thu / Fri->Sun window)")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    min_deposit, pct, max_cc = parse_usvipdm(name)
+    discover_filename = f"{pct}M{max_cc}.png"
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/Promo Detail.png", "Promo Detail.png")
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/Masthead.png", "Masthead.png")
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{discover_filename}", discover_filename)
+    await page.locator("input[placeholder='Promo Header Text']").fill(TITLE_HEADER_TEXT)
+    await page.locator("input[placeholder='Title']").fill(TITLE_HEADER_TEXT)
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill(BUTTON2_LABEL)
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill(BUTTON2_LINK)
+    print(f"    OK Button 2: {BUTTON2_LABEL} -> {BUTTON2_LINK}")
+    await fill_rich_text(page, "How it works", format_hiw(name))
+    await fill_rich_text(page, "T&C", format_tc(name))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Promotion done: {name}")
+
+# ── Bonus ─────────────────────────────────────────────────────────────────────
+
+async def create_bonus(page, name, c):
+    print(f"\\n  Creating bonus: {name}")
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    create_bonus_btn = page.get_by_role("button", name="plus-circle Create Bonus")
+    await create_bonus_btn.wait_for(state="visible", timeout=15000)
+    for _ in range(120):
+        if await create_bonus_btn.is_enabled():
+            break
+        await page.wait_for_timeout(500)
+    await create_bonus_btn.click()
+    await page.wait_for_load_state("networkidle")
+
+    await page.get_by_text("Opt In", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").fill(name)
+    await page.locator("input[placeholder=\\"Bonus' description\\"]").fill(TITLE_HEADER_TEXT)
+
+    if c["send_to_xp"]:
+        await page.get_by_text("Send To XP", exact=True).click()
+        await page.wait_for_timeout(500)
+    if c["external_bonus"]:
+        await page.get_by_text("External Bonus", exact=True).click()
+        await page.wait_for_timeout(500)
+
+    # v3.13 — standard US platform-tag pattern: keep COMBO: Casino
+    for value in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
+        tag = page.locator(f".ant-select-selection-item[title='{value}']")
+        await tag.locator(".ant-select-selection-item-remove").click()
+        await page.wait_for_timeout(500)
+    print("    OK Platforms: Web + STAC: Standalone Casino + COMBO: Casino")
+
+    voucher_code = parse_voucher(name)
+    voucher_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Voucher Code"))
+    await voucher_row.locator("input.ant-input").fill(voucher_code)
+    await page.wait_for_timeout(500)
+    print(f"    OK Voucher Code: {voucher_code}")
+
+    await page.get_by_text("Casino Credit", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("span", has_text="Casino Credit (%)").first.click()
+    await page.wait_for_timeout(500)
+
+    min_deposit, pct, max_cc = parse_usvipdm(name)
+    pct_input = page.locator("input.ant-input-number-input[aria-valuemin='0'][aria-valuemax='100']")
+    await pct_input.click()
+    await pct_input.fill(pct)
+    await page.wait_for_timeout(500)
+    print(f"    OK Casino Credit %: {pct}%")
+
+    days_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Casino_credit Settlement"))
+    await days_row.locator("input.ant-input-number-input").click()
+    await days_row.locator("input.ant-input-number-input").fill(str(c["days_to_settlement"]))
+    await page.wait_for_timeout(500)
+
+    optin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Opt in to Bonus"))
+    await optin_row.locator("input.ant-input-number-input").click()
+    await optin_row.locator("input.ant-input-number-input").fill(str(c["days_to_optin"]))
+    await page.wait_for_timeout(500)
+
+    entitlement_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Days to Meet Entitlement"))
+    await entitlement_row.locator("input.ant-input-number-input").click()
+    await entitlement_row.locator("input.ant-input-number-input").fill(str(c["days_to_entitlement"]))
+    await page.wait_for_timeout(500)
+    print("    OK Days fields filled (form-fill only — dates are fixed by the code date)")
+
+    await page.evaluate("document.querySelector('input.ant-radio-button-input[value=\\"DEPOSIT\\"]').click()")
+    await page.wait_for_timeout(500)
+    print("    OK Entitlement Type: Deposit")
+
+    matched_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Matched Deposit"))
+    await matched_row.locator("input.ant-checkbox-input").first.wait_for(state="visible", timeout=10000)
+    await matched_row.locator("input.ant-checkbox-input").first.click()
+    await page.wait_for_timeout(500)
+    print("    OK Matched Deposit: checked")
+
+    pct_filled = False
+    for label in ["Bonus %", "Casino Credit %"]:
+        row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text=label))
+        if await row.count() > 0:
+            inp = row.locator("input.ant-input-number-input[step='1']").first
+            try:
+                await inp.wait_for(state="visible", timeout=3000)
+                await inp.click()
+                await inp.fill(pct)
+                await page.wait_for_timeout(500)
+                print(f"    OK {label}: {pct}")
+                pct_filled = True
+                break
+            except Exception:
+                continue
+    if not pct_filled:
+        raise Exception("Could not find the summary percentage field (tried 'Bonus %' and 'Casino Credit %')")
+
+    amount_filled = False
+    for card_title in ["Bonus", "Casino Credit"]:
+        card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text=card_title))
+        if await card.count() > 0:
+            try:
+                await fill_currency_amount(page, name, max_cc, scope=card, label=f"{card_title} Amount")
+                amount_filled = True
+                break
+            except Exception:
+                continue
+    if not amount_filled:
+        raise Exception("Could not find the Bonus/Casino Credit amount summary card")
+
+    min_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Minimum Deposit"))
+    await fill_currency_amount(page, name, min_deposit, scope=min_deposit_card, label="Minimum Deposit")
+
+    max_deposit_card = page.locator(".summaryCell").filter(has=page.locator(".ant-card-head-title", has_text="Maximum Deposit"))
+    await fill_currency_amount(page, name, "1000000", scope=max_deposit_card, label="Maximum Deposit")
+
+    status_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Status Active?']"))
+    await status_row.locator("input.ant-checkbox-input").click()
+    await page.wait_for_timeout(500)
+
+    act_start, act_end = parse_dates(name)
+    activation_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Activation Date"))
+    start_input = activation_row.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(act_start)
+    await page.keyboard.press("Enter")
+    end_input = activation_row.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(act_end)
+    await page.keyboard.press("Enter")
+    print(f"    OK Activation Dates: {act_start} -> {act_end} (fixed Tue->Thu / Fri->Sun window)")
+
+    segment_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Segment / Client Profiling"))
+    await segment_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type(name)
+    await page.wait_for_timeout(1000)
+    seg_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+    await seg_option.wait_for(state="visible", timeout=15000)
+    await seg_option.click()
+    await page.wait_for_timeout(500)
+
+    await page.locator("input[placeholder=\\"Bonus' internal name\\"]").click()
+    await page.wait_for_timeout(500)
+
+    promo_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Promotion Tile"))
+    promo_option = None
+    for attempt in range(1, 7):
+        await promo_tile_row.locator(".ant-select-selector").click()
+        await page.wait_for_timeout(500)
+        await page.keyboard.type(name)
+        candidate = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^" + re.escape(name) + r"$")).first
+        try:
+            await candidate.wait_for(state="visible", timeout=10000)
+            promo_option = candidate
+            break
+        except Exception:
+            print(f"    WARN Promotion Tile not found yet (attempt {attempt}/6) - retrying, NATS search index may be lagging...")
+            await page.keyboard.press("Escape")
+            await page.wait_for_timeout(1000)
+    if promo_option is None:
+        raise Exception(f"Promotion Tile option not found after 6 attempts: {name}")
+    await promo_option.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Promotion Tile: {name}")
+
+    reporting_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Reporting Platform Code']"))
+    await reporting_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("CAS (Casino)", exact=True).click()
+    await page.wait_for_timeout(500)
+
+    origin_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Origin']"))
+    await origin_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Opt-In Bonus", exact=True).click()
+    await page.wait_for_timeout(500)
+    print("    OK Bonus Origin: Opt-In Bonus")
+
+    series_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Series']"))
+    await series_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.keyboard.type("VIP")
+    await page.wait_for_timeout(500)
+    vip_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^VIP\$")).first
+    await vip_option.wait_for(state="visible", timeout=15000)
+    await vip_option.click()
+    await page.wait_for_timeout(500)
+    print("    OK Series: VIP")
+
+    type_row2 = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row2.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    type_option = page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(has_text=re.compile(r"^Retention\$")).first
+    await type_option.wait_for(state="visible", timeout=15000)
+    await type_option.click()
+    await page.wait_for_timeout(500)
+    print("    OK Type: Retention")
+
+    await page.locator("button.ant-btn-primary.save").click()
+    # v3.13 — Confirmation modal: none expected (Casino Credit, not FanCash).
+    # Defensive handler anyway (USVIPBGPM-style sweep): confirm if one appears.
+    modal = page.locator(".ant-modal-content")
+    try:
+        await modal.wait_for(state="visible", timeout=5000)
+        await modal.locator("button.ant-btn-primary").click()
+        print("    OK Confirmation modal appeared (unexpected for Casino Credit) — confirmed")
+    except Exception:
+        print("    -- No confirmation modal (expected for Casino Credit)")
+    await page.wait_for_load_state("networkidle")
+    await page.wait_for_timeout(2000)
+    print(f"  OK Bonus done: {name}")
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+
+async def main():
+    segment_codes = [c for c in CODES if c["do_segment"]]
+    promo_codes   = [c for c in CODES if c["do_promo"]]
+    bonus_codes   = [c for c in CODES if c["do_bonus"]]
+
+    # Fail-loud parse of every code (incl. the Tue/Fri weekday rule) before
+    # any PROD write, and Terms ID sanity per code.
+    for c in CODES:
+        parse_usvipdm(c["code_name"])
+        terms_id_for(c["code_name"])
+
+    # Pre-flight: verify image files exist before touching PROD
+    missing = []
+    for c in promo_codes:
+        for f in image_files_for(c["code_name"]):
+            p = os.path.join(IMAGE_FOLDER, f)
+            if not os.path.exists(p) and f not in missing:
+                missing.append(f)
+    if missing:
+        print("ABORT - missing image file(s) in the USA Deposit Matches folder:")
+        for f in missing:
+            print(f"   - {f}")
+        print(f"Folder: {IMAGE_FOLDER}")
+        sys.exit(1)
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=False)
+        context = await browser.new_context()
+        page = await context.new_page()
+        await page.goto(URL)
+        print("\\nPlease log in to the site in the browser window.")
+        print("   Once logged in, come back here and press Enter.\\n")
+        input("Press Enter when ready...")
+
+        if segment_codes:
+            print("\\n--- Creating Segments ---")
+            for attempt in range(1, 6):
+                await page.mouse.move(600, 400)
+                await page.wait_for_timeout(300)
+                await page.locator("[data-menu-id$='-segments']").hover()
+                await page.wait_for_timeout(500)
+                link = page.get_by_text("Account Segments", exact=True)
+                if await link.is_visible():
+                    await link.dispatch_event("click")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                print(f"  WARN Account Segments menu not visible (attempt {attempt}/5), retrying...")
+                await page.wait_for_timeout(500)
+            else:
+                raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+            for c in segment_codes:
+                await create_segment(page, c["code_name"])
+                await page.wait_for_timeout(1000)
+            print("\\nAll segments created!")
+        else:
+            print("\\nSkipping segments (none selected)")
+
+        if promo_codes:
+            await nav_to_promos(page)
+            print("\\n--- Creating Promotions ---")
+            for c in promo_codes:
+                await create_promo(page, c["code_name"])
+                await page.wait_for_timeout(1000)
+            print("\\nAll promotions created!")
+        else:
+            print("\\nSkipping promotions (none selected)")
+
+        if bonus_codes:
+            await nav_to_bonus(page)
+            print("\\n--- Creating Bonuses ---")
+            for c in bonus_codes:
+                await create_bonus(page, c["code_name"], c)
+                await page.wait_for_load_state("networkidle")
+                await page.wait_for_timeout(3000)
+            print("\\nAll bonuses created!")
+        else:
+            print("\\nSkipping bonuses (none selected)")
+
+        notify(f"US VIP Offer Library DM complete! {len(CODES)} codes created.")
+        print("\\nAll done!")
+        await browser.close()
+
+asyncio.run(main())
+`;
+}
+
 function buildVIPBGScript(allNames, imagePath, hiwText, tcText) {
   const isUS               = isVIPBGUS();  // v2.25 — US region (FanCash) vs CA (Casino Credit)
   const namesLines         = allNames.map(n => `    "${n.code}",`).join('\n');
@@ -12765,6 +13587,41 @@ function generateScript() {
         });
       });
       if (uvOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + uvOverlong.join('\n')); return; }
+    } else if (offerType === 'USVIPDM') {
+      // v3.13 - US VIP Offer Library - Deposit Matches (NATS-only). Codes:
+      // MMDDYY_US_VCAS_RET_OL_DM_CC_M{min}_{pct}M{max} (K-notation; 38-40 chars;
+      // three tiers land at exactly 40 - safe: US-only, no state suffix possible).
+      const udInfo = usvipdmInfoForDate(date);
+      if (!udInfo) { alert(`Day ${i + 1}: invalid date.`); return; }
+      if (!udInfo.isValid) { alert(`Day ${i + 1}: ${date} is a ${udInfo.weekday}. This offer runs on Tuesdays and Fridays only (filed 3-day Promo Periods). Script generation is blocked.`); return; }
+      const udOffers = (days[i].usvipdmOfferData || []).filter(o => o.active);
+      if (udOffers.length === 0) { alert(`Day ${i + 1} has a date but no tiers selected.`); return; }
+      const udSendToXP = days[i].usvipdmSendToXP !== false;
+      const udExternalBonus = days[i].usvipdmExternalBonus === true;
+      const udDaysToOptin = days[i].usvipdmDaysToOptin !== undefined ? days[i].usvipdmDaysToOptin : 3;
+      const udDaysToEntitlement = days[i].usvipdmDaysToEntitlement !== undefined ? days[i].usvipdmDaysToEntitlement : 3;
+      const udDaysToSettlement = days[i].usvipdmDaysToSettlement !== undefined ? days[i].usvipdmDaysToSettlement : 7;
+      const udOverlong = [];
+      udOffers.forEach(o => {
+        const code = `${date}_US_VCAS_RET_OL_DM_CC_${o.k}`;
+        if (code.length > 40) udOverlong.push(`${code} (${code.length})`);
+        allNames.push({
+          code: code,
+          min: o.min,
+          pct: o.pct,
+          max: o.max,
+          termsId: o.tid,
+          sendToXP: udSendToXP,
+          externalBonus: udExternalBonus,
+          daysToOptin: udDaysToOptin,
+          daysToEntitlement: udDaysToEntitlement,
+          daysToSettlement: udDaysToSettlement,
+          doSegment: days[i].doSegment !== false,
+          doPromo: days[i].doPromo !== false,
+          doBonus: days[i].doBonus !== false,
+        });
+      });
+      if (udOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + udOverlong.join('\n')); return; }
     } else if (offerType === 'DMCA') {
       const info = dmcaInfoForDate(date);
       if (!info) { alert(`Day ${i + 1}: invalid date.`); return; }
@@ -13220,6 +14077,8 @@ function generateScript() {
     script = buildDMCAScript(allNames, imagePath);
   } else if (offerType === 'USVIPBGPM') {
     script = buildUSVIPBGPMScript(allNames, imagePath);
+  } else if (offerType === 'USVIPDM') {
+    script = buildUSVIPDMScript(allNames, imagePath);
   } else if (offerType === 'DM') {
     script = buildDMScript(namesStr, campaignNamesStr, sendToXPStr, externalBonusStr, daysToOptinStr, daysToEntitlementStr, daysToSettlementStr, dmImagesStr, doSegmentStr, doPromoStr, doBonusStr, hiwText, tcText);
   } else if (offerType === 'CHURNDM') {
@@ -13731,7 +14590,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPBGPM' ? `vcl_bg_pm_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPBGPM' ? `vcl_bg_pm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPDM' ? `vcl_dm_us_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
