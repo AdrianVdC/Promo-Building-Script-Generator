@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.16</title>
+  <title>NATS Bonus Creator v3.17</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -755,6 +755,7 @@
           <option value="VIPDM">VIP Offer Library - Deposit Matches</option>
           <option value="VIPBG">VIP Offer Library - Bet &amp; Gets</option>
           <option value="DMCA">Daily Missions - Canada</option>
+          <option value="DMCA2">Daily Missions - Canada v2</option>
           <option value="USVIPBGPM">US VIP Offer Library - Bet &amp; Gets (Playmaker)</option>
           <option value="USVIPDM">US VIP Offer Library - Deposit Matches</option>
           <option value="USVIPLB">US VIP Offer Library - Lossbacks</option>
@@ -1285,6 +1286,7 @@ function getImagePath() {
   if (t === 'VIPDM') return localStorage.getItem(vipdmKey('vcl_dm_image_path')) || (isVIPDMUS() ? DEFAULT_VIPDM_IMAGE_PATH_US : DEFAULT_VIPDM_IMAGE_PATH);
   if (t === 'VIPBG') return localStorage.getItem(vipbgKey('vcl_bg_image_path')) || (isVIPBGUS() ? DEFAULT_VIPBG_IMAGE_PATH_US : DEFAULT_VIPBG_IMAGE_PATH);
   if (t === 'DMCA') return localStorage.getItem('daily_missions_image_path') || DEFAULT_DMCA_IMAGE_PATH;
+  if (t === 'DMCA2') return localStorage.getItem('daily_missions_v2_image_path') || DEFAULT_DMCA2_IMAGE_PATH;  // v3.17
   if (t === 'USVIPBGPM') return localStorage.getItem('vcl_bg_pm_image_path') || DEFAULT_USVIPBGPM_IMAGE_PATH;  // v3.9
   if (t === 'USVIPDM') return localStorage.getItem('vcl_dm_us_image_path') || DEFAULT_USVIPDM_IMAGE_PATH;  // v3.13
   if (t === 'USVIPLB') return localStorage.getItem('vcl_lb_us_image_path') || DEFAULT_USVIPLB_IMAGE_PATH;  // v3.14
@@ -1294,6 +1296,7 @@ const DEFAULT_USVIPBGPM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStora
 const DEFAULT_USVIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Deposit Matches";  // v3.13 — USVIPDM (same USA folder as old US VIPDM; creative replaced by the user)
 const DEFAULT_USVIPLB_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/USA/Offer Library Lossback - 3 Day Windows";  // v3.14 — USVIPLB (new folder)
 const DEFAULT_DMCA_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Daily Missions";
+const DEFAULT_DMCA2_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Bau Automations/Daily Missions v2";  // v3.17 — DMCA2 (new V2-only Drive folder, 1yvsnxmqFWhwJ6HbLF6_txJA3wHmWiXm7)
 const DEFAULT_CHURNDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM";
 const DEFAULT_CHURNDM_IMAGE_PATH_CA = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/Lifecycle Automations/Churn Risk DM - Canada";  // v3.8 — CA (Ontario) Churn DM creatives
 const DEFAULT_VIPDM_IMAGE_PATH = "/Users/adrian.vandecamp/Library/CloudStorage/GoogleDrive-adrian.vandecamp@betfanatics.com/Shared drives/Marketing Automations/VIP Automations/Offer Library/Canada/Deposit Matches";
@@ -2004,6 +2007,8 @@ function openModal(type) {
         : 'https://drive.google.com/drive/folders/1tkMs1dx-gszSGzlBHxgMYvOYv2l-2UjO')
       : lt === 'DMCA'
       ? 'https://drive.google.com/drive/folders/1w-o2bP7em8fkT86lwOtCu66jO57igRLh'
+      : lt === 'DMCA2'
+      ? 'https://drive.google.com/drive/folders/1yvsnxmqFWhwJ6HbLF6_txJA3wHmWiXm7'
       : lt === 'USVIPDM'
       ? 'https://drive.google.com/drive/folders/1W8GLxrZFBMotLP_WPzAE04KPPb__BxIX'
       : lt === 'USVIPLB'
@@ -2031,7 +2036,7 @@ function saveModal(type) {
   } else if (type === 'tc') {
     localStorage.setItem(t2 === 'BG' ? 'bg_tc' : t2 === 'DM' ? 'dm_tc' : t2 === 'FS' ? 'rtc_fs_tc' : t2 === 'LCREACT' ? 'lc_react_tc' : t2 === 'CHURNDM' ? 'lc_churn_dm_tc' : t2 === 'VIPDM' ? vipdmKey('vcl_dm_tc') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_tc') : rtcKey('rtc_tc'), document.getElementById('tc-textarea').value);
   } else if (type === 'images') {
-    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : t2 === 'USVIPBGPM' ? 'vcl_bg_pm_image_path' : t2 === 'USVIPDM' ? 'vcl_dm_us_image_path' : t2 === 'USVIPLB' ? 'vcl_lb_us_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
+    localStorage.setItem(t2 === 'BG' ? 'bg_image_path' : t2 === 'DM' ? 'dm_image_path' : t2 === 'FS' ? 'rtc_fs_image_path' : t2 === 'RAF' ? 'raf_image_path' : t2 === 'LCREACT' ? 'lc_react_image_path' : t2 === 'CHURNDM' ? (isChurnCanada() ? 'lc_churn_dm_image_path_ca' : 'lc_churn_dm_image_path') : t2 === 'VIPDM' ? vipdmKey('vcl_dm_image_path') : t2 === 'VIPBG' ? vipbgKey('vcl_bg_image_path') : t2 === 'DMCA' ? 'daily_missions_image_path' : t2 === 'DMCA2' ? 'daily_missions_v2_image_path' : t2 === 'USVIPBGPM' ? 'vcl_bg_pm_image_path' : t2 === 'USVIPDM' ? 'vcl_dm_us_image_path' : t2 === 'USVIPLB' ? 'vcl_lb_us_image_path' : rtcKey('rtc_image_path'), document.getElementById('images-path').value);
   }
   closeModal(type);
 }
@@ -2327,7 +2332,7 @@ function initDays() {
     updateGenerateButton();
     return;
   }
-  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA' || t === 'USVIPBGPM' || t === 'USVIPLB') ? 3 : (t === 'VIPDM' || t === 'VIPBG' || t === 'USVIPDM') ? 1 : NUM_DAYS;
+  const numDays = (t === 'BG' || t === 'DM' || t === 'BGRE' || t === 'CHURNDM') ? 4 : t === 'FS' ? 8 : (t === 'LCREACT' || t === 'DMCA' || t === 'DMCA2' || t === 'USVIPBGPM' || t === 'USVIPLB') ? 3 : (t === 'VIPDM' || t === 'VIPBG' || t === 'USVIPDM') ? 1 : NUM_DAYS;
   const fsJurisdictionDefaults = ['MI', 'NJ', 'WV', 'PA'];
   days = Array.from({ length: numDays }, (_, i) => ({
     date: '',
@@ -2347,6 +2352,8 @@ function initDays() {
     usvipdmDaysToSettlement: 7,
     dmcaDaysToUseReward: 7,
     dmcaReward: null, // v3.6 — null = weekday default (see DMCA_DAY_REWARDS)
+    dmca2DaysToUseReward: 7,
+    dmca2Reward: null, // v3.17 — null = default (Casino Credit on all 7 days)
     fsSendToXP: true,
     fsDaysToOptin: 1,
     fsDaysToEntitlement: 1,
@@ -2720,6 +2727,140 @@ function dmcaDateInput(i, val) {
   if (pill) pill.innerHTML = dmcaPillHTML(i, info);
 }
 
+
+// ── Daily Missions - Canada v2 (DMCA2) — v3.17; DMCA2_Handoff_Spec_v1_0 ────────
+// Code shapes are IDENTICAL to V1 by stakeholder decision — NEVER build V1 and V2
+// for the same calendar date (identical codes would collide in NATS/Playmaker).
+// V1 retires at V2 go-live; a hard cutover date is set during handover.
+// Window (all 36 filings): October 1, 2026 → December 31, 2026.
+// Tuesday's 30-step CAD ladder is dump-verified (Oct 5, 2026); Thursday's and
+// Saturday's are assumed identical per stakeholder confirmation — the generated
+// script's dump-and-hard-fail stakes guard backstops; confirm on each weekday's
+// first watched PROD FS run.
+const DMCA2_LADDER_LW = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60','1.80','2.00','2.40','3.00','3.60','4.00','4.80','5.00','6.00','8.00','10.00','12.00','14.00','15.00','16.00','18.00','20.00','24.00','25.00','30.00','35.00','40.00'];
+// Per-weekday game config. name = AS FILED (renders in HIW/T&C/toast verbatim);
+// search = the pre-suffix catalog search string (catalog names carry an
+// "(ON | {AGG})" suffix; matching is TM/case/apostrophe-tolerant at runtime).
+// locked: the four Pragmatic titles are NOT yet set up in Playmaker — Set 1
+// weekday FS ships locked (v2.28 precedent); a point release unlocks them after
+// the game/ladder dry-run sweep. Expected home: PRAGMATIC / PRAGMATICPLAY.
+const DMCA2_GAMES = {
+  Monday:    { name: 'Gates of Olympus 1000', locked: true },
+  Tuesday:   { name: "Huff N' Puff High Rise", search: "Huff N' Puff High Rise", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
+  Wednesday: { name: 'Sugar Rush Super Scatter', locked: true },
+  Thursday:  { name: "Huff N' Puff Money Mansion", search: "Huff N' Puff Money Mansion", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
+  Friday:    { name: 'Big Bass Bonanza', locked: true },
+  Saturday:  { name: "Huff N' Even More Puff GRAND", search: "Huff N' Even More Puff", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
+  Sunday:    { name: 'Sweet Bonanza 1000', locked: true },
+};
+// CC tier sets by the typed date's weekday (Set 1 = Mon/Wed/Fri/Sun, Set 2 =
+// Tue/Thu/Sat). Filings CAS_CA_0158–0165, attached + word-verified.
+const DMCA2_CC_TIERS = {
+  1: [
+    { bet: '75',    get: '5',   tid: 'CAS_CA_0158' },
+    { bet: '150',   get: '15',  tid: 'CAS_CA_0159' },
+    { bet: '800',   get: '75',  tid: 'CAS_CA_0160' },
+    { bet: '7500',  get: '500', tid: 'CAS_CA_0161' },
+  ],
+  2: [
+    { bet: '100',   get: '5',   tid: 'CAS_CA_0162' },
+    { bet: '200',   get: '10',  tid: 'CAS_CA_0163' },
+    { bet: '1000',  get: '50',  tid: 'CAS_CA_0164' },
+    { bet: '10000', get: '500', tid: 'CAS_CA_0165' },
+  ],
+};
+// FS tier sets (filings CAS_CA_0112–0135 + 0138–0141; 0136/0137 filer-skipped —
+// a numbering gap, not missing tiers). value = AS FILED ("$1" no decimals vs
+// "$2.00" — deliberately inconsistent; renders verbatim in the T&C); stake = the
+// ladder-normalized token the Playmaker grid shows; vtok = cents (discover
+// filenames append V: ..._20V.png). FS T1–T4 codes index into the weekday's set.
+const DMCA2_FS_TIERS = {
+  1: [
+    { bet: '50',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Monday: 'CAS_CA_0112', Wednesday: 'CAS_CA_0124', Friday: 'CAS_CA_0116', Sunday: 'CAS_CA_0138' } },
+    { bet: '125',  spins: '30',  value: '0.40', stake: '0.40', vtok: '40',  tids: { Monday: 'CAS_CA_0113', Wednesday: 'CAS_CA_0125', Friday: 'CAS_CA_0117', Sunday: 'CAS_CA_0139' } },
+    { bet: '500',  spins: '50',  value: '1',    stake: '1.00', vtok: '100', tids: { Monday: 'CAS_CA_0114', Wednesday: 'CAS_CA_0126', Friday: 'CAS_CA_0118', Sunday: 'CAS_CA_0140' } },
+    { bet: '5000', spins: '250', value: '2.00', stake: '2.00', vtok: '200', tids: { Monday: 'CAS_CA_0115', Wednesday: 'CAS_CA_0127', Friday: 'CAS_CA_0119', Sunday: 'CAS_CA_0141' } },
+  ],
+  2: [
+    { bet: '25',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Tuesday: 'CAS_CA_0120', Thursday: 'CAS_CA_0128', Saturday: 'CAS_CA_0132' } },
+    { bet: '75',   spins: '25',  value: '0.60', stake: '0.60', vtok: '60',  tids: { Tuesday: 'CAS_CA_0121', Thursday: 'CAS_CA_0129', Saturday: 'CAS_CA_0133' } },
+    { bet: '300',  spins: '100', value: '0.60', stake: '0.60', vtok: '60',  tids: { Tuesday: 'CAS_CA_0122', Thursday: 'CAS_CA_0130', Saturday: 'CAS_CA_0134' } },
+    { bet: '2500', spins: '125', value: '4.00', stake: '4.00', vtok: '400', tids: { Tuesday: 'CAS_CA_0123', Thursday: 'CAS_CA_0131', Saturday: 'CAS_CA_0135' } },
+  ],
+};
+// v3.17 — BOTH rewards are structurally selectable on every weekday (the V1
+// weekday-lock model is dropped); default = Casino Credit on all 7 days (CC
+// first). FS availability is then gated by DMCA2_GAMES[weekday].locked (the
+// Pragmatic titles).
+const DMCA2_DAY_REWARDS = {
+  Sunday:    ['CC', 'FS'],
+  Monday:    ['CC', 'FS'],
+  Tuesday:   ['CC', 'FS'],
+  Wednesday: ['CC', 'FS'],
+  Thursday:  ['CC', 'FS'],
+  Friday:    ['CC', 'FS'],
+  Saturday:  ['CC', 'FS'],
+};
+function dmca2InfoForDate(dateStr) {
+  if (!dateStr || !/^\d{6}$/.test(dateStr)) return null;
+  const mm = parseInt(dateStr.slice(0,2), 10), dd = parseInt(dateStr.slice(2,4), 10), yy = 2000 + parseInt(dateStr.slice(4,6), 10);
+  const dt = new Date(yy, mm - 1, dd);
+  if (dt.getMonth() !== mm - 1 || dt.getDate() !== dd) return null;
+  const names = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const weekday = names[dt.getDay()];
+  const set = (dt.getDay() === 2 || dt.getDay() === 4 || dt.getDay() === 6) ? 2 : 1;  // Tue/Thu/Sat = Set 2
+  return { weekday, set, game: DMCA2_GAMES[weekday] || null };
+}
+function dmca2AllowedRewards(info) {
+  if (!info) return [];
+  const base = DMCA2_DAY_REWARDS[info.weekday] || ['CC'];
+  // Pragmatic lock: FS is only selectable where the weekday's game is live in Playmaker
+  return base.filter(r => r !== 'FS' || (info.game && !info.game.locked));
+}
+function dmca2SyncWeekday(i) {
+  const info = dmca2InfoForDate(days[i].date);
+  const w = info ? info.weekday : null;
+  if (days[i].dmca2LastWeekday !== w) { days[i].dmca2LastWeekday = w; days[i].dmca2Reward = null; }
+  return info;
+}
+function dmca2EffectiveReward(i, info) {
+  if (!info) return null;
+  const allowed = dmca2AllowedRewards(info);
+  return allowed.includes(days[i].dmca2Reward) ? days[i].dmca2Reward : allowed[0];
+}
+function dmca2SetReward(i, r) {
+  const info = dmca2InfoForDate(days[i].date);
+  if (!info || !dmca2AllowedRewards(info).includes(r)) return;
+  days[i].dmca2Reward = r;
+  days[i].dmca2LastWeekday = info.weekday;
+  renderAll();
+  updateGenerateButton();
+}
+function dmca2CCData(i, info) {
+  const key = 'dmca2CC' + info.set;
+  if (!days[i][key]) days[i][key] = DMCA2_CC_TIERS[info.set].map(o => ({ ...o, active: false }));
+  return days[i][key];
+}
+function dmca2FSData(i, info) {
+  const key = 'dmca2FS' + info.set;
+  if (!days[i][key]) days[i][key] = DMCA2_FS_TIERS[info.set].map(o => ({ ...o, active: false }));
+  return days[i][key];
+}
+function dmca2PillHTML(i, info) {
+  if (!info) return '';
+  const reward = dmca2EffectiveReward(i, info);
+  const setLabel = `Set ${info.set}`;
+  if (reward === 'CC') return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(160,208,112,0.12); color:#a0d070; border:1px solid rgba(160,208,112,0.4);">${info.weekday} \u2022 ${setLabel} \u2022 Casino Credit</span>`;
+  return `<span style="margin-left:12px; font-size:12px; font-family:'SF Mono',ui-monospace,monospace; padding:5px 12px; border-radius:6px; background:rgba(240,176,64,0.10); color:#f0b040; border:1px solid rgba(240,176,64,0.4);">${info.weekday} \u2022 ${setLabel} \u2022 Bonus Spins \u2014 ${info.game ? info.game.name : ''}</span>`;
+}
+function dmca2DateInput(i, val) {
+  days[i].date = val.trim();
+  const info = dmca2SyncWeekday(i);
+  updateGenerateButton();
+  const pill = document.getElementById('dmca2-pill-' + i);
+  if (pill) pill.innerHTML = dmca2PillHTML(i, info);
+}
+
 function getOfferType() {
   return document.getElementById('offer-type-select') ? document.getElementById('offer-type-select').value : 'RTC';
 }
@@ -3024,6 +3165,17 @@ const INFO_DMCA = `<ul>
   <li><strong>Toast:</strong> always ON \u2014 "Mission Complete! You have been awarded $X Casino Credit".</li>
 </ul>`;
 
+const INFO_DMCA2 = `<ul>
+  <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (36 new filings, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">\u26a0\ufe0f NEVER build V1 and V2 for the same calendar date</span> \u2014 the code shapes are identical by stakeholder decision and would collide in NATS/Playmaker. V1 retires at V2 go-live (hard cutover date set during handover).</li>
+  <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
+  <li><strong>Bonus Spins \u2014 \u26a0\ufe0f Mon/Wed/Fri/Sun locked:</strong> the four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are <span style="color:#ffffff;">not yet set up in Playmaker</span> \u2014 Set 1 weekday FS ships locked (v2.28 precedent); a point release unlocks it after the game/ladder dry-run sweep. <span style="color:#ffffff;">Tue/Thu/Sat FS is live</span> (Light &amp; Wonder under OGS/LIGHTANDWONDER, Bet Level 20+0): Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; FS Terms CAS_CA_0112\u20130135 + 0138\u20130141 (0136/0137 filer-skipped). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
+  <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops.</li>
+  <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
+  <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2: "Play" \u2192 /docs/usered/CanadaDailyMissions. T&amp;Cs are two canonical baked templates word-verified against all 36 attached filings. <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
+  <li><strong>Images (84-file manifest, Drive-validated):</strong> new V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
+</ul>`;
+
+
 const INFO_DM = `<ul>
   <li><strong>How it Works:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. There is also a dynamic field for the promotion run dates.</li>
   <li><strong>Terms &amp; Conditions:</strong> This copy is always the same with a dynamic field entered to account for different percentage and max bonus amounts, which varies for each code. T&amp;Cs are submitted to regulators every 6 months in the United States. <span style="color:#ffffff;">Please reach out to Adrian Van de Camp on Slack if the T&amp;Cs need to be updated after legal sign-off.</span></li>
@@ -3084,11 +3236,11 @@ const INFO_USVIPBGPM = `<ul>
 
 
   const type = getOfferType();
-  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : type === 'USVIPBGPM' ? INFO_USVIPBGPM : type === 'USVIPDM' ? INFO_USVIPDM : type === 'USVIPLB' ? INFO_USVIPLB : INFO_RTC;
+  document.getElementById('info-offer-type').innerHTML = type === 'BG' ? INFO_BG : type === 'DM' ? INFO_DM : type === 'FS' ? INFO_FS : type === 'RAF' ? INFO_RAF : type === 'SUO' ? INFO_SUO : type === 'LCREACT' ? INFO_LCREACT : type === 'CHURNDM' ? INFO_CHURNDM : type === 'VIPDM' ? INFO_VIPDM : type === 'VIPBG' ? INFO_VIPBG : type === 'DMCA' ? INFO_DMCA : type === 'DMCA2' ? INFO_DMCA2 : type === 'USVIPBGPM' ? INFO_USVIPBGPM : type === 'USVIPDM' ? INFO_USVIPDM : type === 'USVIPLB' ? INFO_USVIPLB : INFO_RTC;
   document.getElementById('btn-edit-images').style.display = (type === 'DM' || type === 'BG' || type === 'SUO' || type === 'BGRE') ? 'none' : '';
-  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
-  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
-  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
+  document.querySelector('.btn-edit-hiw').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'DMCA2' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
+  document.querySelector('.btn-edit-tc').style.display = (type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'DMCA2' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
+  document.getElementById('global-region-row').style.display = (type === 'FS' || type === 'RAF' || type === 'SUO' || type === 'BGRE' || type === 'DMCA' || type === 'DMCA2' || type === 'USVIPBGPM' || type === 'USVIPDM' || type === 'USVIPLB') ? 'none' : '';
   updateJurisdictionOptions(type);
   initDays();
   renderAll();
@@ -3403,6 +3555,7 @@ function renderAll() {
   const isVIPDM = getOfferType() === 'VIPDM';
   const isVIPBG = getOfferType() === 'VIPBG';
   const isDMCA = getOfferType() === 'DMCA';
+  const isDMCA2 = getOfferType() === 'DMCA2';
   const isUSVIPBGPM = getOfferType() === 'USVIPBGPM';
   const isUSVIPDM = getOfferType() === 'USVIPDM';
   const isUSVIPLB = getOfferType() === 'USVIPLB';
@@ -3743,6 +3896,87 @@ function renderAll() {
         <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:01 this date \u2192 00:01 next day.</p>
         ${dmcaRewardSelectorHTML}
         ${dmcaTiersHTML}
+      `;
+
+    } else if (isDMCA2) {
+      if (days[i].dmca2DaysToUseReward === undefined) days[i].dmca2DaysToUseReward = 7;
+      const d2Info = dmca2SyncWeekday(i);
+      const d2Reward = dmca2EffectiveReward(i, d2Info);
+      const d2Allowed = dmca2AllowedRewards(d2Info);
+      const d2IsFS = d2Reward === 'FS';
+      const d2FSLocked = d2Info && d2Info.game && d2Info.game.locked;
+      const d2RewardSelectorHTML = d2Info ? `
+        <div style="display:flex; align-items:center; gap:8px; margin:6px 0 10px;">
+          <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Reward</span>
+          ${[['CC','Casino Credit'],['FS','Bonus Spins']].map(([r, label]) => {
+            const allowed = d2Allowed.includes(r);
+            const sel = d2Reward === r;
+            const style = sel
+              ? 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:1px solid var(--accent, #4a9eff); background:rgba(74,158,255,0.15); color:#ffffff;'
+              : allowed
+                ? 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted);'
+                : 'padding:5px 14px; border-radius:6px; font-size:12px; cursor:not-allowed; border:1px dashed var(--border); background:transparent; color:var(--muted); opacity:0.45;';
+            return `<button type="button" ${allowed ? `onclick="dmca2SetReward(${i}, '${r}')"` : 'disabled'} title="${allowed ? '' : 'Bonus Spins on Mon/Wed/Fri/Sun is locked \u2014 the Pragmatic titles are not yet set up in Playmaker (a point release unlocks them after the game/ladder dry run)'}" style="${style}">${label}</button>`;
+          }).join('')}
+          ${d2FSLocked ? `<span style="font-size:11px; color:#f0b040; font-family:'SF Mono',ui-monospace,monospace;">\u26a0 ${d2Info.game.name} not yet in Playmaker \u2014 FS locked on ${d2Info.weekday}</span>` : ''}
+        </div>` : '';
+      let d2TiersHTML = '';
+      if (d2Info && d2IsFS) {
+        const d2Game = d2Info.game;
+        const d2FSRows = dmca2FSData(i, d2Info);
+        d2TiersHTML = `
+          <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Spins) \u2014 Set ${d2Info.set} \u2022 ${d2Info.weekday} terms \u2014 ${d2Game ? d2Game.name : ''}</span>
+          ${d2FSRows.map((o, j) => {
+            const tid = o.tids ? o.tids[d2Info.weekday] : null;
+            const stakeOK = d2Game && d2Game.stakes && d2Game.stakes.includes(o.stake);
+            return `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
+              <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].dmca2FS${d2Info.set}[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
+              <span style="flex:1;">Bet ${dmcaFmtMoney(o.bet)} \u2192 ${o.spins} Spins @ $${o.value} (filed)</span>
+              ${!stakeOK ? `<span style="font-size:11px; color:#ff6b6b;">$${o.stake} not in the ladder</span>` : ''}
+              <span style="font-size:11px; color:${tid ? '#a0d070' : '#ff6b6b'};">${tid || 'no ID'}</span>
+            </div>`; }).join('')}
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Use Reward</span>
+            <input type="number" min="1" value="${days[i].dmca2DaysToUseReward}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].dmca2DaysToUseReward = parseInt(this.value) || 7;" />
+          </div>
+          <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "Mission Complete! You have been awarded {spins} Bonus Spins to ${d2Game ? d2Game.name : ''}"</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Playmaker: ${d2Game && !d2Game.locked ? `${d2Game.aggregator} / ${d2Game.provider} \u2022 Bet Level ${d2Game.betLevel}` : ''} \u2022 Title "${d2Info.weekday}'s Slots Mission"</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${d2Info.weekday}_BS_</span>Promo_Detail / <span style="color:#ffffff;">${d2Info.weekday}_BS_</span>Masthead / <span style="color:#ffffff;">${d2Info.weekday}_</span>B{bet}_G{spins}S_{vtok}V.png</p>`;
+      } else if (d2Info) {
+        const d2CCRows = dmca2CCData(i, d2Info);
+        d2TiersHTML = `
+          <span class="field-label" style="margin-top:12px;">Offers (Bet \u2192 Get) \u2014 Set ${d2Info.set} terms (${d2Info.set === 1 ? 'CAS_CA_0158\u20130161' : 'CAS_CA_0162\u20130165'})</span>
+          ${d2CCRows.map((o, j) => `
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid ${o.active ? 'var(--accent, #4a9eff)' : 'var(--border)'}; border-radius:6px; margin-bottom:6px; font-family:'SF Mono',ui-monospace,monospace; font-size:13px; ${o.active ? 'background:rgba(74,158,255,0.06);' : ''}">
+              <input type="checkbox" ${o.active ? 'checked' : ''} onchange="days[${i}].dmca2CC${d2Info.set}[${j}].active = this.checked; renderAll(); updateGenerateButton();" style="width:15px; height:15px;" />
+              <span style="flex:1;">Bet ${dmcaFmtMoney(o.bet)} \u2192 Get ${dmcaFmtMoney(o.get)} CC</span>
+              <span style="font-size:11px; color:#a0d070;">${o.tid}</span>
+            </div>`).join('')}
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+            <span style="font-size:13px; color:var(--muted); white-space:nowrap;">Days to Use Reward</span>
+            <input type="number" min="1" value="${days[i].dmca2DaysToUseReward}" style="width:60px; text-align:center; font-family:'SF Mono',ui-monospace,monospace; font-size:13px;"
+              oninput="days[${i}].dmca2DaysToUseReward = parseInt(this.value) || 7;" />
+          </div>
+          <p style="margin-top:12px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Toast: <span style="color:#ffffff;">always ON</span> \u2014 "Mission Complete! You have been awarded {credit} Casino Credit" \u2022 Title "${d2Info.weekday}'s Casino Mission"</p>
+          <p style="margin-top:6px; font-size:12px; color:var(--muted); font-family:'SF Mono',ui-monospace,monospace;">Images auto-resolve to <span style="color:#ffffff;">${d2Info.weekday}_CC_</span>Promo_Detail / <span style="color:#ffffff;">${d2Info.weekday}_CC_</span>Masthead / <span style="color:#ffffff;">${d2Info.weekday}_</span>B{bet}_G{get}.png</p>`;
+      }
+      card.innerHTML = `
+        <div class="day-header">
+          <span class="day-number">Day ${i + 1}</span>
+          <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
+        </div>
+        ${stepBadgesHTML(i)}
+        <span class="field-label">Date (MMDDYY)</span>
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <input type="text" id="date-input-${i}" maxlength="6" placeholder="e.g. 120126" value="${day.date}"
+            oninput="dmca2DateInput(${i}, this.value)" onchange="days[${i}].date = this.value.trim(); renderAll(); updateGenerateButton();" style="width: 120px;" />
+          <span id="dmca2-pill-${i}">${dmca2PillHTML(i, d2Info)}</span>
+        </div>
+        <p style="font-size:11px; color:var(--muted); margin:0 0 4px; font-family:'SF Mono',ui-monospace,monospace;">Promo runs this date 00:00:00 \u2192 23:59:59 ET. Bonus: 00:01 this date \u2192 00:01 next day. \u26a0 Never build V1 and V2 for the same date.</p>
+        ${d2RewardSelectorHTML}
+        ${d2TiersHTML}
       `;
 
     } else if (isUSVIPBGPM) {
@@ -4315,6 +4549,13 @@ function resetDay(i) {
   days[i].dmcaDaysToUseReward = 7;
   days[i].dmcaReward = null;          // v3.6 — back to the weekday default
   days[i].dmcaLastWeekday = undefined;
+  days[i].dmca2CC1 = DMCA2_CC_TIERS[1].map(o => ({ ...o, active: false }));   // v3.17
+  days[i].dmca2CC2 = DMCA2_CC_TIERS[2].map(o => ({ ...o, active: false }));
+  days[i].dmca2FS1 = DMCA2_FS_TIERS[1].map(o => ({ ...o, active: false }));
+  days[i].dmca2FS2 = DMCA2_FS_TIERS[2].map(o => ({ ...o, active: false }));
+  days[i].dmca2DaysToUseReward = 7;
+  days[i].dmca2Reward = null;
+  days[i].dmca2LastWeekday = undefined;
   days[i].bgreRewardType = 'FC';
   days[i].bgreJurisdiction = 'US';
   days[i].bgreDaysToUseReward = 7;
@@ -4775,7 +5016,7 @@ function selectAllBGREOffers(i) {
 
 function clearSettings() {
   if (!confirm('Clear all saved HIW, T&Cs, and image paths? This cannot be undone.')) return;
-  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','vcl_bg_pm_image_path','vcl_dm_us_image_path','vcl_lb_us_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
+  ['rtc_hiw','rtc_tc','rtc_tc_ca','rtc_image_path','rtc_image_path_ca','bg_hiw','bg_tc','bg_image_path','dm_hiw','dm_tc','dm_image_path','rtc_fs_hiw','rtc_fs_tc','rtc_fs_image_path','raf_image_path','daily_missions_image_path','daily_missions_v2_image_path','vcl_bg_pm_image_path','vcl_dm_us_image_path','vcl_lb_us_image_path','lc_react_hiw','lc_react_tc','lc_react_image_path','lc_churn_dm_hiw','lc_churn_dm_tc','lc_churn_dm_image_path','lc_churn_dm_image_path_ca','vcl_dm_hiw','vcl_dm_tc','vcl_dm_image_path','vcl_dm_terms_ids','vcl_dm_terms_start_date','vcl_dm_terms_end_date','vcl_dm_hiw_us','vcl_dm_tc_us','vcl_dm_image_path_us','vcl_dm_terms_ids_us','vcl_dm_terms_start_date_us','vcl_dm_terms_end_date_us','vcl_bg_hiw','vcl_bg_tc','vcl_bg_image_path','vcl_bg_terms_ids','vcl_bg_terms_start_date','vcl_bg_terms_end_date','vcl_bg_hiw_us','vcl_bg_tc_us','vcl_bg_image_path_us','vcl_bg_terms_ids_us','vcl_bg_terms_start_date_us','vcl_bg_terms_end_date_us','rtc_terms_ids','rtc_terms_ids_ca','rtc_terms_start_date','rtc_terms_start_date_ca','rtc_terms_end_date','rtc_terms_end_date_ca'].forEach(k => localStorage.removeItem(k));
   alert('Saved settings cleared. Defaults will now load for both offer types.');
 }
 
@@ -5950,6 +6191,15 @@ function updateGenerateButton() {
         ? (d.dmcaOfferData || []).filter(o => o.active)
         : (d.dmcaFSOfferData || []).filter(o => o.active);
       if (info && offers.length > 0) { ready = true; break; }
+    } else if (offerType === 'DMCA2') {
+      const d2i = dmca2InfoForDate(date);
+      if (d2i) {
+        const d2r = dmca2EffectiveReward(i, d2i);
+        const d2offers = d2r === 'FS'
+          ? dmca2FSData(i, d2i).filter(o => o.active)
+          : dmca2CCData(i, d2i).filter(o => o.active);
+        if (d2offers.length > 0) { ready = true; break; }
+      }
     } else if (offerType === 'DM') {
       const offers = (d.dmOfferData || []).filter(o => o.active);
       if (offers.length > 0) { ready = true; break; }
@@ -12423,6 +12673,1017 @@ asyncio.run(main())
 `;
 }
 
+function buildDMCA2Script(allNames, imagePath) {
+  const codesStr = allNames.map(n => `    {
+        "code_name":       "${n.code}",
+        "reward":          "${n.reward}",
+        "weekday":         "${n.weekday}",
+        "bet":             "${n.bet}",
+        "get":             "${n.get}",
+        "spins":           "${n.spins}",
+        "spin_value":      "${n.spinValue}",
+        "stake":           "${n.stake}",
+        "vtok":            "${n.vtok}",
+        "game_name":       "${n.gameName}",
+        "game_search":     "${n.gameSearch}",
+        "aggregator":      "${n.aggregator}",
+        "provider":        "${n.provider}",
+        "bet_level":       "${n.betLevel}",
+        "terms_id":        "${n.termsId}",
+        "days_to_fulfill": "${n.daysToUseReward}",
+        "do_segment":      ${n.doSegment !== false ? 'True' : 'False'},
+        "do_promo":        ${n.doPromo ? 'True' : 'False'},
+        "do_bonus":        ${n.doBonus ? 'True' : 'False'},
+    },`).join('\n');
+
+  return `"""
+Daily Missions - Canada v2 Auto-Generated Script
+Generated by NATS Bonus Creator v3.17
+
+Phase 1 (NATS, production):     builds Account Segments, then Promotions
+Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
+                                 The segment is attached via the "Existing Account Segments" field
+                                 (the "Create Account Segments" field is never used as of v2.31).
+
+v3.17 (DMCA2): both rewards are selectable on every weekday card (default: Casino
+Credit on all 7 days); the weekday selects the TIER SET (Set 1 = Mon/Wed/Fri/Sun,
+Set 2 = Tue/Thu/Sat) and, for Bonus Spins, the game. FS is currently available on
+Tue/Thu/Sat only (Light & Wonder); the four Pragmatic titles for Mon/Wed/Fri/Sun are
+not yet set up in Playmaker (generation is locked upstream until a point release).
+Playmaker FS flow (dry-run-verified Oct 5, 2026): a mandatory Bet Level combobox sits
+between Casino Game and the stakes grid; the grid renders empty until the level is
+picked and mounts up to several seconds later (polled). A Create form is NEVER reused
+across games (a game switch in one form leaves the stakes grid permanently unmounted)
+- each bonus opens a fresh Create form. Catalog names carry an "(ON | {AGG})" suffix;
+matching is pre-suffix, TM/case/apostrophe-tolerant; toast and T&C render the game
+name AS FILED. Masthead / Promo Detail creatives are reward-scoped:
+{Weekday}_CC_Masthead.png / {Weekday}_BS_Masthead.png (same for _Promo_Detail).
+
+!! OPERATIONAL RULE: never build Daily Missions V1 and V2 for the same calendar
+date - the code shapes are identical by stakeholder decision and would collide in
+NATS/Playmaker. V1 retires at V2 go-live (hard cutover date set during handover).
+"""
+
+import asyncio
+import os
+import re
+import subprocess
+import sys
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from playwright.async_api import async_playwright
+
+EASTERN = ZoneInfo("America/New_York")
+
+NATS_URL      = "https://trading.1.betfanatics.com/"
+PLAYMAKER_URL = "https://playmaker-internal.1.betfanatics.com/home"
+
+IMAGE_FOLDER = "${imagePath}"
+
+# v3.5 - Button 2 (identical for all tiers, all days)
+BUTTON2_LABEL = "Play"
+BUTTON2_LINK  = "/docs/usered/CanadaDailyMissions"
+
+# Ontario legal filing window (baked in at generation time)
+TERMS_START_LONG = "October 1, 2026"
+TERMS_END_LONG   = "December 31, 2026"
+
+CODES = [
+${codesStr}
+]
+
+# ── Copy templates ─────────────────────────────────────────────────────────────
+HIW_CC_TEMPLATE = """1) Opt in
+2) Place {bet_fmt}+ in cumulative cash wagers on any Fanatics Casino games before 11:59pm ET tonight
+3) We'll reward you with {get_fmt} in Casino Credit to use on any game on Fanatics Casino"""
+
+TC_CC_TEMPLATE = """PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) \\u2013 BET {bet_fmt} CAD, GET {get_fmt} CAD IN CASINO CREDIT ({terms_id})
+
+1.   Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (\\u201cFanatics Casino\\u201d). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer are eligible to receive {get_fmt} CAD in Casino Credit (\\u201cRewards\\u201d). Your twenty-four (24) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
+2.   Promotional Period
+This \\u201cPromotion\\u201d begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (\\u201cPromotional Period\\u201d).
+3.   Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (\\u201cAccount\\u201d). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+4.   Action Required
+To be eligible for the Rewards: (i) each time you are eligible for this Promotion, you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 24 hours of satisfying the wagering requirement. You will receive {get_fmt} CAD in Casino Credit.
+5.   Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+Casino Credit expires seven (7) days from issuance (at 11:59 p.m. ET).
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+Casino Credit can be combined with deposited funds (cash) to place a wager. As an example, if you have $20 CAD in cash and $2 CAD in Casino Credit in your Account and you wager $5 CAD on a blackjack hand, $2 CAD in Casino Credit and $3 CAD in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $2 CAD in Casino Credit and place a $1 CAD wager, $1 CAD of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you wager $2 CAD in Casino Credit on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $2 CAD stake will be added to your cash balance).
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Casino Credit may not be exchanged, substituted, or transferred.
+6.   Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino\\u2019s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+7.   Limitations on Participation
+Limit one (1) Reward per customer, up to a maximum of {get_fmt} CAD in Casino Credit, each time you are eligible for this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino\\u2019s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+8.   Wagering Requirements/Exclusions
+Bets must be placed with cash (CAD). Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement.
+9.   Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+10.   Eligible Games
+Cash wagers can be placed on any games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. Rewards issued with this Promotion can be used on any Fanatics Casino games and expire seven (7) days from the date of issuance (at 11:59 p.m. ET).
+11.   Restrictions on Withdrawal
+Casino Credit or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+12.   Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+13.   Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+14.   Other
+Participation in this Promotion is subject to Fanatics Casino\\u2019s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino\\u2019s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino\\u2019s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to \\u201cyou\\u201d or \\u201cyour\\u201d throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control."""
+
+HIW_FS_TEMPLATE = """1) Opt in
+2) Place {bet_fmt}+ in cumulative cash wagers on any slot games on Fanatics Casino before 11:59pm ET tonight
+3) We'll reward you with {spins} Bonus Spins to use on {game_name}"""
+
+# Word-verified against all 28 v2 filings (CAS_CA_0112-0135 + 0138-0141; 0136/0137
+# filer-skipped) by verify_dmca2_runtime_v0_1.py. v2 delta vs V1: the wagering
+# requirement is slots-only as filed ("on any slot games in the Fanatics Casino",
+# sections 1, 4, and 10). Spin values render AS FILED per tier ({spin_value}:
+# "$1" vs "$2.00" formatting is deliberately inconsistent in the filings).
+TC_FS_TEMPLATE = """PROMOTIONAL TERMS AND CONDITIONS
+FANATICS CASINO (CANADA) \\u2013 BET {bet_fmt} CAD, GET {spins} BONUS SPINS ({terms_id})
+
+1.   Description of Promotion
+This promotion is offered by FBG Enterprises Canada, Inc. (\\u201cFanatics Casino\\u201d). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any slot games in the Fanatics Casino within twenty-four (24) hours of receiving this offer are eligible to receive {spins} Bonus Spins (valued at \${spin_value} CAD each) to use on the slots game {game_name} (\\u201cRewards\\u201d). Your twenty-four (24) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
+2.   Promotional Period
+This \\u201cPromotion\\u201d begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (\\u201cPromotional Period\\u201d).
+3.   Eligibility
+This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (\\u201cAccount\\u201d). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
+Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
+4.   Action Required
+To be eligible for the Rewards: (i) you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any slot games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 24 hours of satisfying the wagering requirement. You will receive {spins} Bonus Spins (valued at \${spin_value} CAD each) to use on the slots game {game_name}.
+5.   Claiming Promotional Offer
+Bonus Spins (Rewards) Terms
+Bonus Spins are valued at \${spin_value} CAD each.
+Bonus Spins will not be included in any winnings (e.g., if you place a Bonus Spin that wins \$15 CAD, you will only receive the \$15 CAD in winnings).
+Bonus Spins can only be used on the slots game {game_name} and cannot be redeemed on Tables, Poker, Live Dealer, Video Poker, or any other slots games.
+Bonus Spins expire at 11:59 p.m. ET on the 7th day following the date of issuance.
+Bonus Spins cannot be redeemed for or withdrawn as cash at any time.
+Bonus Spins can only be redeemed in-app with a valid Account.
+Bonus Spins do not count towards qualifying for any other promotional offers.
+There are no playthrough requirements on Bonus Spins.
+Bonus Spins are non-refundable and may not be exchanged, substituted, or transferred.
+6.   Account Requirements
+To qualify for this Promotion, you must have an active and verified Account. Your continued use of your Account is subject to Fanatics Casino\\u2019s Terms of Service, game rules, and these Promotional Terms and Conditions, as well as our Privacy Policy.
+7.   Limitations on Participation
+Limit one (1) Reward per customer, up to a maximum of {spins} Bonus Spins. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any province without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino\\u2019s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by applicable law.
+8.   Wagering Requirements/Exclusions
+Bets must be placed with cash (CAD). Bets placed with Bonus Spins, Casino Credit, or any other promotional credit do not count towards the cumulative wager requirement.
+9.   Order of Funds Used for Wagering
+To place a bet using a Bonus Spin, select \\u201cBonus Spin\\u201d in the slots game. If you do not apply any Bonus Spins you may have, then bets will be placed with deposited funds (cash).
+10.   Eligible Games
+Cash wagers can be placed on any slot games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. Rewards issued with this Promotion can only be used on the slots game {game_name} and expire at 11:59 p.m. ET on the 7th day following the date of issuance.
+11.   Restrictions on Withdrawal
+Bonus Spins or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. There are no playthrough requirements on Bonus Spins.
+12.   Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+13.   Responsible Gaming
+Fanatics Casino is committed to promoting responsible gambling.
+Ontario Customers: If you or someone you know has a problem with gambling, please contact the ConnexOntario Gambling Helpline at 1-866-531-2600 or visit www.connexontario.ca.
+14.   Other
+Participation in this Promotion is subject to Fanatics Casino\\u2019s Terms of Service, House Rules, and these Promotional Terms and Conditions, and all other applicable laws, rules, and regulations, including applicable provincial gaming laws. By participating in this Promotion, you acknowledge that you have read and agreed to Fanatics Casino\\u2019s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Casino\\u2019s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to \\u201cyou\\u201d or \\u201cyour\\u201d throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Taxes: Rewards recipients will be solely responsible for any federal, provincial, or other taxes arising from participation in this Promotion or receipt of Rewards, as required by applicable Canadian law.
+Publicity: By participating in this Promotion, you consent to the use of your name, province of residence, and likeness for advertising and publicity purposes by FBG Enterprises Canada, Inc. without additional compensation, except where prohibited by applicable law.
+Personal Information: Sponsor and its authorized agents will collect, use, and disclose the personal information participants provide for the purposes of administering this Promotion. Participants may opt out of receiving marketing communications from Fanatics Casino at any time without impacting their participation in this Promotion.
+This Promotion is subject to all applicable federal, provincial, and municipal laws of Canada. The invalidity or unenforceability of any provision of these Promotional Terms and Conditions shall not affect the validity or enforceability of any other provision. All decisions rendered by Fanatics Casino regarding any aspect of this Promotion are final and binding.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.
+In the event of any discrepancy or inconsistency between the terms and conditions of these Promotional Terms and Conditions and disclosures or other statements contained in any promotional materials, these Promotional Terms and Conditions shall prevail, govern, and control."""
+
+# \u2500\u2500 Helpers ────────────────────────────────────────────────────────────────────
+def fmt_money(s):
+    v = int(s)
+    return f"\${v:,}" if v >= 1000 else f"\${v}"
+
+def code_datetime(code):
+    d = code.split("_")[0]
+    return datetime(2000 + int(d[4:6]), int(d[0:2]), int(d[2:4]))
+
+def parse_dates(code):
+    """Single-day promo window: 00:00:00 ET -> 23:59:59 ET of the typed date."""
+    dt = code_datetime(code)
+    start_et = dt.replace(hour=0, minute=0, second=0, tzinfo=EASTERN)
+    end_et   = dt.replace(hour=23, minute=59, second=59, tzinfo=EASTERN)
+    return (start_et.astimezone().strftime('%d-%m-%Y %H:%M:%S'),
+            end_et.astimezone().strftime('%d-%m-%Y %H:%M:%S'))
+
+def build_hiw(c):
+    if c["reward"] == "FS":
+        return HIW_FS_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]),
+                                      spins=c["spins"], game_name=c["game_name"])
+    return HIW_CC_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), get_fmt=fmt_money(c["get"]))
+
+def build_tc(c):
+    if c["reward"] == "FS":
+        return TC_FS_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), spins=c["spins"],
+                                     spin_value=c["spin_value"], game_name=c["game_name"],
+                                     terms_id=c["terms_id"], start_date_long=TERMS_START_LONG,
+                                     end_date_long=TERMS_END_LONG)
+    return TC_CC_TEMPLATE.format(bet_fmt=fmt_money(c["bet"]), get_fmt=fmt_money(c["get"]),
+                                 terms_id=c["terms_id"], start_date_long=TERMS_START_LONG,
+                                 end_date_long=TERMS_END_LONG)
+
+def image_files_for(c):
+    # DMCA2 creative manifest (84 files, Drive-validated Oct 5, 2026): reward-scoped
+    # Masthead / Promo Detail ({Weekday}_CC_* / {Weekday}_BS_*), CC discovers
+    # {Weekday}_B{bet}_G{get}.png, FS discovers {Weekday}_B{bet}_G{spins}S_{vtok}V.png
+    # with vtok in cents (20/40/60/100/200/400 -> ..._20V.png etc.).
+    w = c["weekday"]
+    rtok = "BS" if c["reward"] == "FS" else "CC"
+    if c["reward"] == "FS":
+        return [f"{w}_{rtok}_Promo_Detail.png", f"{w}_{rtok}_Masthead.png",
+                f"{w}_B{c['bet']}_G{c['spins']}S_{c['vtok']}V.png"]
+    return [f"{w}_{rtok}_Promo_Detail.png", f"{w}_{rtok}_Masthead.png", f"{w}_B{c['bet']}_G{c['get']}.png"]
+
+def notify(message):
+    subprocess.run(["osascript", "-e",
+        f'display notification "{message}" with title "Daily Missions v2 Script" sound name "Glass"'])
+
+# ── NATS helpers ───────────────────────────────────────────────────────────────
+async def upload_image(page, label_title, filepath, display_name=None):
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Add").click()
+    await page.wait_for_timeout(1000)
+    await row.locator(".anticon-edit").click()
+    await page.wait_for_timeout(1000)
+    async with page.expect_file_chooser() as fc_info:
+        await page.get_by_role("button", name="plus Upload").click()
+    file_chooser = await fc_info.value
+    await file_chooser.set_files(filepath)
+    await page.wait_for_timeout(8000)
+    await page.get_by_role("button", name="OK").click()
+    await page.wait_for_timeout(2000)
+    print(f"    OK Image uploaded: {display_name or os.path.basename(filepath)}")
+
+async def fill_rich_text(page, label_title, content):
+    print(f"    Filling rich text: {label_title}...")
+    row = page.locator(".ant-legacy-form-item").filter(has=page.locator(f"label[title='{label_title}']"))
+    await row.get_by_text("Edit", exact=True).click()
+    await page.wait_for_timeout(1500)
+    all_editors = page.locator(".ProseMirror[contenteditable='true']")
+    count = await all_editors.count()
+    for i in range(count):
+        ed = all_editors.nth(i)
+        if await ed.is_visible():
+            await ed.click()
+            break
+    await page.keyboard.press("Meta+a")
+    await page.keyboard.press("Delete")
+    await page.wait_for_timeout(300)
+    await page.evaluate(f"navigator.clipboard.writeText({repr(content)})")
+    await page.keyboard.press("Meta+v")
+    await page.wait_for_timeout(500)
+    await page.get_by_label("Close").last.click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Rich text filled: {label_title}")
+
+async def nav_to_promos(page):
+    print("  Navigating to Promos...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-cms']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Promos", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Promos page")
+            return
+        print(f"  WARN Promos menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Promos from sidebar after 5 attempts")
+
+async def nav_to_segments(page):
+    print("  Navigating to Account Segments...")
+    for attempt in range(1, 6):
+        await page.mouse.move(600, 400)
+        await page.wait_for_timeout(300)
+        await page.locator("[data-menu-id$='-segments']").hover()
+        await page.wait_for_timeout(500)
+        link = page.get_by_text("Account Segments", exact=True)
+        if await link.is_visible():
+            await link.dispatch_event("click")
+            await page.wait_for_load_state("networkidle")
+            print("  OK On Account Segments page")
+            return
+        print(f"  WARN Account Segments menu not visible (attempt {attempt}/5), retrying...")
+        await page.wait_for_timeout(500)
+    raise Exception("Could not open Account Segments from sidebar after 5 attempts")
+
+async def create_segment(page, name):
+    # Standard NATS segment build - same AMELCO dispatch_event pattern as the other offer types.
+    print(f"\\n  Creating segment: {name}")
+    await page.locator("button.ant-btn-primary.create").click()
+    await page.wait_for_load_state("networkidle")
+    await page.locator("#name").fill(name)
+    await page.locator("#code").fill(name)
+    await page.locator("#parentId").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("AMELCO").nth(2).dispatch_event("click")
+    await page.locator("#forBonus").check()
+    await page.wait_for_timeout(2000)
+    await page.locator("span", has_text="OK").click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK Segment done: {name}")
+
+async def create_promo(page, c):
+    name = c["code_name"]
+    weekday = c["weekday"]
+    # v2: reward-scoped title/header (a structural upgrade over V1's single string)
+    title_text = f"{weekday}'s Slots Mission" if c["reward"] == "FS" else f"{weekday}'s Casino Mission"
+    print(f"\\n  Creating promotion: {name}")
+    for _attempt in range(120):
+        btn = page.get_by_text("Create Promotion", exact=True)
+        if await btn.is_enabled():
+            await btn.click()
+            break
+        await page.wait_for_timeout(500)
+    else:
+        raise Exception("Create Promotion button did not become enabled after 60s")
+    await page.wait_for_load_state("networkidle")
+    await page.locator("input[placeholder=\\"Promotion's internal name\\"]").fill(name)
+    start_date, end_date = parse_dates(name)
+    start_input = page.locator("input[placeholder='Start Time']")
+    await start_input.click()
+    await start_input.click(click_count=3)
+    await start_input.fill(start_date)
+    await page.keyboard.press("Enter")
+    end_input = page.locator("input[placeholder='End Time']")
+    await end_input.click()
+    await end_input.click(click_count=3)
+    await end_input.fill(end_date)
+    await page.keyboard.press("Enter")
+    print(f"    OK Promo Dates: {start_date} -> {end_date} (single-day window, ET)")
+    type_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Type']"))
+    await type_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Image only CTA", exact=True).click()
+    layout_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Layout Type']"))
+    await layout_row.locator(".ant-select-selector").click()
+    await page.wait_for_timeout(500)
+    await page.get_by_text("Overlay", exact=True).click()
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    pd_file, mh_file, disc_file = image_files_for(c)
+    await upload_image(page, "Promo Detail Image Upload", f"{IMAGE_FOLDER}/{pd_file}", pd_file)
+    await upload_image(page, "Masthead Image Upload", f"{IMAGE_FOLDER}/{mh_file}", mh_file)
+    await upload_image(page, "Discover Image Upload", f"{IMAGE_FOLDER}/{disc_file}", disc_file)
+    await page.locator("input[placeholder='Title']").fill(title_text)
+    await page.locator("input[placeholder='Promo Header Text']").fill(title_text)
+    print(f"    OK Title & Promo Header Text: {title_text}")
+    # v3.5 - Button 2 filled on every Daily Missions promo (all tiers, all days)
+    btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
+    await btn2_label_row.locator("input.ant-input").fill(BUTTON2_LABEL)
+    btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
+    await btn2_link_row.locator("input.ant-input").fill(BUTTON2_LINK)
+    print(f"    OK Button 2: {BUTTON2_LABEL} -> {BUTTON2_LINK}")
+    bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
+    await bonus_tile_row.locator(".ant-switch").click()
+    await page.wait_for_timeout(500)
+    await fill_rich_text(page, "How it works", build_hiw(c))
+    await fill_rich_text(page, "T&C", build_tc(c))
+    await page.get_by_text("Save", exact=True).click()
+    await page.wait_for_load_state("networkidle")
+    print(f"  OK NATS promotion done: {name}")
+
+# ── Playmaker helpers ──────────────────────────────────────────────────────────
+async def set_jurisdictions_canada(page):
+    all_cb = await page.wait_for_selector("#jurisdiction-all", timeout=15000)
+    if await all_cb.is_checked():
+        await all_cb.click()
+        await page.wait_for_timeout(500)
+    cb = await page.wait_for_selector("#jurisdiction-ontario", timeout=15000)
+    if not await cb.is_checked():
+        await cb.click()
+        await page.wait_for_timeout(300)
+    print("    OK Jurisdictions: Canada (Ontario)")
+
+async def set_calendar_date(page, picker_index, target_date):
+    pickers = await page.query_selector_all("button.dc-w-\\\\[280px\\\\]")
+    if len(pickers) <= picker_index:
+        raise Exception(f"Date picker button at index {picker_index} not found")
+    await pickers[picker_index].click()
+    await page.wait_for_timeout(1000)
+    for _ in range(24):
+        header = await page.query_selector("div[aria-live='polite']")
+        header_text = await header.inner_text() if header else ""
+        target_str = target_date.strftime("%B %Y")
+        if target_str in header_text:
+            break
+        next_btn = await page.query_selector("button[name='next-month']")
+        if next_btn:
+            await next_btn.click()
+            await page.wait_for_timeout(500)
+    day_btns = await page.query_selector_all("button[name='day']")
+    for btn in day_btns:
+        cls = await btn.get_attribute("class") or ""
+        if "dc-day-outside" in cls:
+            continue
+        txt = (await btn.inner_text()).strip()
+        if txt == str(target_date.day):
+            await btn.click()
+            await page.wait_for_timeout(300)
+            break
+
+async def clear_and_fill(element, value):
+    await element.click(click_count=3)
+    await element.fill(value)
+
+async def select_promotion(page, promo_name):
+    combobox = await page.wait_for_selector("button[role='combobox']", timeout=15000)
+    await combobox.click()
+    await page.wait_for_timeout(500)
+    search_input = await page.wait_for_selector("input[placeholder*='Search']", timeout=15000)
+    await search_input.fill(promo_name)
+    await page.wait_for_timeout(1000)
+    await page.get_by_label(promo_name).get_by_text(promo_name).click()
+    await page.wait_for_timeout(500)
+    print(f"    OK Promotion: {promo_name}")
+
+async def dump_open_options(page, header):
+    """Print every visible [role='option']; returns list of (handle, text)."""
+    await page.wait_for_timeout(800)
+    opts = await page.query_selector_all("[role='option']")
+    out = []
+    print(f"    {header} - {len(opts)} option(s)")
+    for o in opts:
+        txt = (await o.inner_text()).strip()
+        out.append((o, txt))
+    return out
+
+async def find_combobox_by_label(page, label_substring):
+    boxes = await page.query_selector_all("button[role='combobox']")
+    for b in boxes:
+        label = (await b.get_attribute("aria-label")) or ""
+        if label_substring.lower() in label.lower():
+            return b
+    return None
+
+def _norm_game_text(s):
+    s = s.replace("\\u2122", "").replace("\\u00ae", "")
+    s = s.replace("\\u2019", "'")  # curly apostrophe -> straight (catalog/filing tolerance)
+    return re.sub(r"\\s+", " ", s).strip().lower()
+
+async def select_radix_option(page, combobox, want, header, tm_tolerant=False):
+    """Open a Radix select, click the option matching want. Returns clicked text or None."""
+    await combobox.click()
+    options = await dump_open_options(page, header)
+    want_n = _norm_game_text(want) if tm_tolerant else want.strip().lower()
+    clicked = None
+    for handle, txt in options:
+        txt_cmp = _norm_game_text(txt) if tm_tolerant else txt.strip().lower()
+        if txt_cmp == want_n or (tm_tolerant and want_n in txt_cmp):
+            await handle.click()
+            clicked = txt
+            break
+    if clicked:
+        print(f"    OK selected: {clicked!r}")
+    else:
+        print(f"    WARN no option matched {want!r}")
+        await page.keyboard.press("Escape")
+    await page.wait_for_timeout(500)
+    return clicked
+
+async def find_existing_segment_input(page):
+    """v2.31: locate the input for 'Existing Account Segments' inside the INCLUDE
+    Segments section. Step 2 contains FOUR cmdk fields - Include/Exclude x
+    Create/Existing - and the Exclude section and both Create fields must NEVER
+    be touched (Exclude would silently invert targeting; Create would duplicate
+    the NATS segment on Save Bonus).
+
+    Primary (label-anchored, from captured Playmaker HTML): the <label> whose exact
+    text is 'Existing Account Segments' and whose section resolves to Include
+    Segments; follow its for= attribute to the form-item container and take the
+    input[cmdk-input] inside (climbing from the label as a backstop).
+    Fallback: the v2.31 parent-walk, hardened to also require the Include section.
+    Both paths are placeholder-asserted: Existing = 'Search...', Create =
+    'Type and press Enter...' - a Create-style placeholder is rejected."""
+    handle = await page.evaluate_handle("""() => {
+        const sectionOf = (el) => {
+            let n = el.parentElement;
+            for (let i = 0; i < 12 && n; i++) {
+                const t = n.innerText || '';
+                const inc = t.includes('Include Segments');
+                const exc = t.includes('Exclude Segments');
+                if (inc && !exc) return 'include';
+                if (exc && !inc) return 'exclude';
+                if (inc && exc) return 'both';
+                n = n.parentElement;
+            }
+            return 'none';
+        };
+        const labels = Array.from(document.querySelectorAll('label'))
+            .filter(l => (l.innerText || '').trim() === 'Existing Account Segments');
+        for (const l of labels) {
+            if (sectionOf(l) !== 'include') continue;
+            const forId = l.getAttribute('for');
+            const container = forId ? document.getElementById(forId) : null;
+            if (container) {
+                if (container.matches && container.matches('input[cmdk-input]')) return container;
+                const inp = container.querySelector('input[cmdk-input]');
+                if (inp) return inp;
+            }
+            let n = l.parentElement;
+            for (let i = 0; i < 4 && n; i++) {
+                const inp = n.querySelector("input[cmdk-input][placeholder='Search...']");
+                if (inp && sectionOf(inp) === 'include') return inp;
+                n = n.parentElement;
+            }
+        }
+        return null;
+    }""")
+    seg_input = handle.as_element() if handle else None
+    if seg_input:
+        ph = (await seg_input.get_attribute("placeholder")) or ""
+        if "Type and press Enter" in ph:
+            print(f"    WARN label-anchored lookup landed on a Create-style field (placeholder {ph!r}) - rejected")
+            seg_input = None
+        else:
+            print("    OK Existing field located (label-anchored, Include section)")
+            return seg_input
+    # Fallback: v2.31 parent-walk, hardened with the Include-section requirement.
+    candidates = await page.query_selector_all("input[cmdk-input], input[role='combobox'], input[type='text'], input:not([type])")
+    for inp in candidates:
+        try:
+            verdict = await inp.evaluate("""el => {
+                let n = el.parentElement;
+                let field = 'none';
+                for (let i = 0; i < 8 && n; i++) {
+                    const t = n.innerText || '';
+                    const hasE = t.includes('Existing Account Segments');
+                    const hasC = t.includes('Create Account Segments');
+                    if (hasE && !hasC) { field = 'existing'; break; }
+                    if (hasE && hasC) { field = 'both'; break; }
+                    n = n.parentElement;
+                }
+                if (field !== 'existing') return false;
+                n = el.parentElement;
+                for (let i = 0; i < 12 && n; i++) {
+                    const t = n.innerText || '';
+                    const inc = t.includes('Include Segments');
+                    const exc = t.includes('Exclude Segments');
+                    if (inc && !exc) return true;
+                    if (exc || (inc && exc)) return false;
+                    n = n.parentElement;
+                }
+                return false;
+            }""")
+        except Exception:
+            continue
+        if verdict:
+            ph = (await inp.get_attribute("placeholder")) or ""
+            if "Type and press Enter" in ph:
+                continue
+            print("    OK Existing field located (parent-walk fallback, Include section)")
+            return inp
+    return None
+
+async def verify_segment_chip(page, name):
+    """v2.31 read-back: confirm a chip with the exact code name rendered inside the
+    INCLUDE section's Existing Account Segments field (chip = span with the code
+    name, per captured Playmaker HTML). Polls up to ~5s for the chip to render."""
+    for _ in range(10):
+        ok = await page.evaluate("""(name) => {
+            const sectionOf = (el) => {
+                let n = el.parentElement;
+                for (let i = 0; i < 12 && n; i++) {
+                    const t = n.innerText || '';
+                    const inc = t.includes('Include Segments');
+                    const exc = t.includes('Exclude Segments');
+                    if (inc && !exc) return 'include';
+                    if (exc && !inc) return 'exclude';
+                    if (inc && exc) return 'both';
+                    n = n.parentElement;
+                }
+                return 'none';
+            };
+            const fieldOf = (el) => {
+                let n = el.parentElement;
+                for (let i = 0; i < 10 && n; i++) {
+                    const t = n.innerText || '';
+                    const hasE = t.includes('Existing Account Segments');
+                    const hasC = t.includes('Create Account Segments');
+                    if (hasE && !hasC) return 'existing';
+                    if (hasC && !hasE) return 'create';
+                    if (hasE && hasC) return 'both';
+                    n = n.parentElement;
+                }
+                return 'none';
+            };
+            return Array.from(document.querySelectorAll('span'))
+                .filter(sp => (sp.innerText || '').trim() === name)
+                .some(sp => sectionOf(sp) === 'include' && fieldOf(sp) === 'existing');
+        }""", name)
+        if ok:
+            return True
+        await page.wait_for_timeout(500)
+    return False
+
+async def dump_step2_fields(page):
+    """Diagnostic dump so the real selector can be captured if the Step 2 layout changed."""
+    print("    Step 2 field dump (for selector capture):")
+    for b in await page.query_selector_all("button[role='combobox']"):
+        label = (await b.get_attribute("aria-label")) or ""
+        txt = ((await b.inner_text()) or "").strip().replace("\\n", " | ")
+        print(f"      combobox aria-label={label!r} text={txt!r}")
+    for inp in await page.query_selector_all("input"):
+        ph = (await inp.get_attribute("placeholder")) or ""
+        cm = await inp.get_attribute("cmdk-input")
+        print(f"      input placeholder={ph!r} cmdk={'yes' if cm is not None else 'no'}")
+
+async def attach_existing_segment(page, name):
+    """v2.31: attach the NATS-built segment via the INCLUDE section's
+    'Existing Account Segments' field. The Create Account Segments fields are NEVER
+    used (a chip there would create a duplicate segment on Save Bonus) and the
+    Exclude Segments section is NEVER used (it would invert targeting). NATS ->
+    Playmaker segment sync may lag, so the lookup polls for up to ~60 seconds
+    before hard-failing. After the option click, the chip is read back and must
+    be present in the Include/Existing field or the bonus is FAILED."""
+    for attempt in range(1, 13):
+        seg_input = await find_existing_segment_input(page)
+        if seg_input is None:
+            print(f"    WARN Include/Existing Account Segments field not found (attempt {attempt}/12)")
+        else:
+            await seg_input.click()
+            await seg_input.fill("")
+            await seg_input.type(name, delay=30)
+            await page.wait_for_timeout(1500)
+            options = await page.query_selector_all("[cmdk-item], [role='option']")
+            texts = []
+            hit = None
+            for o in options:
+                txt = ((await o.inner_text()) or "").strip()
+                texts.append(txt)
+                if txt == name and hit is None:
+                    hit = o
+            if hit:
+                await hit.click()
+                await page.wait_for_timeout(500)
+                if await verify_segment_chip(page, name):
+                    print(f"    OK Existing segment attached and chip verified: {name}")
+                    return
+                await dump_step2_fields(page)
+                raise Exception(f"Clicked segment option {name!r} but no chip rendered in the Include/Existing field - refusing to continue on an unverified attach")
+            shown = ", ".join(t for t in texts if t) or "(none)"
+            print(f"    WARN segment not in Existing list yet (attempt {attempt}/12) - options: {shown}")
+            await seg_input.fill("")
+        await page.wait_for_timeout(5000)
+    await dump_step2_fields(page)
+    raise Exception(f"Segment {name!r} never appeared in the Include/Existing Account Segments field - refusing to fall back to Create Account Segments (would duplicate the NATS segment)")
+
+async def set_toast(page, c):
+    toast_cb = await page.wait_for_selector("#toastEnabled", timeout=15000)
+    if not await toast_cb.is_checked():
+        await toast_cb.click()
+        await page.wait_for_timeout(500)
+    title_input = await page.wait_for_selector("input[name='toastTitle']", timeout=15000)
+    await clear_and_fill(title_input, "Mission Complete!")
+    desc_input = await page.wait_for_selector("input[name='toastDescription']", timeout=15000)
+    if c["reward"] == "FS":
+        # FS toast - no quotes around the game name (stakeholder-confirmed)
+        await clear_and_fill(desc_input,
+            f"You have been awarded {c['spins']} Bonus Spins to {c['game_name']}")
+    else:
+        await clear_and_fill(desc_input, f"You have been awarded {fmt_money(c['get'])} Casino Credit")
+    print(f"    OK Toast set")
+
+async def goto_step(page, n, label):
+    """Tolerant Create-flow stepper navigation. The current form does NOT render
+    "Step N: {label}" uniformly on every stepper button (an Oct 5, 2026 dump showed
+    only "Step 4: Settlement" carrying that text), so try the labeled form first,
+    then the bare label, and dump every button before failing. Verified against the
+    live form during the build's watched PROD run."""
+    for sel in [f"button:has-text('Step {n}: {label}')", f"button:has-text('{label}')"]:
+        try:
+            btn = await page.wait_for_selector(sel, timeout=5000)
+        except Exception:
+            btn = None
+        if btn:
+            await btn.click()
+            await page.wait_for_timeout(2000)
+            print(f"    OK Stepper -> Step {n}: {label}")
+            return
+    print("    Stepper button dump (for selector capture):")
+    for btn in await page.query_selector_all("button"):
+        txt = ((await btn.inner_text()) or "").strip().replace("\\n", " | ")
+        if txt:
+            print(f"      button text={txt!r}")
+    raise Exception(f"Stepper button for Step {n} ({label!r}) not found - refusing to continue")
+
+async def create_pm_bonus(page, c):
+    name            = c["code_name"]
+    days_to_fulfill = c["days_to_fulfill"]
+    get             = c["get"]
+    bet             = c["bet"]
+    print(f"\\n  Creating Playmaker bonus: {name}")
+    code_date = name.split("_")[0]
+
+    create_btn = await page.wait_for_selector("[data-testid='create-bonus-button']", timeout=15000)
+    await create_btn.click()
+    await page.wait_for_timeout(2000)
+
+    print(f"  --- Step 1: Details")
+    bonus_name_input = await page.wait_for_selector("input[name='name']", timeout=15000)
+    await bonus_name_input.fill(name)
+    print(f"    OK Bonus Name: {name}")
+    await set_jurisdictions_canada(page)
+    start_date = datetime.strptime(code_date, "%m%d%y")
+    end_date   = start_date + timedelta(days=1)
+    await set_calendar_date(page, 0, start_date)
+    print("    OK Start Date set")
+    await set_calendar_date(page, 1, end_date)
+    print("    OK End Date set")
+    for _nth, _label in [(0, "Start"), (1, "End")]:
+        _field = page.get_by_role("textbox", name="Time").nth(_nth)
+        _el = await _field.element_handle()
+        await page.evaluate("""el => {
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype, 'value').set;
+            nativeInputValueSetter.call(el, '00:01');
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }""", _el)
+        await page.wait_for_timeout(400)
+        _val = await _field.input_value()
+        if "00:01" not in _val and "12:01 AM" not in _val:
+            print(f"    WARN {_label} Time native-setter did not stick (reads {_val!r}) - retrying via keyboard")
+            await _field.click()
+            await _field.click(click_count=3)
+            await page.keyboard.type("00:01", delay=50)
+            await page.keyboard.press("Enter")
+            await page.wait_for_timeout(400)
+            _val = await _field.input_value()
+            if "00:01" not in _val and "12:01 AM" not in _val:
+                await _field.fill("00:01")
+                await page.keyboard.press("Tab")
+                await page.wait_for_timeout(400)
+                _val = await _field.input_value()
+        _ok = "00:01" in _val or "12:01 AM" in _val
+        print(f"    {'OK' if _ok else 'WARN'} {_label} Time now reads: {_val!r}")
+
+    print(f"  --- Step 2: Eligibility")
+    await goto_step(page, 2, "Eligibility")
+    await attach_existing_segment(page, name)
+
+    print(f"  --- Step 3: Entitlement")
+    await goto_step(page, 3, "Entitlement")
+    wagering_input = await page.wait_for_selector("input[name='wageringAmount']", timeout=15000)
+    await wagering_input.fill(bet)
+    print(f"    OK Wagering Amount: {bet}")
+
+    print(f"  --- Step 4: Settlement")
+    await goto_step(page, 4, "Settlement")
+    if c["reward"] == "FS":
+        fs_radio = await page.wait_for_selector("button[role='radio'][value='free_spin']", timeout=15000)
+        if await fs_radio.get_attribute("aria-checked") != "true":
+            await fs_radio.click()
+            await page.wait_for_timeout(1000)
+        print("    OK Reward Type: Bonus Spins (free_spin)")
+        spins_input = await page.wait_for_selector("#fs-count", timeout=15000)
+        await clear_and_fill(spins_input, c["spins"])
+        print(f"    OK Number of Spins: {c['spins']}")
+        agg_box = await find_combobox_by_label(page, "Aggregator")
+        if not agg_box:
+            raise Exception("Aggregator combobox not found")
+        if not await select_radix_option(page, agg_box, c["aggregator"], "Aggregator options"):
+            raise Exception(f"Aggregator {c['aggregator']!r} not selectable")
+        await page.wait_for_timeout(1000)
+        prov_box = await find_combobox_by_label(page, "Provider")
+        if not prov_box:
+            raise Exception("Provider combobox not found")
+        if not await select_radix_option(page, prov_box, c["provider"], "Provider options"):
+            raise Exception(f"Provider {c['provider']!r} not selectable")
+        await page.wait_for_timeout(1000)
+        game_box = await find_combobox_by_label(page, "Game")
+        if not game_box:
+            raise Exception("Casino Game combobox not found")
+        game_clicked = await select_radix_option(
+            page, game_box, c["game_search"], "Casino Game options", tm_tolerant=True)
+        if not game_clicked:
+            raise Exception(f"Casino Game matching {c['game_search']!r} not found in dropdown")
+        print(f"    OK Casino Game: {game_clicked!r}")
+        await page.wait_for_timeout(1500)
+        # Bet Level (mandatory, new vs V1's Playtech flow): a combobox between the
+        # Casino Game pick and the stakes grid; single option per L&W game ("20+0").
+        # The stakes grid renders EMPTY until the level is picked. Select + read back;
+        # HARD FAIL if the baked level is not offered.
+        level_box = None
+        for _ in range(10):
+            level_box = await find_combobox_by_label(page, "Bet Level")
+            if level_box:
+                break
+            await page.wait_for_timeout(1000)
+        if not level_box:
+            raise Exception("Bet Level combobox did not mount after the game pick (10s)")
+        if not await select_radix_option(page, level_box, c["bet_level"], "Bet Level options"):
+            raise Exception(f"Bet Level {c['bet_level']!r} not offered for this game - refusing to continue")
+        level_shown = (await level_box.inner_text()).strip()
+        if c["bet_level"] not in level_shown:
+            raise Exception(f"Bet Level read-back failed (reads {level_shown!r}, wanted {c['bet_level']!r})")
+        print(f"    OK Bet Level: {level_shown!r}")
+        # Grid-mount poll (>=20s): the stakes combobox mounts up to several seconds
+        # after the level pick. A grid that never mounts means a stale/reused form
+        # (confirmed at 20s poll in the Oct 5 dry run) - HARD FAIL, never reuse a form.
+        grid = await page.wait_for_selector("[data-testid='free-spin-stakes-grid']", timeout=15000)
+        stakes_box = None
+        for _ in range(25):
+            stakes_box = await grid.query_selector("button[role='combobox']")
+            if stakes_box:
+                break
+            await page.wait_for_timeout(1000)
+        grid_text = (await grid.inner_text()).strip().replace("\\n", " | ")
+        print(f"    Stakes grid: {grid_text}")
+        if not stakes_box:
+            raise Exception("Stakes combobox never mounted inside free-spin-stakes-grid after the Bet Level pick (25s) - stale form? This form must be abandoned, never reused.")
+        # HARD FAIL if the exact value is absent (never substitute: the T&C and Terms
+        # ID legally state the spin value). Match on the ladder-normalized token.
+        await stakes_box.click()
+        options = await dump_open_options(page, "Stake options")
+        want = c["stake"]
+        clicked = None
+        for handle, txt in options:
+            if txt.strip() == want:
+                await handle.click()
+                clicked = txt
+                break
+        if not clicked:
+            avail = ", ".join(t for _h, t in options)
+            await page.keyboard.press("Escape")
+            raise Exception(f"Spin value {want!r} NOT in this game's stakes list ({avail}) - refusing to substitute")
+        shown = (await stakes_box.inner_text()).strip()
+        print(f"    OK Spin Value: {shown!r}")
+    else:
+        cc_radio = await page.wait_for_selector("button[role='radio'][value='casino_credit']", timeout=15000)
+        if await cc_radio.get_attribute("aria-checked") != "true":
+            await cc_radio.click()
+            await page.wait_for_timeout(500)
+        print("    OK Reward Type: Casino Credit")
+        settlement_input = await page.wait_for_selector("input[name='settlementAmount']", timeout=15000)
+        await settlement_input.fill(get)
+        print(f"    OK Settlement Amount: {get}")
+    days_input = await page.wait_for_selector("input[name='daysToFulfill']", timeout=15000)
+    if await days_input.input_value() != str(days_to_fulfill):
+        await clear_and_fill(days_input, str(days_to_fulfill))
+    print(f"    OK Days to Use Reward: {days_to_fulfill}")
+
+    print(f"  --- Step 5: Display")
+    await goto_step(page, 5, "Display")
+    await select_promotion(page, name)
+    await set_toast(page, c)
+
+    print(f"  --- Step 6: Review")
+    await goto_step(page, 6, "Review")
+    save_btn = await page.wait_for_selector("button:has-text('Save Bonus')", timeout=15000)
+    await save_btn.click()
+    await page.wait_for_timeout(3000)
+    print(f"  OK Playmaker bonus done: {name}")
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+async def main():
+    segment_codes = [c for c in CODES if c["do_segment"]]
+    promo_codes   = [c for c in CODES if c["do_promo"]]
+    bonus_codes   = [c for c in CODES if c["do_bonus"]]
+
+    # Pre-flight: verify image files exist before touching PROD
+    missing = []
+    for c in promo_codes:
+        for f in image_files_for(c):
+            p = os.path.join(IMAGE_FOLDER, f)
+            if not os.path.exists(p) and f not in missing:
+                missing.append(f)
+    if missing:
+        print("ABORT - missing image file(s) in the Daily Missions folder:")
+        for f in missing:
+            print(f"   - {f}")
+        print(f"Folder: {IMAGE_FOLDER}")
+        sys.exit(1)
+
+    async with async_playwright() as p:
+        # Okta Verify (FastPass) login fix - confirmed working Aug 2026:
+        # persistent profile + local-network-access grant + feature flag.
+        user_data_dir = os.path.expanduser("~/.dm_canada_pw_profile")
+        context = await p.chromium.launch_persistent_context(
+            user_data_dir,
+            headless=False,
+            args=["--disable-features=LocalNetworkAccessChecks"],
+            permissions=["clipboard-read", "clipboard-write"],
+        )
+        try:
+            await context.grant_permissions(
+                ["local-network-access"], origin="https://betfanatics.okta.com")
+            await context.grant_permissions(["local-network-access"])
+            print("  OK local-network-access permission granted")
+        except Exception as e:
+            print(f"  WARN could not grant local-network-access ({type(e).__name__}) - relying on feature flag")
+
+        if segment_codes or promo_codes:
+            print("\\n" + "=" * 60)
+            print("  PHASE 1 - NATS: Build Segments + Promotions")
+            print("=" * 60)
+            nats_page = context.pages[0] if context.pages else await context.new_page()
+            await nats_page.goto(NATS_URL, wait_until="domcontentloaded")
+            print("\\n>> Please log in to NATS in the browser window.")
+            input("   Once logged in and on the dashboard, press ENTER here...\\n")
+            await nats_page.wait_for_timeout(2000)
+            if segment_codes:
+                await nav_to_segments(nats_page)
+                print(f"\\n--- Creating {len(segment_codes)} Segment(s) ---")
+                for c in segment_codes:
+                    await create_segment(nats_page, c["code_name"])
+                    await nats_page.wait_for_timeout(1000)
+            else:
+                print("\\nSkipping segments (no codes with Segment enabled)")
+            if promo_codes:
+                await nav_to_promos(nats_page)
+                print(f"\\n--- Creating {len(promo_codes)} Promotion(s) ---")
+                for c in promo_codes:
+                    await create_promo(nats_page, c)
+                    await nats_page.wait_for_timeout(1000)
+            else:
+                print("\\nSkipping promos (no codes with Promo enabled)")
+            print("\\nOK Phase 1 complete.")
+        else:
+            print("\\nSkipping Phase 1 (no codes with Segment or Promo enabled)")
+
+        if bonus_codes:
+            print("\\n" + "=" * 60)
+            print("  PHASE 2 - Playmaker: Build Bonuses")
+            print("=" * 60)
+            pm_page = await context.new_page()
+            await pm_page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+            print("\\n>> Please log in to Playmaker via SSO in the browser window.")
+            input("   Once on the Playmaker dashboard, press ENTER here...\\n")
+            await pm_page.wait_for_timeout(2000)
+            icasino = await pm_page.wait_for_selector("h3:has-text('iCasino')", timeout=15000)
+            await icasino.click()
+            await pm_page.wait_for_timeout(2000)
+            bonus_setup = await pm_page.wait_for_selector("[data-testid='bonus-setup-navItem']", timeout=15000)
+            await bonus_setup.click()
+            await pm_page.wait_for_timeout(2000)
+            print(f"\\n--- Creating {len(bonus_codes)} Playmaker Bonus(es) ---")
+            results = {}
+            for c in bonus_codes:
+                try:
+                    await create_pm_bonus(pm_page, c)
+                    results[c["code_name"]] = True
+                except Exception as e:
+                    print(f"  FAILED {c['code_name']}: {type(e).__name__}: {e}")
+                    results[c["code_name"]] = False
+                    try:
+                        await pm_page.goto(PLAYMAKER_URL, wait_until="domcontentloaded")
+                        await pm_page.wait_for_timeout(2000)
+                        icasino = await pm_page.wait_for_selector("h3:has-text('iCasino')", timeout=15000)
+                        await icasino.click()
+                        await pm_page.wait_for_timeout(2000)
+                        bonus_setup = await pm_page.wait_for_selector("[data-testid='bonus-setup-navItem']", timeout=15000)
+                        await bonus_setup.click()
+                        await pm_page.wait_for_timeout(2000)
+                    except Exception:
+                        pass
+                await pm_page.wait_for_timeout(1000)
+            print("\\nPhase 2 results:")
+            for k, v in results.items():
+                print(f"   {'SAVED ' if v else 'FAILED'} {k}")
+            if all(results.values()):
+                print("OK Phase 2 complete - all Playmaker bonuses created.")
+            else:
+                print("WARN Phase 2 finished with failures - see list above.")
+        else:
+            print("\\nSkipping Phase 2 (no codes with Bonus enabled)")
+
+        notify(f"Daily Missions v2 complete! {len(CODES)} code(s) done.")
+        print("\\nAll done!")
+        print(f"   Codes: {[c['code_name'] for c in CODES]}")
+        input("\\nPress ENTER to close the browser...")
+        await context.close()
+
+asyncio.run(main())
+`;
+}
+
 function buildUSVIPLBScript(allNames, imagePath) {
   // v3.14 — US VIP Offer Library - Lossbacks. DMCA's two-system architecture
   // (Phase 1 NATS segments + promotions; Phase 2 Playmaker bonuses via the
@@ -14696,6 +15957,85 @@ function generateScript() {
         });
       }
       if (dmcaOverlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + dmcaOverlong.join('\n')); return; }
+    } else if (offerType === 'DMCA2') {
+      const d2i = dmca2InfoForDate(date);
+      if (!d2i) { alert(`Day ${i + 1}: invalid date.`); return; }
+      const d2DoSegment = days[i].doSegment !== false;
+      const d2DoPromo = days[i].doPromo !== false;
+      const d2DoBonus = days[i].doBonus !== false;
+      const d2Days = days[i].dmca2DaysToUseReward !== undefined ? days[i].dmca2DaysToUseReward : 7;
+      const d2Overlong = [];
+      // v3.17 — the selected reward drives the branch; the weekday selects the tier
+      // SET (Set 1 = Mon/Wed/Fri/Sun, Set 2 = Tue/Thu/Sat). Code shapes are IDENTICAL
+      // to V1 by stakeholder decision — never build V1 and V2 for the same date.
+      const d2Reward = dmca2EffectiveReward(i, d2i);
+      if (d2Reward === 'FS' && !dmca2AllowedRewards(d2i).includes('FS')) {
+        alert(`Day ${i + 1}: Bonus Spins is locked on ${d2i.weekday} — ${d2i.game ? d2i.game.name : 'this weekday\u2019s game'} is not yet set up in Playmaker. Script generation is blocked (a point release unlocks it after the game/ladder dry run).`);
+        return;
+      }
+      if (d2Reward === 'CC') {
+        const offers = dmca2CCData(i, d2i).filter(o => o.active);
+        if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+        offers.forEach(o => {
+          const code = `${date}_CA_CAS_RET_BAU_BG_CC_B${o.bet}_G${o.get}`;
+          if (code.length > 40) d2Overlong.push(`${code} (${code.length})`);
+          allNames.push({
+            code: code,
+            reward: 'CC',
+            weekday: d2i.weekday,
+            bet: o.bet,
+            get: o.get,
+            spins: '', spinValue: '', stake: '', vtok: '', gameName: '', gameSearch: '',
+            aggregator: '', provider: '', betLevel: '',
+            termsId: o.tid,
+            daysToUseReward: d2Days,
+            doSegment: d2DoSegment,
+            doPromo: d2DoPromo,
+            doBonus: d2DoBonus,
+          });
+        });
+      } else {
+        const d2Game = d2i.game;
+        if (!d2Game || d2Game.locked) { alert(`Day ${i + 1}: no live Playmaker game configured for ${d2i.weekday}.`); return; }
+        const offers = dmca2FSData(i, d2i).filter(o => o.active);
+        if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
+        const d2Tiers = DMCA2_FS_TIERS[d2i.set];
+        for (const o of offers) {
+          const tid = o.tids ? o.tids[d2i.weekday] : null;
+          if (!tid) { alert(`Day ${i + 1}: Bet ${dmcaFmtMoney(o.bet)} \u2192 ${o.spins} Spins has no Terms ID for ${d2i.weekday}. Script generation is blocked.`); return; }
+          if (!d2Game.stakes.includes(o.stake)) { alert(`Day ${i + 1}: spin value $${o.stake} is not in ${d2Game.name}'s stakes ladder. Script generation is blocked \u2014 the value must exist in Playmaker for this game.`); return; }
+          if (!d2Tiers.some((t, idx) => t.bet === o.bet)) { alert(`Day ${i + 1}: Bet ${dmcaFmtMoney(o.bet)} is not in Set ${d2i.set}'s baked tier list \u2014 reach out to Adrian Van de Camp to add the new tier.`); return; }
+        }
+        offers.forEach(o => {
+          // FS T{n} = the tier's 1-based position within the weekday's SET (T1–T4
+          // serve both sets; values live in the baked CODES config).
+          const tIdx = d2Tiers.findIndex(t => t.bet === o.bet) + 1;
+          const code = `${date}_CA_CAS_RET_BAU_BG_FS_T${tIdx}`;
+          if (code.length > 40) d2Overlong.push(`${code} (${code.length})`);
+          allNames.push({
+            code: code,
+            reward: 'FS',
+            weekday: d2i.weekday,
+            bet: o.bet,
+            get: '',
+            spins: o.spins,
+            spinValue: o.value,
+            stake: o.stake,
+            vtok: o.vtok,
+            gameName: d2Game.name,
+            gameSearch: d2Game.search,
+            aggregator: d2Game.aggregator,
+            provider: d2Game.provider,
+            betLevel: d2Game.betLevel,
+            termsId: o.tids[d2i.weekday],
+            daysToUseReward: d2Days,
+            doSegment: d2DoSegment,
+            doPromo: d2DoPromo,
+            doBonus: d2DoBonus,
+          });
+        });
+      }
+      if (d2Overlong.length > 0) { alert('Code(s) exceed the 40-character NATS limit:\n' + d2Overlong.join('\n')); return; }
     } else if (offerType === 'BGRE') {
       const offers = (days[i].bgreOfferData || []).filter(o => o.active);
       if (offers.length === 0) { alert(`Day ${i + 1} has a date but no offers selected.`); return; }
@@ -15076,6 +16416,8 @@ function generateScript() {
     script = buildBGREScript(allNames, bgreImagesStr);
   } else if (offerType === 'DMCA') {
     script = buildDMCAScript(allNames, imagePath);
+  } else if (offerType === 'DMCA2') {
+    script = buildDMCA2Script(allNames, imagePath);
   } else if (offerType === 'USVIPBGPM') {
     script = buildUSVIPBGPMScript(allNames, imagePath);
   } else if (offerType === 'USVIPDM') {
@@ -15593,7 +16935,7 @@ if __name__ == "__main__":
   const yy = String(today.getFullYear()).slice(-2);
   const hh = String(today.getHours()).padStart(2, '0');
   const min = String(today.getMinutes()).padStart(2, '0');
-  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPBGPM' ? `vcl_bg_pm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPDM' ? `vcl_dm_us_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPLB' ? `vcl_lb_us_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
+  const filename = offerType === 'FS' ? `rtc_fs_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BG' ? `bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'BGRE' ? `bg_re_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DM' ? `dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'RAF' ? `raf_full_campaign_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'SUO' ? `suo_day2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'LCREACT' ? `lc_react_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'CHURNDM' ? `lc_churn_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPDM' ? `vcl_dm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'VIPBG' ? `vcl_bg_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA' ? `daily_missions_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'DMCA2' ? `daily_missions_v2_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPBGPM' ? `vcl_bg_pm_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPDM' ? `vcl_dm_us_${mm}${dd}${yy}_${hh}${min}.py` : offerType === 'USVIPLB' ? `vcl_lb_us_${mm}${dd}${yy}_${hh}${min}.py` : `rtc_top_up_${mm}${dd}${yy}_${hh}${min}.py`;
 
   // Update run cards
   document.getElementById('mac-run-cmd').textContent = `cd ~/Downloads && python3 ${filename}`;
