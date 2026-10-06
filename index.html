@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.19</title>
+  <title>NATS Bonus Creator v3.20</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -3168,10 +3168,11 @@ const INFO_DMCA = `<ul>
 const INFO_DMCA2 = `<ul>
   <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (36 new filings, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">\u26a0\ufe0f NEVER build V1 and V2 for the same calendar date</span> \u2014 the code shapes are identical by stakeholder decision and would collide in NATS/Playmaker. V1 retires at V2 go-live (hard cutover date set during handover).</li>
   <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
+  <li><strong>Contribution rates (v3.20):</strong> the Playmaker Entitlement step selects <span style="color:#ffffff;">Configure Contribution</span> on every bonus \u2014 <span style="color:#ffffff;">CC: Table 100 / Slot 0</span>; <span style="color:#ffffff;">FS: Slot 100 / Table 0</span> \u2014 both hard-verified by read-back (Playmaker defaults arrive Slot 100 / Table 20 and are never trusted). CC wagering is <span style="color:#ffffff;">table-games-only as re-filed</span> (CC T&amp;C set re-filed Oct 2026, same IDs; the Casino Credit reward still spends on any game). \u26a0\ufe0f Every pre-v3.20 daily_missions_v2_ script is DEAD \u2014 regenerate.</li>
   <li><strong>Bonus Spins \u2014 \u26a0\ufe0f Mon/Wed/Fri/Sun locked:</strong> the four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are <span style="color:#ffffff;">not yet set up in Playmaker</span> \u2014 Set 1 weekday FS ships locked (v2.28 precedent); a point release unlocks it after the game/ladder dry-run sweep. <span style="color:#ffffff;">Tue/Thu/Sat FS is live</span> (Light &amp; Wonder under OGS/LIGHTANDWONDER, Bet Level 20+0): Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; FS Terms CAS_CA_0112\u20130135 + 0138\u20130141 (0136/0137 filer-skipped). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
   <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops.</li>
   <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
-  <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2: "Play" \u2192 /docs/usered/CanadaDailyMissions. T&amp;Cs are two canonical baked templates word-verified against all 36 attached filings. <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
+  <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2: "Play" \u2192 /docs/usered/CanadaDailyMissions. T&amp;Cs are two canonical baked templates word-verified against all 36 attached filings (CC set re-filed Oct 2026: table-games wagering; FS set unchanged). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
   <li><strong>Images (84-file manifest, Drive-validated):</strong> new V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
 </ul>`;
 
@@ -12702,7 +12703,7 @@ function buildDMCA2Script(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada v2 Auto-Generated Script
-Generated by NATS Bonus Creator v3.17
+Generated by NATS Bonus Creator v3.20
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
@@ -12758,21 +12759,21 @@ ${codesStr}
 
 # ── Copy templates ─────────────────────────────────────────────────────────────
 HIW_CC_TEMPLATE = """1) Opt in
-2) Place {bet_fmt}+ in cumulative cash wagers on any Fanatics Casino games before 11:59pm ET tonight
+2) Place {bet_fmt}+ in cumulative cash wagers on any table games on Fanatics Casino before 11:59pm ET tonight
 3) We'll reward you with {get_fmt} in Casino Credit to use on any game on Fanatics Casino"""
 
 TC_CC_TEMPLATE = """PROMOTIONAL TERMS AND CONDITIONS
 FANATICS CASINO (CANADA) \\u2013 BET {bet_fmt} CAD, GET {get_fmt} CAD IN CASINO CREDIT ({terms_id})
 
 1.   Description of Promotion
-This promotion is offered by FBG Enterprises Canada, Inc. (\\u201cFanatics Casino\\u201d). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer are eligible to receive {get_fmt} CAD in Casino Credit (\\u201cRewards\\u201d). Your twenty-four (24) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
+This promotion is offered by FBG Enterprises Canada, Inc. (\\u201cFanatics Casino\\u201d). Select customers who opt in and place {bet_fmt}+ CAD in cumulative cash wagers on any table games in the Fanatics Casino within twenty-four (24) hours of receiving this offer are eligible to receive {get_fmt} CAD in Casino Credit (\\u201cRewards\\u201d). Your twenty-four (24) hour wagering window begins upon your receipt of this offer. YOU MUST OPT IN TO CLAIM YOUR REWARD.
 2.   Promotional Period
 This \\u201cPromotion\\u201d begins at 12:00 a.m. ET on {start_date_long} and ends at 11:59 p.m. ET on {end_date_long} (\\u201cPromotional Period\\u201d).
 3.   Eligibility
 This Promotion is available to select customers with an active and verified Ontario, Canada Fanatics Casino Account (\\u201cAccount\\u201d). To participate in this Promotion, you must be 19 years of age or older and be physically present in Ontario to use your Account. You must receive the invitation to participate in this Promotion directly from Fanatics Casino (offer may not be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. If you do not opt in or otherwise satisfy the requirements set forth herein, you are ineligible to participate in this Promotion.
 Employees of FBG Enterprises Canada, Inc. and its affiliates, their advertising and promotional agencies, and the immediate family members of any such employees (defined as parents, siblings, children, or spouse) and persons with whom such employees are domiciled are ineligible to participate. Individuals on any voluntary or involuntary self-exclusion list maintained by Fanatics Casino or any applicable provincial gaming authority are ineligible to participate in this Promotion.
 4.   Action Required
-To be eligible for the Rewards: (i) each time you are eligible for this Promotion, you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any Fanatics Casino games within twenty-four (24) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 24 hours of satisfying the wagering requirement. You will receive {get_fmt} CAD in Casino Credit.
+To be eligible for the Rewards: (i) each time you are eligible for this Promotion, you must opt in via the Promos page; and (ii) you must place {bet_fmt}+ CAD in cumulative cash wagers on any table games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. YOU MUST OPT IN PRIOR TO PLACING YOUR QUALIFYING WAGERS TO BE ELIGIBLE FOR THE REWARD. Rewards will be added to your Account within 24 hours of satisfying the wagering requirement. You will receive {get_fmt} CAD in Casino Credit.
 5.   Claiming Promotional Offer
 Casino Credit (Rewards) Terms
 Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
@@ -12797,7 +12798,7 @@ Bets must be placed with cash (CAD). Bets placed with Bonus Spins, Casino Credit
 9.   Order of Funds Used for Wagering
 If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
 10.   Eligible Games
-Cash wagers can be placed on any games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. Rewards issued with this Promotion can be used on any Fanatics Casino games and expire seven (7) days from the date of issuance (at 11:59 p.m. ET).
+Cash wagers can be placed on any table games in the Fanatics Casino within twenty-four (24) hours of receiving this offer. Rewards issued with this Promotion can be used on any games in the Fanatics Casino and expire seven (7) days from the date of issuance (at 11:59 p.m. ET).
 11.   Restrictions on Withdrawal
 Casino Credit or any other promotional credits may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with promotional credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
 12.   Cancellation
@@ -13457,6 +13458,33 @@ async def create_pm_bonus(page, c):
     wagering_input = await page.wait_for_selector("input[name='wageringAmount']", timeout=15000)
     await wagering_input.fill(bet)
     print(f"    OK Wagering Amount: {bet}")
+
+    # v3.20 - contribution rates: CC = Table 100 / Slot 0, FS = Slot 100 / Table 0.
+    # Playmaker defaults arrive Slot 100 / Table 20 under Configure - NEVER trusted
+    # (the lossPercentage lesson); both fills hard-verify by read-back.
+    cfg_radio = await page.wait_for_selector("button[role='radio'][value='configure']", timeout=15000)
+    await cfg_radio.click()
+    await page.wait_for_timeout(1000)
+    if await cfg_radio.get_attribute("aria-checked") != "true":
+        raise Exception("Configure Contribution radio did not take (aria-checked != 'true') - refusing to continue")
+    print("    OK Configure Contribution selected (aria-checked verified)")
+    _cmounted = False
+    for _ in range(40):
+        if await page.query_selector("input[name='slotContribution']") and await page.query_selector("input[name='tableContribution']"):
+            _cmounted = True
+            break
+        await page.wait_for_timeout(500)
+    if not _cmounted:
+        raise Exception("Contribution inputs never mounted within 20s of selecting Configure - stale form, refusing to continue")
+    _slot_target, _table_target = ("100", "0") if c["reward"] == "FS" else ("0", "100")
+    for _cname, _ctarget, _clabel in (("slotContribution", _slot_target, "SLOT Contribution (%)"), ("tableContribution", _table_target, "Table Contribution (%)")):
+        _cel = await page.wait_for_selector(f"input[name='{_cname}']", timeout=15000)
+        await _cel.fill(_ctarget)
+        await page.wait_for_timeout(500)
+        _cgot = await _cel.input_value()
+        if str(_cgot).strip() != _ctarget:
+            raise Exception(f"{_clabel}: read-back mismatch - filled {_ctarget!r} but field reads {_cgot!r} - a surviving default pays the wrong wagering math")
+        print(f"    OK {_clabel}: {_ctarget} (read-back verified)")
 
     print(f"  --- Step 4: Settlement")
     await goto_step(page, 4, "Settlement")
