@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.18</title>
+  <title>NATS Bonus Creator v3.19</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -751,8 +751,8 @@
           <option value="SUO">SUO Day 2+ Spins</option>
           <option value="LCREACT">Lifecycle - REACT CC Drop</option>
           <option value="CHURNDM">Lifecycle - Churn DM</option>
-          <option value="VIPDM">VIP Offer Library - Deposit Matches</option>
-          <option value="VIPBG">VIP Offer Library - Bet &amp; Gets</option>
+          <option value="VIPDM">Canada VIP Offer Library - Deposit Matches</option>
+          <option value="VIPBG">Canada VIP Offer Library - Bet &amp; Gets</option>
           <option value="DMCA">Daily Missions - Canada</option>
           <option value="DMCA2">Daily Missions - Canada v2</option>
           <option value="USVIPBGPM">US VIP Offer Library - Bet &amp; Gets (Playmaker)</option>
@@ -3000,7 +3000,7 @@ function updateJurisdictionOptions(type) {
   sel.innerHTML = '';
   const rtcOnly = ['US','CA'];  // v2.22 — RTC Top Up - Casino Credit is US / CA only
   const vipdmRegions = ['CA'];  // v3.13 — VIP Offer Library - Deposit Matches is CA-only (region visible-locked; the US flow is retired — US branch preserved unreachable; USVIPDM is the US successor)
-  const vipbgRegions = ['US','CA'];  // v2.25 — VIP Offer Library - Bet & Gets is US / CA (US: FanCash; CA: Casino Credit)
+  const vipbgRegions = ['CA'];  // v3.19 — Canada VIP Offer Library - Bet & Gets is CA-only (region visible-locked; the US FanCash flow is retired — US branch preserved unreachable; USVIPBGPM is the US successor)
   const churnRegions = ['US','CA'];  // v3.1 — LC-CHURN-DM restricted to US / CA (state codes + the v3.1 state suffix would exceed the 40-char NATS limit)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
     : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
@@ -3023,8 +3023,9 @@ function updateJurisdictionOptions(type) {
     // US flow is retired and old US VIPDM scripts are dead as of v3.13
     sel.value = 'CA';
   } else if (type === 'VIPBG') {
-    // v2.25 — keep the current region if valid, otherwise default to CA (the original region)
-    sel.value = vipbgRegions.includes(current) ? current : 'CA';
+    // v3.19 — locked to CA — Canada (the sole option); the US (FanCash) flow is
+    // retired and old US VIPBG scripts are dead as of v3.19 (USVIPBGPM is the US successor)
+    sel.value = 'CA';
   } else if (type === 'CHURNDM') {
     // v3.1 — keep the current region if valid, otherwise default to US
     sel.value = churnRegions.includes(current) ? current : 'US';
@@ -3126,7 +3127,7 @@ const INFO_CHURNDM = `<ul>
 </ul>`;
 
 const INFO_VIPBG = `<ul>
-  <li><strong>Offer Type:</strong> VIP Offer Library - Bet &amp; Gets. <span style="color:#ffffff;">Dual region (v2.25):</span> <span style="color:#ffffff;">US — United States</span> pays <span style="color:#ffffff;">FanCash</span> (USD rows); <span style="color:#ffffff;">CA — Canada</span> pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. The wager requirement is enforced upstream (XP/segment) — no bet amount is entered on the bonus. <span style="color:#ffffff;">Switching Region resets all card values</span> (silent, by design).</li>
+  <li><strong>Offer Type (v3.19):</strong> Canada VIP Offer Library - Bet &amp; Gets. <span style="color:#ffffff;">CA — Canada only</span> (region visible-locked; the US FanCash flow is retired — USVIPBGPM is the US successor). Pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. The wager requirement is enforced upstream (XP/segment) — no bet amount is entered on the bonus. <span style="color:#ffffff;">Codes carry product token VCL as of v3.19</span> — every pre-v3.19 vcl_bg_ script is dead; regenerate. US bullets below describe the retired branch.</li>
   <li><strong>Offers:</strong> CA offers are Category (Slots/Tables) &rarr; Bet &rarr; Get (eight defaults); US offers are Bet &rarr; Get only — all US tiers are slots B&amp;Gs (four defaults, Terms IDs CAS_10687–CAS_10690). Each offer maps to a Terms ID (editable in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
   <li><strong>Promo &amp; Activation Window (both regions):</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
   <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". Button 2: <span style="color:#ffffff;">US fills "Play Now!" &rarr; /docs/usered/casgenericgamelist; CA is left empty</span> by design.</li>
@@ -3140,7 +3141,7 @@ const INFO_VIPBG = `<ul>
 </ul>`;
 
 const INFO_VIPDM = `<ul>
-  <li><strong>Offer Type:</strong> VIP Offer Library - Deposit Matches. <span style="color:#ffffff;">Dual region (v2.26):</span> <span style="color:#ffffff;">US — United States</span> (default) pays <span style="color:#ffffff;">FanCash</span> (USD rows); <span style="color:#ffffff;">CA — Canada</span> pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. <span style="color:#ffffff;">Switching Region resets all card values</span> (silent, by design).</li>
+  <li><strong>Offer Type (v3.19):</strong> Canada VIP Offer Library - Deposit Matches. <span style="color:#ffffff;">CA — Canada only</span> (region visible-locked since v3.13; the US FanCash flow is retired — USVIPDM is the US successor). Pays <span style="color:#ffffff;">Casino Credit</span> (CAD rows). Builds Segment, Promotion, and Bonus for each selected offer. <span style="color:#ffffff;">Codes carry product token VCL as of v3.19</span> — every pre-v3.19 vcl_dm_ script is dead; regenerate. US bullets below describe the retired branch.</li>
   <li><strong>Offers:</strong> Each offer is Minimum Deposit &rarr; Match % &rarr; Max reward. US has ten defaults (Terms IDs CAS_10677&ndash;CAS_10686); CA has twelve defaults (CAS_CA_0078&ndash;CAS_CA_0086 plus the v3.3/v3.4 additions: 20% &rarr; $10,000 / 20% &rarr; $20,000 / 50% &rarr; $5,000, Terms IDs CAS_CA_0092&ndash;CAS_CA_0094). Each offer maps to a Terms ID (editable per region in the Edit T&amp;Cs modal). <span style="color:#ffffff;">Offers without a configured Terms ID block script generation.</span></li>
   <li><strong>Promo &amp; Activation Window (both regions):</strong> Starts 1 day <em>before</em> the typed date at 00:00:00 ET. Ends on the <span style="color:#ffffff;">last day of the typed date's calendar month at 23:59:59 ET, plus the Days to Entitlement value</span>. Changing Days to Entitlement changes the end date.</li>
   <li><strong>Title / Promo Header / Bonus Description:</strong> Fixed as "From Your VIP Host". Button 2: "Deposit" &rarr; /auth/account/deposit (both regions).</li>
@@ -4184,7 +4185,7 @@ function renderAll() {
       card.style.maxWidth = '620px';
       card.innerHTML = `
         <div class="day-header">
-          <span class="day-number">VIP Offer Library — ${isVIPDMUS() ? 'US — United States' : 'CA — Canada'}</span>
+          <span class="day-number">Canada VIP Offer Library — ${isVIPDMUS() ? 'US — United States' : 'CA — Canada'}</span>
           <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
         </div>
         ${stepBadgesHTML(i)}
@@ -4235,7 +4236,7 @@ function renderAll() {
       card.style.maxWidth = '680px';
       card.innerHTML = `
         <div class="day-header">
-          <span class="day-number">VIP Offer Library — Bet &amp; Gets — ${isVIPBGUS() ? 'US — United States' : 'CA — Canada'}</span>
+          <span class="day-number">Canada VIP Offer Library — Bet &amp; Gets — ${isVIPBGUS() ? 'US — United States' : 'CA — Canada'}</span>
           <button class="reset-btn" onclick="resetDay(${i})">Reset</button>
         </div>
         ${stepBadgesHTML(i)}
@@ -9435,6 +9436,8 @@ def parse_vipdm(code):
         raise ValueError(f"code has fewer than 8 fields: {code}")
     if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
         raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    if parts[2] != "VCL":
+        raise ValueError(f"product (field 2) must be 'VCL' (v3.19 cost-tracking rename) - pre-v3.19 VCAS-coded scripts are DEAD, regenerate from v3.19: got {parts[2]!r} in {code}")
     freeform = "_".join(parts[7:])
     m = re.fullmatch(r"M(\\d+K?)_(\\d+)M(\\d+K?)", freeform)
     if not m:
@@ -10745,6 +10748,8 @@ ${isUS ? `def parse_vipbg(code):
         raise ValueError(f"code has fewer than 8 fields: {code}")
     if parts[1] not in USD_JURISDICTIONS and parts[1] not in CANADIAN_JURISDICTIONS:
         raise ValueError(f"jurisdiction not at position 1 (v2.x-shaped code?): {code}")
+    if parts[2] != "VCL":
+        raise ValueError(f"product (field 2) must be 'VCL' (v3.19 cost-tracking rename) - pre-v3.19 VCAS-coded scripts are DEAD, regenerate from v3.19: got {parts[2]!r} in {code}")
     cat = parts[5]
     if cat not in ("SBG", "TBG"):
         raise ValueError(f"VIPBG mechanic (field 5) must be SBG or TBG, got {cat!r} in {code}")
@@ -16257,14 +16262,14 @@ function generateScript() {
       const vdmDoSegment = days[i].doSegment !== false;
       const vdmDoPromo = days[i].doPromo !== false;
       const vdmDoBonus = days[i].doBonus !== false;
-      // v3.0 naming: MMDDYY_JUR_VCAS_RET_OL_DM_{FC|CC}_M{min}_{pct}M{max}
+      // v3.19 naming: CA: MMDDYY_CA_VCL_RET_OL_DM_CC_M{min}_{pct}M{max} (VCL since v3.19); the retired US branch keeps VCAS+FC (unreachable since v3.13)
       // K-notation: min/max >= 1000 and divisible by 1000 render as {n}K (expanded back at runtime)
       const vdmK = v => { const n = parseInt(v, 10); return (n >= 1000 && n % 1000 === 0) ? (n / 1000) + 'K' : String(n); };
       const vdmOverlong = [];
       offers.forEach(o => {
         const code = isVIPDMUS()
           ? `${date}_US_VCAS_RET_OL_DM_FC_M${vdmK(o.min)}_${o.pct}M${vdmK(o.max)}`
-          : `${date}_CA_VCAS_RET_OL_DM_CC_M${vdmK(o.min)}_${o.pct}M${vdmK(o.max)}`;
+          : `${date}_CA_VCL_RET_OL_DM_CC_M${vdmK(o.min)}_${o.pct}M${vdmK(o.max)}`;
         if (code.length > 40) vdmOverlong.push(`${code} (${code.length})`);
         allNames.push({
           code: code,
@@ -16299,15 +16304,15 @@ function generateScript() {
       const vbgDoSegment = days[i].doSegment !== false;
       const vbgDoPromo = days[i].doPromo !== false;
       const vbgDoBonus = days[i].doBonus !== false;
-      // v3.0 naming: US: MMDDYY_US_VCAS_RET_OL_SBG_FC_B{bet}_G{get} (all US tiers are slots)
-      //              CA: MMDDYY_CA_VCAS_RET_OL_{SBG|TBG}_CC_B{bet}_G{get}
+      // v3.19 naming: US (retired, unreachable): MMDDYY_US_VCAS_RET_OL_SBG_FC_B{bet}_G{get}
+      //              CA: MMDDYY_CA_VCL_RET_OL_{SBG|TBG}_CC_B{bet}_G{get} (VCL since v3.19)
       // K-notation: bet/get >= 1000 and divisible by 1000 render as {n}K (expanded back at runtime)
       const vbgK = v => { const n = parseInt(v, 10); return (n >= 1000 && n % 1000 === 0) ? (n / 1000) + 'K' : String(n); };
       const vbgOverlong = [];
       offers.forEach(o => {
         const code = vipbgUS
           ? `${date}_US_VCAS_RET_OL_SBG_FC_B${vbgK(o.bet)}_G${vbgK(o.get)}`
-          : `${date}_CA_VCAS_RET_OL_${o.cat}_CC_B${vbgK(o.bet)}_G${vbgK(o.get)}`;
+          : `${date}_CA_VCL_RET_OL_${o.cat}_CC_B${vbgK(o.bet)}_G${vbgK(o.get)}`;
         if (code.length > 40) vbgOverlong.push(`${code} (${code.length})`);
         allNames.push({
           code: code,
