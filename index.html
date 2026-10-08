@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.21</title>
+  <title>NATS Bonus Creator v3.22</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2747,7 +2747,7 @@ const DMCA2_LADDER_LW = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60'
 // dump-verified ladders — four DISTINCT ladders, no shared constant). The four
 // Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass
 // Bonanza, Sweet Bonanza 1000) remain the plan for these weekdays — when they
-// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.22 swaps the
+// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.23 swaps the
 // builds over after their own dry-run sweep. The interim games NEVER build once
 // Pragmatic is live; the reserved Pragmatic Set 1 filings (CAS_CA_0112–0119,
 // 0124–0127, 0138–0141) are restored at the swap.
@@ -2789,7 +2789,7 @@ const DMCA2_FS_TIERS = {
   1: [
     // v3.21 INTERIM L&W tids (CAS_CA_0172–0187, contiguous, no filer-skips); the
     // reserved Pragmatic Set 1 tids (0112–0119/0124–0127/0138–0141) are restored at
-    // v3.22. Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
+    // v3.23 (the pre-planned Pragmatic swap). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
     // filed "$1" — deliberate filer delta; values render verbatim in the T&C;
     // the stake token and vtok are unchanged).
     { bet: '50',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Monday: 'CAS_CA_0172', Wednesday: 'CAS_CA_0176', Friday: 'CAS_CA_0180', Sunday: 'CAS_CA_0184' } },
@@ -3186,11 +3186,11 @@ const INFO_DMCA2 = `<ul>
   <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (52 filings \u2014 the original 36 + the 16 interim L&amp;W, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">\u26a0\ufe0f NEVER build V1 and V2 for the same calendar date</span> \u2014 the code shapes are identical by stakeholder decision and would collide in NATS/Playmaker. V1 retires at V2 go-live (hard cutover date set during handover).</li>
   <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
   <li><strong>Contribution rates (v3.20):</strong> the Playmaker Entitlement step selects <span style="color:#ffffff;">Configure Contribution</span> on every bonus \u2014 <span style="color:#ffffff;">CC: Table 100 / Slot 0</span>; <span style="color:#ffffff;">FS: Slot 100 / Table 0</span> \u2014 both hard-verified by read-back (Playmaker defaults arrive Slot 100 / Table 20 and are never trusted). CC wagering is <span style="color:#ffffff;">table-games-only as re-filed</span> (CC T&amp;C set re-filed Oct 2026, same IDs; the Casino Credit reward still spends on any game). \u26a0\ufe0f Every pre-v3.20 daily_missions_v2_ script is DEAD \u2014 regenerate.</li>
-  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS/LIGHTANDWONDER, Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.22 successors</span> \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
+  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS/LIGHTANDWONDER, Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.23 successors</span> (the pre-planned Pragmatic swap, moved from v3.22 by this release) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
   <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops. The four interim Mon/Wed/Fri/Sun ladders are <span style="color:#ffffff;">individually dump-verified</span> (Oct 8, 2026) \u2014 no assumed-ladder caveat on those weekdays.</li>
   <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
-  <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2: "Play" \u2192 /docs/usered/CanadaDailyMissions. T&amp;Cs are two canonical baked templates word-verified against all 36 attached filings (CC set re-filed Oct 2026: table-games wagering; FS set unchanged). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
-  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at v3.22). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
+  <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2 (v3.22, reward-scoped): <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionTable</span> (CC) / <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionSlots</span> (FS). T&amp;Cs are two canonical baked templates word-verified against all 52 attached filings (CC set re-filed Oct 2026: table-games wagering; FS incl. the 16 interim L&amp;W filings). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
+  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.23 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
 </ul>`;
 
 
@@ -12721,7 +12721,7 @@ function buildDMCA2Script(allNames, imagePath) {
 
   return `"""
 Daily Missions - Canada v2 Auto-Generated Script
-Generated by NATS Bonus Creator v3.21
+Generated by NATS Bonus Creator v3.22
 
 Phase 1 (NATS, production):     builds Account Segments, then Promotions
 Phase 2 (Playmaker, production): builds Casino Credit / Bonus Spins bonuses (Save Bonus IS clicked)
@@ -12733,8 +12733,12 @@ Credit on all 7 days); the weekday selects the TIER SET (Set 1 = Mon/Wed/Fri/Sun
 Set 2 = Tue/Thu/Sat) and, for Bonus Spins, the game. FS is live on all 7 weekdays
 as of v3.21: Tue/Thu/Sat on the Huff N' Puff trio, and Mon/Wed/Fri/Sun on four
 INTERIM Light & Wonder games (dry-run-proven Oct 8, 2026) until the four Pragmatic
-titles land in Playmaker — v3.22 swaps the builds over; the interim games never
-build once Pragmatic is live.
+titles land in Playmaker — v3.23 (the pre-planned Pragmatic swap) swaps the
+builds over; the interim games never build once Pragmatic is live.
+
+v3.22: Button 2's link is reward-scoped — "Play" -> /docs/usered/CanadaDailyMissionTable
+(Casino Credit) / "Play" -> /docs/usered/CanadaDailyMissionSlots (Bonus Spins).
+The label is unchanged.
 Playmaker FS flow (dry-run-verified Oct 5, 2026): a mandatory Bet Level combobox sits
 between Casino Game and the stakes grid; the grid renders empty until the level is
 picked and mounts up to several seconds later (polled). A Create form is NEVER reused
@@ -12765,9 +12769,12 @@ PLAYMAKER_URL = "https://playmaker-internal.1.betfanatics.com/home"
 
 IMAGE_FOLDER = "${imagePath}"
 
-# v3.5 - Button 2 (identical for all tiers, all days)
+# v3.22 - Button 2: label fixed; link reward-scoped (CC -> Table page, FS -> Slots page)
 BUTTON2_LABEL = "Play"
-BUTTON2_LINK  = "/docs/usered/CanadaDailyMissions"
+BUTTON2_LINKS = {
+    "CC": "/docs/usered/CanadaDailyMissionTable",
+    "FS": "/docs/usered/CanadaDailyMissionSlots",
+}
 
 # Ontario legal filing window (baked in at generation time)
 TERMS_START_LONG = "October 1, 2026"
@@ -12937,7 +12944,7 @@ def image_files_for(c):
     # with vtok in cents (20/40/60/100/200/400 -> ..._20V.png etc.).
     # v3.21: Mon/Wed/Fri/Sun FS uses the interim L&W creative - the same three
     # filenames with an _INT suffix (the un-suffixed Set 1 names stay RESERVED for
-    # the Pragmatic creative; nothing is ever renamed; _INT retires at v3.22).
+    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.23 Pragmatic swap).
     w = c["weekday"]
     rtok = "BS" if c["reward"] == "FS" else "CC"
     if c["reward"] == "FS":
@@ -13083,12 +13090,13 @@ async def create_promo(page, c):
     await page.locator("input[placeholder='Title']").fill(title_text)
     await page.locator("input[placeholder='Promo Header Text']").fill(title_text)
     print(f"    OK Title & Promo Header Text: {title_text}")
-    # v3.5 - Button 2 filled on every Daily Missions promo (all tiers, all days)
+    # v3.22 - Button 2 filled on every promo; link reward-scoped via BUTTON2_LINKS
+    button2_link = BUTTON2_LINKS[c["reward"]]
     btn2_label_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 label']"))
     await btn2_label_row.locator("input.ant-input").fill(BUTTON2_LABEL)
     btn2_link_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Button 2 link']"))
-    await btn2_link_row.locator("input.ant-input").fill(BUTTON2_LINK)
-    print(f"    OK Button 2: {BUTTON2_LABEL} -> {BUTTON2_LINK}")
+    await btn2_link_row.locator("input.ant-input").fill(button2_link)
+    print(f"    OK Button 2: {BUTTON2_LABEL} -> {button2_link}")
     bonus_tile_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title='Bonus Tile']"))
     await bonus_tile_row.locator(".ant-switch").click()
     await page.wait_for_timeout(500)
