@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.26</title>
+  <title>NATS Bonus Creator v3.27</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2754,7 +2754,7 @@ const DMCA2_LADDER_LW = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60'
 // dump-verified ladders — four DISTINCT ladders, no shared constant). The four
 // Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass
 // Bonanza, Sweet Bonanza 1000) remain the plan for these weekdays — when they
-// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.27 swaps the
+// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.28 swaps the
 // builds over after their own dry-run sweep. The interim games NEVER build once
 // Pragmatic is live; the reserved Pragmatic Set 1 filings (CAS_CA_0112–0119,
 // 0124–0127, 0138–0141) are restored at the swap.
@@ -2796,7 +2796,7 @@ const DMCA2_FS_TIERS = {
   1: [
     // v3.21 INTERIM L&W tids (CAS_CA_0172–0187, contiguous, no filer-skips); the
     // reserved Pragmatic Set 1 tids (0112–0119/0124–0127/0138–0141) are restored at
-    // v3.27 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
+    // v3.28 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27 -> v3.28). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
     // filed "$1" — deliberate filer delta; values render verbatim in the T&C;
     // the stake token and vtok are unchanged).
     { bet: '50',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Monday: 'CAS_CA_0172', Wednesday: 'CAS_CA_0176', Friday: 'CAS_CA_0180', Sunday: 'CAS_CA_0184' } },
@@ -3023,8 +3023,47 @@ const FS_GAMES = {
       { spinAmount: "100", spinValue: "1.0000", active: false },
       { spinAmount: "100", spinValue: "2.0000", active: false },
     ]
+  },
+  HEMPG: {
+    // v3.27 — Huff N' Even More Puff Grand: the first JURISDICTION-SCOPED game
+    // (jurisdictions: ["ON"]; absence of the key = the historical MI/NJ/WV/PA
+    // default) and the first non-"default" Bet Level in the NATS SUO flow
+    // (betLevel: "20+0" — exact ant-select-selection-item text, read back
+    // hard-fail in the generated script). SUO-only by stakeholder decision.
+    // All facts live-form-verified Oct 15, 2026: OGS / LIGHTANDWONDER (exact
+    // dropdown texts); the ON catalog shows "Grand" (not the Playmaker
+    // "GRAND"); ASCII apostrophe (the tolerant matcher handles it); typed
+    // search "grand (ON)" is the only selectable result (case-insensitive).
+    // The stakes ladder is TWO-DECIMAL, 30 steps, read from the CAD row,
+    // baked verbatim — the Spin Value match is exact-text.
+    fullName: "Huff N' Even More Puff Grand",
+    searchName: "Huff N' Even More Puff Grand",
+    searchOverride: "grand",
+    aggregator: "OGS",
+    provider: "LIGHTANDWONDER",
+    deeplink: "/casino_game/OGS_71870_ON",
+    betLevel: "20+0",
+    suoOnly: true,
+    jurisdictions: ["ON"],
+    suoDefaults: { spinAmount: "50", numDays: 10 },
+    spinValues: ["0.20","0.40","0.60","0.80","1.00","1.20","1.40","1.60","1.80","2.00","2.40","3.00","3.60","4.00","4.80","5.00","6.00","8.00","10.00","12.00","14.00","15.00","16.00","18.00","20.00","24.00","25.00","30.00","35.00","40.00"],
+    presets: [
+      { spinAmount: "25",  spinValue: "0.20", active: false },
+      { spinAmount: "50",  spinValue: "0.20", active: true  },
+      { spinAmount: "100", spinValue: "0.20", active: false },
+      { spinAmount: "50",  spinValue: "0.40", active: false },
+      { spinAmount: "50",  spinValue: "1.00", active: false },
+      { spinAmount: "50",  spinValue: "2.00", active: false },
+    ]
   }
 };
+
+// v3.27 — jurisdiction-scoped SUO games. A game without a `jurisdictions` key
+// keeps the historical MI/NJ/WV/PA availability; HEMPG is ["ON"].
+const SUO_US_STATES = ['MI', 'NJ', 'WV', 'PA'];
+function suoGameJurisdictions(k) { return FS_GAMES[k].jurisdictions || SUO_US_STATES; }
+function suoGameAvailable(k, jur) { return suoGameJurisdictions(k).includes(jur); }
+function suoGamesFor(jur) { return Object.keys(FS_GAMES).filter(k => suoGameAvailable(k, jur)); }
 
 
 function getFSPresets(game) {
@@ -3145,9 +3184,9 @@ const INFO_RAF = `<ul>
 const INFO_SUO = `<ul>
   <li><strong>Single Campaign:</strong> SUO Day 2+ Spins generates segments and bonuses for each day code — no promos are built.</li>
   <li><strong>Num Days:</strong> Must be <strong>5 or 10</strong> only. Codes are generated for DAY2 through DAY(N).</li>
-  <li><strong>Jurisdiction:</strong> MI, NJ, WV, or PA only.</li>
-  <li><strong>Game:</strong> Select the game from the dropdown. Same games available as RTC Free Spins.</li>
-  <li><strong>Code name format:</strong> <code>MMDDYY_CAS_ACQ_SUO_DAY{n}_{jurisdiction}_FS_{spins}</code></li>
+  <li><strong>Jurisdiction (v3.27):</strong> MI, NJ, WV, PA, or ON — Ontario. <span style="color:#ffffff;">Games are jurisdiction-scoped:</span> Huff N' Even More Puff Grand is ON-only; the six US games are MI/NJ/WV/PA-only. The game dropdown filters to the selected jurisdiction.</li>
+  <li><strong>Game — Huff N' Even More Puff Grand (ON, v3.27):</strong> OGS / LIGHTANDWONDER (exact dropdown texts), typed search <code>grand (ON)</code> (the only selectable result), Bet Level <span style="color:#ffffff;">20+0</span> (exact-text, read back hard-fail — the first non-default Bet Level in this flow), two-decimal CAD stakes ladder 0.20–40.00 baked verbatim, deeplink <code>/casino_game/OGS_71870_ON</code>, defaults 50 spins × 10 days @ 0.20. <span style="color:#ffffff;">ON bonuses remove all three COMBO tags</span> (Web + STAC only — matches every other CA flow); US states keep COMBO: Casino.</li>
+  <li><strong>Code name format (v3.0/v3.1):</strong> <code>MMDDYY_{US|CA}_CAS_ACQ_SUO_BG_FS_DAY{n}_{spins}_{ST}</code> — ON codes carry the CA group at position 1 and the _ON suffix. ⚠️ DAY10 with a 3-digit spin count is exactly 40 characters (fits; on the exact-40 watch list).</li>
   <li><strong>No voucher codes</strong> — these are no-opt-in bonuses. No promo tile.</li>
   <li><strong>Series:</strong> Early Life. <strong>Trigger:</strong> No Opt In. <strong>Status Active:</strong> checked.</li>
 </ul>`;
@@ -3221,11 +3260,11 @@ const INFO_DMCA2 = `<ul>
   <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (52 filings \u2014 the original 36 + the 16 interim L&amp;W, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">V1 is RETIRED as of v3.26 (Oct 15, 2026)</span> \u2014 removed from the selector, builder preserved byte-identical. The code shapes are identical by stakeholder decision, so the never-build-V1-and-V2-for-the-same-date rule is now historical: V1 can no longer be built. Existing live V1 objects stay as-is.</li>
   <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
   <li><strong>Contribution rates (v3.20):</strong> the Playmaker Entitlement step selects <span style="color:#ffffff;">Configure Contribution</span> on every bonus \u2014 <span style="color:#ffffff;">CC: Table 100 / Slot 0</span>; <span style="color:#ffffff;">FS: Slot 100 / Table 0</span> \u2014 both hard-verified by read-back (Playmaker defaults arrive Slot 100 / Table 20 and are never trusted). CC wagering is <span style="color:#ffffff;">table-games-only as re-filed</span> (CC T&amp;C set re-filed Oct 2026, same IDs; the Casino Credit reward still spends on any game). \u26a0\ufe0f Every pre-v3.20 daily_missions_v2_ script is DEAD \u2014 regenerate.</li>
-  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS/LIGHTANDWONDER, Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.27 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
+  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS/LIGHTANDWONDER, Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.28 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27 \u2192 v3.28; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
   <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops. The four interim Mon/Wed/Fri/Sun ladders are <span style="color:#ffffff;">individually dump-verified</span> (Oct 8, 2026) \u2014 no assumed-ladder caveat on those weekdays.</li>
   <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
   <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2 (v3.22, reward-scoped): <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionTable</span> (CC) / <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionSlots</span> (FS). T&amp;Cs are two canonical baked templates word-verified against all 52 attached filings (CC set re-filed Oct 2026: table-games wagering; FS incl. the 16 interim L&amp;W filings). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
-  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.27 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
+  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.28 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
 </ul>`;
 
 
@@ -3624,7 +3663,10 @@ function renderAll() {
     const card = document.createElement('div');
     card.className = 'day-card';
     card.style.maxWidth = '100%';
-    const game = day.suoGame || '7FH';
+    // v3.27 — jurisdiction-scoped games: resolve the selected game against the
+    // selected jurisdiction (HEMPG is ON-only; the six US games are MI/NJ/WV/PA).
+    const suoJur = day.suoJurisdiction || 'MI';
+    const game = (day.suoGame && suoGameAvailable(day.suoGame, suoJur)) ? day.suoGame : suoGamesFor(suoJur)[0];
     const gameData = FS_GAMES[game];
     const spinValuesOptions = gameData
       ? gameData.spinValues.map(v => `<option value="${v}" ${(day.suoSpinValue || '0.10') === v ? 'selected' : ''}>${v}</option>`).join('')
@@ -3642,17 +3684,18 @@ function renderAll() {
 
           <span class="field-label">Jurisdiction</span>
           <select style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; cursor: pointer; width: 180px; margin-bottom: 14px;"
-            onchange="days[0].suoJurisdiction = this.value;">
+            onchange="days[0].suoJurisdiction = this.value; var gk = days[0].suoGame; if (!gk || !suoGameAvailable(gk, this.value)) { var fg = suoGamesFor(this.value)[0]; days[0].suoGame = fg; days[0].suoSpinValue = FS_GAMES[fg].spinValues[0]; var sd = FS_GAMES[fg].suoDefaults; if (sd) { days[0].suoSpinAmount = sd.spinAmount; days[0].suoNumDays = sd.numDays; } } renderAll(); updateGenerateButton();">
             <option value="MI" ${(day.suoJurisdiction || 'MI') === 'MI' ? 'selected' : ''}>MI — Michigan</option>
             <option value="NJ" ${(day.suoJurisdiction || 'MI') === 'NJ' ? 'selected' : ''}>NJ — New Jersey</option>
             <option value="WV" ${(day.suoJurisdiction || 'MI') === 'WV' ? 'selected' : ''}>WV — West Virginia</option>
             <option value="PA" ${(day.suoJurisdiction || 'MI') === 'PA' ? 'selected' : ''}>PA — Pennsylvania</option>
+            <option value="ON" ${(day.suoJurisdiction || 'MI') === 'ON' ? 'selected' : ''}>ON — Ontario</option>
           </select>
 
           <span class="field-label">Game</span>
           <select style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; background: var(--surface2); color: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; cursor: pointer; width: 100%; margin-bottom: 14px;"
             onchange="days[0].suoGame = this.value; days[0].suoSpinValue = FS_GAMES[this.value].spinValues[0]; var sd = FS_GAMES[this.value].suoDefaults; if (sd) { days[0].suoSpinAmount = sd.spinAmount; days[0].suoNumDays = sd.numDays; } renderAll(); updateGenerateButton();">
-            ${Object.keys(FS_GAMES).map(k => `<option value="${k}" ${game === k ? 'selected' : ''}>${FS_GAMES[k].fullName}</option>`).join('')}
+            ${suoGamesFor(suoJur).map(k => `<option value="${k}" ${game === k ? 'selected' : ''}>${FS_GAMES[k].fullName}</option>`).join('')}
           </select>
 
           <div style="display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
@@ -3686,7 +3729,7 @@ function renderAll() {
           </div>
 
           <div style="font-size:11px; color:var(--muted); line-height:1.7;">
-            Builds a <span style="color:var(--text);">Segment</span> and <span style="color:var(--text);">Bonus</span> for every day code. No promos, no voucher codes. Spooky Link: Go Ghost (v3.23) defaults to 150 spins \u00d7 10 days @ 0.2000 \u2014 \u26a0\ufe0f DAY10 at 150 spins with a state suffix is exactly 40 characters (fits; on the exact-40 watch list).
+            Builds a <span style="color:var(--text);">Segment</span> and <span style="color:var(--text);">Bonus</span> for every day code. No promos, no voucher codes. Spooky Link: Go Ghost (v3.23) defaults to 150 spins \u00d7 10 days @ 0.2000 \u2014 \u26a0\ufe0f DAY10 at 150 spins with a state suffix is exactly 40 characters (fits; on the exact-40 watch list). Huff N' Even More Puff Grand (v3.27) is ON-only \u2014 Bet Level 20+0, defaults 50 spins \u00d7 10 days @ 0.20, ON removes all three COMBO tags; the six US games are MI/NJ/WV/PA-only.
           </div>
         </div>
 
@@ -6188,11 +6231,15 @@ function getSuoPreview(day) {
   const sv = day.suoSpinValue || '—';
   const ba = day.suoBetAmount || '—';
   const nd = day.suoNumDays || 10;
-  const game = day.suoGame || '7FH';
+  // v3.27 — jurisdiction-validated game + the true v3.0/v3.1 code shape
+  // (drive-by fix: the preview showed the pre-v3.0 shape; generated codes
+  // were always correct).
+  const grp = ['ON', 'AB', 'CA'].includes(jur) ? 'CA' : 'US';
+  const game = (day.suoGame && suoGameAvailable(day.suoGame, jur)) ? day.suoGame : suoGamesFor(jur)[0];
   const gameName = FS_GAMES[game] ? FS_GAMES[game].fullName : game;
   const codeLines = [];
   for (let n = 2; n <= nd; n++) {
-    codeLines.push(`<span style="color:#ffffff;">DAY${n}:</span> ${d}_CAS_ACQ_SUO_DAY${n}_${jur}_FS_${sa}`);
+    codeLines.push(`<span style="color:#ffffff;">DAY${n}:</span> ${d}_${grp}_CAS_ACQ_SUO_BG_FS_DAY${n}_${sa}_${jur}`);
   }
   return [
     ...codeLines,
@@ -8389,11 +8436,33 @@ GAMES = {
         "provider": "Aristocrat Interactive",
         "deeplink": "/casino_game/ART_play-spooky-link-go-ghost",
     },
+    "HEMPG": {
+        # v3.27 - Huff N' Even More Puff Grand (ON-only + SUO-only). The ON
+        # catalog shows "Grand" (ASCII apostrophe; the tolerant matcher
+        # handles it). searchOverride "grand" -> typed search "grand (ON)",
+        # live-form-proven the only selectable result Oct 15, 2026. First
+        # non-"default" Bet Level in this flow: "20+0" (exact-text select +
+        # read-back hard-fail). The stakes ladder is two-decimal, 30 steps,
+        # read from the CAD row - SPIN_VALUE is matched exact-text.
+        "searchName": "Huff N' Even More Puff Grand",
+        "searchOverride": "grand",
+        "aggregator": "OGS",
+        "provider": "LIGHTANDWONDER",
+        "deeplink": "/casino_game/OGS_71870_ON",
+        "betLevel": "20+0",
+    },
 }
 
 # ── Startup validation ────────────────────────────────────────────────────────
 
 assert NUM_DAYS in (5, 10), f"NUM_DAYS must be 5 or 10, got {NUM_DAYS}"
+
+# v3.27 - jurisdiction-scoped games: HEMPG is ON-only; games without an entry
+# keep the historical MI/NJ/WV/PA availability. Fail loud before any NATS write.
+GAME_JURISDICTIONS = {"HEMPG": {"ON"}}
+_allowed_jurs = GAME_JURISDICTIONS.get(GAME_KEY, {"MI", "NJ", "WV", "PA"})
+if JURISDICTION not in _allowed_jurs:
+    raise ValueError(f"game {GAME_KEY} is not available in {JURISDICTION} (allowed: {sorted(_allowed_jurs)})")
 
 # ── Derived names ─────────────────────────────────────────────────────────────
 
@@ -8524,12 +8593,27 @@ async def fill_free_spin_fields(page, num_spins):
     await casino_game_option.click()
     await page.wait_for_timeout(500)
     print(f"  \\u2705 Casino Game: {selected_game}")
+    # v3.27 - Bet Level is per-game (HEMPG: "20+0" - the first non-"default"
+    # level in this flow). Games without a betLevel keep the original "default"
+    # select byte-for-byte; overrides are matched exact-text against the
+    # dropdown and read back from the selection item - hard-fail, never
+    # substitute (the stakeholder HTML shows title="20+0" on the selected item).
+    bet_level = GAMES[GAME_KEY].get("betLevel", "default")
     bet_level_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("span", has_text="Bet Level"))
     await bet_level_row.locator(".ant-select-selector").click()
     await page.wait_for_timeout(500)
-    await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="default").first.click()
+    if bet_level == "default":
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content", has_text="default").first.click()
+    else:
+        await page.locator(".ant-select-dropdown:not(.ant-select-dropdown-hidden) div.ant-select-item-option-content").filter(
+            has_text=re.compile(r"^" + re.escape(bet_level) + r"$")
+        ).first.click()
+        await page.wait_for_timeout(500)
+        selected_level = (await bet_level_row.locator(".ant-select-selection-item").inner_text()).strip()
+        if selected_level != bet_level:
+            raise RuntimeError(f"Bet Level read-back failed: wanted {bet_level!r}, form shows {selected_level!r}")
     await page.wait_for_timeout(500)
-    print("  \\u2705 Bet Level: default")
+    print(f"  \\u2705 Bet Level: {bet_level}")
     deeplink_row = page.locator(".ant-legacy-form-item").filter(has=page.locator("label[title=\\"Free Spin's Deeplink\\"]"))
     await deeplink_row.locator("input[placeholder=\\"Free Spin's Deeplink\\"]").fill(game_data["deeplink"])
     await page.wait_for_timeout(500)
@@ -8641,7 +8725,15 @@ async def create_bonus_suo_day(page, n):
     await send_to_xp_checkbox.click()
     await page.wait_for_timeout(500)
     print("  \\u2705 Send To XP: checked")
-    for tag_text in ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]:
+    # v3.27 - ON (the CA group) removes ALL THREE COMBO tags (Web + STAC only -
+    # matches every other CA flow: CA VIPDM / CA VIPBG / Churn CA); US states
+    # keep COMBO: Casino (standard behavior, unchanged). "COMBO: Casino" is
+    # removed LAST - by then both Sportsbook tags are gone, so the substring
+    # matcher resolves to exactly one tag.
+    combo_tags = ["COMBO: Sportsbook", "COMBO: Sportsbook And Casino"]
+    if JURISDICTION_GROUP == "CA":
+        combo_tags.append("COMBO: Casino")
+    for tag_text in combo_tags:
         tag = page.locator(".ant-tag", has_text=tag_text).locator("span[aria-label='close']")
         if await tag.is_visible():
             await tag.click()
@@ -12789,7 +12881,7 @@ Credit on all 7 days); the weekday selects the TIER SET (Set 1 = Mon/Wed/Fri/Sun
 Set 2 = Tue/Thu/Sat) and, for Bonus Spins, the game. FS is live on all 7 weekdays
 as of v3.21: Tue/Thu/Sat on the Huff N' Puff trio, and Mon/Wed/Fri/Sun on four
 INTERIM Light & Wonder games (dry-run-proven Oct 8, 2026) until the four Pragmatic
-titles land in Playmaker — v3.27 (the pre-planned Pragmatic swap) swaps the
+titles land in Playmaker — v3.28 (the pre-planned Pragmatic swap) swaps the
 builds over; the interim games never build once Pragmatic is live.
 
 v3.22: Button 2's link is reward-scoped — "Play" -> /docs/usered/CanadaDailyMissionTable
@@ -13000,7 +13092,7 @@ def image_files_for(c):
     # with vtok in cents (20/40/60/100/200/400 -> ..._20V.png etc.).
     # v3.21: Mon/Wed/Fri/Sun FS uses the interim L&W creative - the same three
     # filenames with an _INT suffix (the un-suffixed Set 1 names stay RESERVED for
-    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.27 Pragmatic swap).
+    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.28 Pragmatic swap).
     w = c["weekday"]
     rtok = "BS" if c["reward"] == "FS" else "CC"
     if c["reward"] == "FS":
@@ -15876,14 +15968,21 @@ function generateScript() {
     if (!d.suoSpinAmount || parseFloat(d.suoSpinAmount) <= 0) { alert('Please enter Spins / Day.'); return; }
     if (!d.suoBetAmount || parseFloat(d.suoBetAmount) <= 0) { alert('Please enter Bet Amount.'); return; }
     if (!d.suoSpinValue) { alert('Please select Spin Value.'); return; }
+    // v3.27 — jurisdiction-scoped games: block generation on an unavailable pair
+    const suoJurSel = d.suoJurisdiction || 'MI';
+    const suoGameSel = d.suoGame || '7FH';
+    if (!suoGameAvailable(suoGameSel, suoJurSel)) {
+      alert(`${FS_GAMES[suoGameSel].fullName} is not available in ${suoJurSel}. Pick a game from the ${suoJurSel} list.`);
+      return;
+    }
     const suoCfg = {
       date: d.date,
-      jurisdiction: d.suoJurisdiction || 'MI',
+      jurisdiction: suoJurSel,
       spinAmount: parseInt(d.suoSpinAmount),
       spinValue: d.suoSpinValue,
       betAmount: parseInt(d.suoBetAmount),
       numDays: d.suoNumDays || 10,
-      gameKey: d.suoGame || '7FH',
+      gameKey: suoGameSel,
     };
     // v3.0: guard the longest code (highest day number) against the 40-char NATS limit
     const suoLongest = `${suoCfg.date}_${jurGroup(suoCfg.jurisdiction)}_CAS_ACQ_SUO_BG_FS_DAY${suoCfg.numDays}_${suoCfg.spinAmount}${jurSuffix(suoCfg.jurisdiction)}`;
