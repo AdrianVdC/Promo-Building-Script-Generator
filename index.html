@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.28</title>
+  <title>NATS Bonus Creator v3.29</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -2754,7 +2754,7 @@ const DMCA2_LADDER_LW = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60'
 // dump-verified ladders — four DISTINCT ladders, no shared constant). The four
 // Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass
 // Bonanza, Sweet Bonanza 1000) remain the plan for these weekdays — when they
-// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.29 swaps the
+// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.30 swaps the
 // builds over after their own dry-run sweep. The interim games NEVER build once
 // Pragmatic is live; the reserved Pragmatic Set 1 filings (CAS_CA_0112–0119,
 // 0124–0127, 0138–0141) are restored at the swap.
@@ -2762,11 +2762,21 @@ const DMCA2_LADDER_UFL = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60
 const DMCA2_LADDER_RLP = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60','1.80','2.00','2.40','3.00','3.20','4.00','4.80','5.00','5.60','6.00','6.40','7.00','7.20','8.00','9.00','10.00','12.00','14.00','15.00','16.00','18.00','20.00','24.00','25.00','28.00','30.00','32.00'];
 const DMCA2_LADDER_DDT = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60','1.80','2.00','2.40','3.00','3.60','4.00','4.80','5.00','6.00','8.00','10.00','12.00','14.00','15.00','16.00','18.00','20.00','24.00','25.00','30.00','35.00','40.00'];
 const DMCA2_LADDER_MLG = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60','2.00','3.00','4.00','5.00','8.00','10.00','20.00','40.00','60.00','80.00','100.00'];
+// v3.29 — Playmaker OGS Provider SPLIT (live-dropdown-verified Oct 20, 2026,
+// operator screenshots + selected-state HTML): 'Light & Wonder' now exists
+// ALONGSIDE LIGHTANDWONDER and holds exactly two games — Rich Little Piggies
+// (Wed) and Huff N' Puff Money Mansion (Thu). The other five weekdays' games,
+// and SUO's HEMPG, stay under LIGHTANDWONDER. Provider is matched by exact
+// text (select_radix_option, non-tolerant branch) — the ampersand is plain
+// inner_text, no escaping involved. Wednesday's catalog name also gained
+// punctuation ('Rich Little Piggies\u2122: World Class\u2122 Halloween Edition') — the
+// baked prefix search still substring-matches past the colon; names stay
+// AS FILED in toast/T&C, so neither name nor search changes.
 const DMCA2_GAMES = {
   Monday:    { name: 'Ultimate Fire Link\u2122 Triple Nova - Desert Nights', search: 'Ultimate Fire Link Triple Nova', aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_UFL },
   Tuesday:   { name: "Huff N' Puff High Rise", search: "Huff N' Puff High Rise", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
-  Wednesday: { name: 'Rich Little Piggies World Class Halloween Edition', search: 'Rich Little Piggies', aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_RLP },
-  Thursday:  { name: "Huff N' Puff Money Mansion", search: "Huff N' Puff Money Mansion", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
+  Wednesday: { name: 'Rich Little Piggies World Class Halloween Edition', search: 'Rich Little Piggies', aggregator: 'OGS', provider: 'Light & Wonder', betLevel: '20+0', stakes: DMCA2_LADDER_RLP },
+  Thursday:  { name: "Huff N' Puff Money Mansion", search: "Huff N' Puff Money Mansion", aggregator: 'OGS', provider: 'Light & Wonder', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
   Friday:    { name: 'Dancing Drums Tower', search: 'Dancing Drums Tower', aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_DDT },
   Saturday:  { name: "Huff N' Even More Puff GRAND", search: "Huff N' Even More Puff", aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_LW },
   Sunday:    { name: 'Money Link Moon Goddess', search: 'Money Link Moon Goddess', aggregator: 'OGS', provider: 'LIGHTANDWONDER', betLevel: '20+0', stakes: DMCA2_LADDER_MLG },
@@ -2796,7 +2806,7 @@ const DMCA2_FS_TIERS = {
   1: [
     // v3.21 INTERIM L&W tids (CAS_CA_0172–0187, contiguous, no filer-skips); the
     // reserved Pragmatic Set 1 tids (0112–0119/0124–0127/0138–0141) are restored at
-    // v3.29 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27 -> v3.28 -> v3.29). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
+    // v3.30 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27 -> v3.28 -> v3.29 -> v3.30). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
     // filed "$1" — deliberate filer delta; values render verbatim in the T&C;
     // the stake token and vtok are unchanged).
     { bet: '50',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Monday: 'CAS_CA_0172', Wednesday: 'CAS_CA_0176', Friday: 'CAS_CA_0180', Sunday: 'CAS_CA_0184' } },
@@ -3260,11 +3270,11 @@ const INFO_DMCA2 = `<ul>
   <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (52 filings \u2014 the original 36 + the 16 interim L&amp;W, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">V1 is RETIRED as of v3.26 (Oct 15, 2026)</span> \u2014 removed from the selector, builder preserved byte-identical. The code shapes are identical by stakeholder decision, so the never-build-V1-and-V2-for-the-same-date rule is now historical: V1 can no longer be built. Existing live V1 objects stay as-is.</li>
   <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
   <li><strong>Contribution rates (v3.20):</strong> the Playmaker Entitlement step selects <span style="color:#ffffff;">Configure Contribution</span> on every bonus \u2014 <span style="color:#ffffff;">CC: Table 100 / Slot 0</span>; <span style="color:#ffffff;">FS: Slot 100 / Table 0</span> \u2014 both hard-verified by read-back (Playmaker defaults arrive Slot 100 / Table 20 and are never trusted). CC wagering is <span style="color:#ffffff;">table-games-only as re-filed</span> (CC T&amp;C set re-filed Oct 2026, same IDs; the Casino Credit reward still spends on any game). \u26a0\ufe0f Every pre-v3.20 daily_missions_v2_ script is DEAD \u2014 regenerate.</li>
-  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS/LIGHTANDWONDER, Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.29 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27 \u2192 v3.28 \u2192 v3.29; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
+  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS \u2014 Provider <span style="color:#ffffff;">'Light &amp; Wonder' for Rich Little Piggies, LIGHTANDWONDER for the other three</span> after the Oct 20, 2026 Playmaker provider split \u2014 Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.30 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27 \u2192 v3.28 \u2192 v3.29 \u2192 v3.30; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion \u2014 now under Provider 'Light &amp; Wonder' \u2014 / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
   <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops. The four interim Mon/Wed/Fri/Sun ladders are <span style="color:#ffffff;">individually dump-verified</span> (Oct 8, 2026) \u2014 no assumed-ladder caveat on those weekdays.</li>
   <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
   <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2 (v3.22, reward-scoped): <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionTable</span> (CC) / <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionSlots</span> (FS). T&amp;Cs are two canonical baked templates word-verified against all 52 attached filings (CC set re-filed Oct 2026: table-games wagering; FS incl. the 16 interim L&amp;W filings). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
-  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.29 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
+  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.30 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
 </ul>`;
 
 
@@ -12918,11 +12928,15 @@ Credit on all 7 days); the weekday selects the TIER SET (Set 1 = Mon/Wed/Fri/Sun
 Set 2 = Tue/Thu/Sat) and, for Bonus Spins, the game. FS is live on all 7 weekdays
 as of v3.21: Tue/Thu/Sat on the Huff N' Puff trio, and Mon/Wed/Fri/Sun on four
 INTERIM Light & Wonder games (dry-run-proven Oct 8, 2026) until the four Pragmatic
-titles land in Playmaker — v3.29 (the pre-planned Pragmatic swap) swaps the
+titles land in Playmaker — v3.30 (the pre-planned Pragmatic swap) swaps the
 builds over; the interim games never build once Pragmatic is live.
 
 v3.22: Button 2's link is reward-scoped — "Play" -> /docs/usered/CanadaDailyMissionTable
 (Casino Credit) / "Play" -> /docs/usered/CanadaDailyMissionSlots (Bonus Spins).
+
+v3.29: Playmaker OGS provider split (live-dropdown-verified Oct 20, 2026) -
+Rich Little Piggies (Wed) and Huff N' Puff Money Mansion (Thu) now sit under
+Provider 'Light & Wonder'; the other five weekdays stay LIGHTANDWONDER.
 The label is unchanged.
 Playmaker FS flow (dry-run-verified Oct 5, 2026): a mandatory Bet Level combobox sits
 between Casino Game and the stakes grid; the grid renders empty until the level is
@@ -13129,7 +13143,7 @@ def image_files_for(c):
     # with vtok in cents (20/40/60/100/200/400 -> ..._20V.png etc.).
     # v3.21: Mon/Wed/Fri/Sun FS uses the interim L&W creative - the same three
     # filenames with an _INT suffix (the un-suffixed Set 1 names stay RESERVED for
-    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.29 Pragmatic swap).
+    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.30 Pragmatic swap).
     w = c["weekday"]
     rtok = "BS" if c["reward"] == "FS" else "CC"
     if c["reward"] == "FS":
