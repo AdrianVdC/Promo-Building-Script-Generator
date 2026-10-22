@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.30</title>
+  <title>NATS Bonus Creator v3.31</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -1376,14 +1376,163 @@ References to "you" or "your" throughout these Promotional Terms and Conditions 
 Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards' value may be reported for tax purposes as required by law.
 Any questions relating to eligibility, these Promotional Terms and CONDITIONS, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
 
-// LC-REACT T&C data — keyed by amount string
+// v3.31 — the re-filed US LC-REACT T&Cs, baked VERBATIM (title + sections
+// 1–14 as filed; letterhead / header line / Abbreviated Disclaimer excluded
+// per the standing baked-T&C convention; curly typography AS FILED, the
+// v3.16 precedent). $10 → CAS_15361, $25 → CAS_15363; promotional period
+// October 17, 2026 → April 17, 2027. The two filings are NOT substitution
+// twins as filed (the $25 filing keeps the $10 worked examples and words
+// its abbreviated disclaimer differently), so each is a full-text constant.
+const TC_LCREACT_US_10 = `FANATICS CASINO - $10 CASINO CREDIT DROP (ID: CAS_15361)
+
+1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC (“Fanatics Casino”). Fanatics Casino is giving eligible customers $10 of Casino Credit (“Rewards”) to use on any games in the Fanatics Casino.
+
+2. Promotional Period
+This “Promotion” begins at 12:00am ET on October 17, 2026, and ends at 11:59pm ET on April 17, 2027 (“Promotional Period”).
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Casino Account (“Account”). To participate in this Promotion, (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states; and (iii) you must receive the invite to participate in this Promotion directly from Fanatics Casino (offer cannot be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+You must opt-in to claim the Rewards. Your Rewards will automatically be loaded to your Account after you opt in, and you will be notified when your Rewards have been added.
+
+5. Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Rewards expire at seventy-two (72) hours from the date of issuance.
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available to use, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+As an example, if you have $20 in deposited funds (cash) and $10 in Casino Credit in your Account and you place a $10 wager that wins $8, the entire $10 Casino Credit will be applied to your wager (making your Casino Credit balance $0), and the $8 in winnings will be added to your cash balance (making it $28). Using the same example but with a $5 wager instead of $10, your Casino Credit balance will be $5, and your cash balance will be $28.
+Casino Credit can be combined with deposited funds (cash) to place a wager.
+As an example, if you have $20 in cash and $10 in Casino Credit in your Account and you wager $15 on a blackjack hand, $10 in Casino Credit and $5 in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $10 in Casino Credit and place a $2 wager, $2 of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you have $5 in Casino Credit and wager it on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $5 stake will be added to your cash balance).
+Casino Credit closest to expiration will be applied first.
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Bets placed using Casino Credit will not earn FanCash.
+Casino Credit may not be exchanged, substituted, or transferred.
+
+6. Casino Registration Procedures
+To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino’s Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees’, officers’ and directors’ immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+There are no wagering requirements on any winnings from bets placed with Casino Credit. Casino Credit must be played through one time. Rewards can be used on any games in the Fanatics Casino and expire seventy-two (72) hours from the date and time of issuance.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire seventy-two (72) hours from the date and time of issuance.
+
+11. Restrictions on Withdrawal
+Casino Credit may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with Casino Credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+Michigan/New Jersey/West Virginia Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER or visit www.1800gambler.net.
+Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+Participation in this Promotion is subject to Fanatics Sportsbook & Casino’s Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook & Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook & Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+
+const TC_LCREACT_US_25 = `FANATICS CASINO - $25 CASINO CREDIT DROP (ID: CAS_15363)
+
+1. Description of Promotion
+This promotion is offered by FBG Enterprises Opco, LLC (“Fanatics Casino”). Fanatics Casino is giving eligible customers $25 of Casino Credit (“Rewards”) to use on any games in the Fanatics Casino.
+
+2. Promotional Period
+This “Promotion” begins at 12:00am ET on October 17, 2026, and ends at 11:59pm ET on April 17, 2027 (“Promotional Period”).
+
+3. Eligibility
+This Promotion is only available to select customers with an active and verified Michigan, New Jersey, Pennsylvania, or West Virginia Fanatics Casino Account (“Account”). To participate in this Promotion, (i) you must be 21 years of age or older; (ii) you must be physically present in one of the foregoing states; and (iii) you must receive the invite to participate in this Promotion directly from Fanatics Casino (offer cannot be forwarded or shared). Promotion eligibility is subject to any Account wagering restrictions/limits and is determined by Fanatics Casino at its discretion on an ongoing basis. Individuals on any involuntary state gambling exclusion list, state gambling self-exclusion list, and/or self-exclusion list for any Fanatics subsidiary are ineligible to participate in the Promotion.
+
+4. Action Required
+You must opt-in to claim the Rewards. Your Rewards will automatically be loaded to your Account after you opt in, and you will be notified when your Rewards have been added.
+
+5. Claiming Promotional Offer
+Casino Credit (Rewards) Terms
+Rewards expire at seventy-two (72) hours from the date of issuance.
+Casino Credit is a type of bonus issued by Fanatics Casino that is applied to casino wagers in lieu of (or in combination with) deposited funds (cash).
+You can view your Casino Credit balance in your Account or in the Rewards carousel in the App.
+If you have Casino Credit available to use, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash).
+As an example, if you have $20 in deposited funds (cash) and $10 in Casino Credit in your Account and you place a $10 wager that wins $8, the entire $10 Casino Credit will be applied to your wager (making your Casino Credit balance $0), and the $8 in winnings will be added to your cash balance (making it $28). Using the same example but with a $5 wager instead of $10, your Casino Credit balance will be $5, and your cash balance will be $28.
+Casino Credit can be combined with deposited funds (cash) to place a wager.
+As an example, if you have $20 in cash and $10 in Casino Credit in your Account and you wager $15 on a blackjack hand, $10 in Casino Credit and $5 in cash will be applied to that wager.
+Casino Credit must be played through one time.
+Any payouts from bets placed with Casino Credit will be added to your cash balance.
+You do not need to use all of your Casino Credit as a single wager. Your wager amount will dictate how much Casino Credit is applied (e.g., if you have $10 in Casino Credit and place a $2 wager, $2 of Casino Credit will be applied to that wager).
+If Casino Credit is used on a blackjack hand that results in a push, the value of the Casino Credit will be added to your cash balance in your Account (e.g., if you have $5 in Casino Credit and wager it on a blackjack hand that results in a push, your Casino Credit balance will be $0, but the $5 stake will be added to your cash balance).
+Casino Credit closest to expiration will be applied first.
+Casino Credit cannot be redeemed for or withdrawn as cash at any time.
+Casino Credit can only be redeemed online or in-app with a valid Account.
+Use of Casino Credit does not count towards qualifying for any other promotional offers, nor can Casino Credit be used in other promotions.
+Bets placed using Casino Credit will not earn FanCash.
+Casino Credit may not be exchanged, substituted, or transferred.
+
+6. Casino Registration Procedures
+To create an Account: (i) your identity must be verified; and (ii) you must agree to Fanatics Sportsbook & Casino’s Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as well as acknowledge our Privacy Policy. You can create an Account for free on the App.
+
+7. Limitations on Participation
+Limit one (1) Reward per customer each time you are eligible to participate in this Promotion. Fanatics Casino expressly reserves the right to amend, suspend, or terminate this Promotion, including the administration thereof, at any time and in any state(s) without prior notice or consent. In addition, Fanatics Casino, in its sole discretion, may disqualify you from participating in this Promotion for any reason. Anyone deemed to be abusing this or any other promotion in Fanatics Casino’s sole discretion may be prohibited from participating in this or any future promotions and/or may be subject to Account closure. This Promotion is void in any jurisdiction where prohibited by law. This Promotion is not available to any employee, officer, or director of Fanatics Casino, its parent and affiliates, or each of such employees’, officers’ and directors’ immediate family members and/or those living in the same household (whether legally related or not).
+
+8. Wagering Requirements/Exclusions
+There are no wagering requirements on any winnings from bets placed with Casino Credit. Casino Credit must be played through one time. Rewards can be used on any games in the Fanatics Casino and expire seventy-two (72) hours from the date and time of issuance.
+
+9. Order of Funds Used for Wagering
+If you have Casino Credit available to use in your Account, it will automatically be applied to eligible casino wagers before (or in combination with) any deposited funds (cash). If you do not have Casino Credit in your Account, then bets will be placed with deposited funds (cash).
+
+10. Eligible Games
+Rewards issued with this Promotion can be used on any Fanatics Casino games and expire seventy-two (72) hours from the date and time of issuance.
+
+11. Restrictions on Withdrawal
+Casino Credit may not be withdrawn or redeemed for cash at any time, but any winnings from bets placed with Casino Credit can be withdrawn once the winnings have been added to your Account cash balance. Casino Credit must be played through one time.
+
+12. Cancellation
+To cancel your participation in this Promotion, please contact customer support on the App. Upon cancellation, you may withdraw any funds you have deposited into your Account without restriction. However, Rewards may not be withdrawn.
+
+13. Responsible Gaming
+Fanatics Casino aims to consistently care for our customers and promote responsible gambling practices.
+Michigan/New Jersey/West Virginia Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER or visit www.1800gambler.net.
+Pennsylvania Customers: If you or someone you know has a gambling problem, help is available. Call 1-800-GAMBLER.
+
+14. Other
+Participation in this Promotion is subject to Fanatics Sportsbook & Casino’s Terms of Service, House Rules, game rules, and these Promotional Terms and Conditions, as may be modified by Fanatics Casino, and all other applicable laws, rules and regulations. By creating an Account and participating in this Promotion, you also acknowledge that you have read and agreed to Fanatics Sportsbook & Casino’s Privacy Policy.
+In the event of any inconsistency between these Promotional Terms and Conditions and the relevant corresponding provision(s) of Fanatics Sportsbook & Casino’s Terms of Service, these Promotional Terms and Conditions will prevail.
+References to “you” or “your” throughout these Promotional Terms and Conditions are to the participants in this Promotion.
+Rewards recipients will be solely responsible for all federal, state, and local taxes, and for any other fees or costs associated with the Rewards, regardless of whether the Rewards are used in whole or in part, and the Rewards’ value may be reported for tax purposes as required by law.
+Any questions relating to eligibility, these Promotional Terms and Conditions, or any other questions concerning this Promotion will be resolved at the sole discretion of Fanatics Casino, and its decisions will be final and binding with respect thereto.`;
+
+// LC-REACT T&C data — keyed by amount string (v3.31: the CA / legacy
+// path — US $10/$25 take the verbatim constants above; US $50 and all
+// CA amounts still render from this map, byte-unchanged)
 const LCREACT_TC_DATA = {
   "10": { terms_id: "CAS_9237", promo_period: 'This "Promotion" begins at 12:00am ET on April 16, 2026, and ends at 11:59pm ET on October 16, 2026 ("Promotional Period").' },
   "25": { terms_id: "CAS_9238", promo_period: 'This "Promotion" begins at 12:00am ET on April 16, 2026, and ends at 11:59pm ET on October 16, 2026 ("Promotional Period").' },
   "50": { terms_id: "CAS_9456", promo_period: 'This "Promotion" begins at 12:00am ET on June 1, 2026, and ends at 11:59pm ET on December 1, 2026 ("Promotional Period").' },
 };
 
-function getLCREACTTC(amount) {
+function getLCREACTTC(amount, jurisdiction) {
+  // v3.31 — region-scoped: US $10/$25 return the re-filed CAS_15361/CAS_15363
+  // texts verbatim; CA (all amounts) and the US $50 tier (CAS_9456, not
+  // re-filed) keep the original template path byte-unchanged.
+  const grp = (jurisdiction === 'ON' || jurisdiction === 'AB' || jurisdiction === 'CA') ? 'CA' : 'US';
+  if (grp === 'US' && String(amount) === '10') return TC_LCREACT_US_10;
+  if (grp === 'US' && String(amount) === '25') return TC_LCREACT_US_25;
   const d = LCREACT_TC_DATA[String(amount)] || LCREACT_TC_DATA["10"];
   return DEFAULT_TC_LCREACT_10
     .replace(/\$10 CASINO CREDIT DROP/g, `\$${amount} CASINO CREDIT DROP`)
@@ -2754,7 +2903,7 @@ const DMCA2_LADDER_LW = ['0.20','0.40','0.60','0.80','1.00','1.20','1.40','1.60'
 // dump-verified ladders — four DISTINCT ladders, no shared constant). The four
 // Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass
 // Bonanza, Sweet Bonanza 1000) remain the plan for these weekdays — when they
-// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.31 swaps the
+// land in Playmaker (expected home PRAGMATIC / PRAGMATICPLAY), v3.32 swaps the
 // builds over after their own dry-run sweep. The interim games NEVER build once
 // Pragmatic is live; the reserved Pragmatic Set 1 filings (CAS_CA_0112–0119,
 // 0124–0127, 0138–0141) are restored at the swap.
@@ -2806,7 +2955,7 @@ const DMCA2_FS_TIERS = {
   1: [
     // v3.21 INTERIM L&W tids (CAS_CA_0172–0187, contiguous, no filer-skips); the
     // reserved Pragmatic Set 1 tids (0112–0119/0124–0127/0138–0141) are restored at
-    // v3.31 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27 -> v3.28 -> v3.29 -> v3.30 -> v3.31). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
+    // v3.32 (the pre-planned Pragmatic swap; renumbered v3.22 -> v3.23 -> v3.24 -> v3.25 -> v3.26 -> v3.27 -> v3.28 -> v3.29 -> v3.30 -> v3.31 -> v3.32). Tier 3's value is filed "$1.00" in the interim set (the Pragmatic set
     // filed "$1" — deliberate filer delta; values render verbatim in the T&C;
     // the stake token and vtok are unchanged).
     { bet: '50',   spins: '25',  value: '0.20', stake: '0.20', vtok: '20',  tids: { Monday: 'CAS_CA_0172', Wednesday: 'CAS_CA_0176', Friday: 'CAS_CA_0180', Sunday: 'CAS_CA_0184' } },
@@ -3103,11 +3252,13 @@ function updateJurisdictionOptions(type) {
   const vipdmRegions = ['CA'];  // v3.13 — VIP Offer Library - Deposit Matches is CA-only (region visible-locked; the US flow is retired — US branch preserved unreachable; USVIPDM is the US successor)
   const vipbgRegions = ['CA'];  // v3.19 — Canada VIP Offer Library - Bet & Gets is CA-only (region visible-locked; the US FanCash flow is retired — US branch preserved unreachable; USVIPBGPM is the US successor)
   const churnRegions = ['US','CA'];  // v3.1 — LC-CHURN-DM restricted to US / CA (state codes + the v3.1 state suffix would exceed the 40-char NATS limit)
+  const lcreactRegions = ['US','CA'];  // v3.31 — LC-REACT restricted to US / CA (stakeholder request; the re-filed US $10/$25 T&Cs are region-scoped)
   const filtered = (type === 'FS' || type === 'SUO') ? allOptions.filter(o => fsOnly.includes(o.value))
     : (type === 'RTC') ? allOptions.filter(o => rtcOnly.includes(o.value))
     : (type === 'VIPDM') ? allOptions.filter(o => vipdmRegions.includes(o.value))
     : (type === 'VIPBG') ? allOptions.filter(o => vipbgRegions.includes(o.value))
     : (type === 'CHURNDM') ? allOptions.filter(o => churnRegions.includes(o.value))
+    : (type === 'LCREACT') ? allOptions.filter(o => lcreactRegions.includes(o.value))
     : allOptions;
   filtered.forEach(o => {
     const opt = document.createElement('option');
@@ -3130,6 +3281,9 @@ function updateJurisdictionOptions(type) {
   } else if (type === 'CHURNDM') {
     // v3.1 — keep the current region if valid, otherwise default to US
     sel.value = churnRegions.includes(current) ? current : 'US';
+  } else if (type === 'LCREACT') {
+    // v3.31 — keep the current region if valid, otherwise default to US
+    sel.value = lcreactRegions.includes(current) ? current : 'US';
   } else {
     sel.value = 'US';
   }
@@ -3204,6 +3358,7 @@ const INFO_SUO = `<ul>
 const INFO_LCREACT = `<ul>
   <li><strong>Offer Type:</strong> Lifecycle - REACT CC Drop. Builds Segment, Promotion, and Bonus for each amount on each day card.</li>
   <li><strong>Default Amounts:</strong> $10, $25, $50 — each with its own Terms ID. Add or remove amounts as needed.</li>
+  <li><strong>Region (v3.31):</strong> <span style="color:#ffffff;">US — United States (default) or CA — Canada only</span> — the state/province options are removed. US $10/$25 carry the <span style="color:#ffffff;">re-filed CAS_15361 / CAS_15363 T&amp;Cs</span> (Oct 17, 2026 &rarr; Apr 17, 2027), baked verbatim; <span style="color:#ffffff;">CA copy and the US $50 tier (CAS_9456) are unchanged</span>.</li>
   <li><strong>Activation Window:</strong> 00:00:00 ET on the card date → 23:59:59 ET three days later (72-hour window).</li>
   <li><strong>Promo Window:</strong> Same 72-hour window as activation.</li>
   <li><strong>Voucher Code format:</strong> <code>CRLCCC{MMDDYY}{XXX}</code> — 15 characters, random 3-char suffix at runtime.</li>
@@ -3270,11 +3425,11 @@ const INFO_DMCA2 = `<ul>
   <li><strong>Offer Type (v3.17):</strong> Daily Missions - Canada v2 \u2014 the successor dataset to V1 (52 filings \u2014 the original 36 + the 16 interim L&amp;W, window <span style="color:#ffffff;">October 1 \u2192 December 31, 2026</span>). <span style="color:#ffffff;">V1 is RETIRED as of v3.26 (Oct 15, 2026)</span> \u2014 removed from the selector, builder preserved byte-identical. The code shapes are identical by stakeholder decision, so the never-build-V1-and-V2-for-the-same-date rule is now historical: V1 can no longer be built. Existing live V1 objects stay as-is.</li>
   <li><strong>Rewards (v2 model):</strong> Both rewards are selectable on <span style="color:#ffffff;">every</span> weekday card; the <span style="color:#ffffff;">default is Casino Credit on all 7 days</span>. The weekday drives only the tier set, game, and Terms mapping: <span style="color:#ffffff;">Set 1 = Mon/Wed/Fri/Sun</span> (CC $75/$150/$800/$7,500; Terms CAS_CA_0158\u20130161), <span style="color:#ffffff;">Set 2 = Tue/Thu/Sat</span> (CC $100/$200/$1,000/$10,000; CAS_CA_0162\u20130165).</li>
   <li><strong>Contribution rates (v3.20):</strong> the Playmaker Entitlement step selects <span style="color:#ffffff;">Configure Contribution</span> on every bonus \u2014 <span style="color:#ffffff;">CC: Table 100 / Slot 0</span>; <span style="color:#ffffff;">FS: Slot 100 / Table 0</span> \u2014 both hard-verified by read-back (Playmaker defaults arrive Slot 100 / Table 20 and are never trusted). CC wagering is <span style="color:#ffffff;">table-games-only as re-filed</span> (CC T&amp;C set re-filed Oct 2026, same IDs; the Casino Credit reward still spends on any game). \u26a0\ufe0f Every pre-v3.20 daily_missions_v2_ script is DEAD \u2014 regenerate.</li>
-  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS \u2014 Provider <span style="color:#ffffff;">'Light &amp; Wonder' for Rich Little Piggies, LIGHTANDWONDER for the other three</span> after the Oct 20, 2026 Playmaker provider split \u2014 Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.31 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27 \u2192 v3.28 \u2192 v3.29 \u2192 v3.30 \u2192 v3.31; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion \u2014 now under Provider 'Light &amp; Wonder' \u2014 / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
+  <li><strong>Bonus Spins \u2014 live on all 7 weekdays (v3.21 interim):</strong> <span style="color:#ffffff;">Mon/Wed/Fri/Sun run four INTERIM Light &amp; Wonder games</span> \u2014 Ultimate Fire Link\u2122 Triple Nova - Desert Nights / Rich Little Piggies World Class Halloween Edition / Dancing Drums Tower / Money Link Moon Goddess (OGS \u2014 Provider <span style="color:#ffffff;">'Light &amp; Wonder' for Rich Little Piggies, LIGHTANDWONDER for the other three</span> after the Oct 20, 2026 Playmaker provider split \u2014 Bet Level 20+0, <span style="color:#ffffff;">per-game dump-verified ladders</span> Oct 8, 2026; Set 1 FS Terms <span style="color:#ffffff;">CAS_CA_0172\u20130187</span>; tier-3 spin value filed <span style="color:#ffffff;">"$1.00"</span>). The four Pragmatic titles (Gates of Olympus 1000, Sugar Rush Super Scatter, Big Bass Bonanza, Sweet Bonanza 1000) are the planned <span style="color:#ffffff;">v3.32 successors</span> (the pre-planned Pragmatic swap, renumbered v3.22 \u2192 v3.23 \u2192 v3.24 \u2192 v3.25 \u2192 v3.26 \u2192 v3.27 \u2192 v3.28 \u2192 v3.29 \u2192 v3.30 \u2192 v3.31 \u2192 v3.32; content unchanged) \u2014 their own dry-run sweep when they land, then the swap; the interim games never build once Pragmatic is live (the reserved Set 1 filings 0112\u20130119/0124\u20130127/0138\u20130141 are restored at the swap). <span style="color:#ffffff;">Tue/Thu/Sat FS unchanged</span> (Huff N' Puff High Rise / Money Mansion \u2014 now under Provider 'Light &amp; Wonder' \u2014 / Even More Puff GRAND; Terms CAS_CA_0120\u20130135). FS wagering is <span style="color:#ffffff;">slots-only as filed</span>.</li>
   <li><strong>Playmaker FS flow (new vs V1, dry-run-verified Oct 5, 2026):</strong> a mandatory <span style="color:#ffffff;">Bet Level</span> combobox sits between Casino Game and the stakes grid (selected + read back; hard-fails if the baked level isn't offered); the stakes grid renders empty until the level is picked and is <span style="color:#ffffff;">polled \u2265 20s</span> to mount; a Create form is <span style="color:#ffffff;">never reused across games</span>; catalog names carry an "(ON | OGS)" suffix \u2014 matching is pre-suffix and \u2122/case/apostrophe-tolerant, while <span style="color:#ffffff;">toast and T&amp;C render the game name AS FILED</span>. Thu/Sat ladders are assumed = Tuesday's dump-verified ladder (stakeholder-confirmed); the runtime stakes guard backstops. The four interim Mon/Wed/Fri/Sun ladders are <span style="color:#ffffff;">individually dump-verified</span> (Oct 8, 2026) \u2014 no assumed-ladder caveat on those weekdays.</li>
   <li><strong>Two-phase script (V1 machinery):</strong> Phase 1 NATS segments + promos (single-day window: typed date 00:00:00 \u2192 23:59:59 ET); Phase 2 Playmaker bonuses 00:01 \u2192 next-day 00:01 ET, segment attached via Include \u2192 Existing with chip read-back, Days to Use Reward 7, Okta persistent-profile launch.</li>
   <li><strong>Copy (all locked):</strong> Title/Header is reward-scoped \u2014 <span style="color:#ffffff;">"{Weekday}'s Casino Mission"</span> (CC) / <span style="color:#ffffff;">"{Weekday}'s Slots Mission"</span> (FS). HIW says <span style="color:#ffffff;">"before 11:59pm ET tonight"</span> (deliberate \u2014 tighter than the filed 24-hour language, never overstates; flag for review if a future variant runs multi-day). Toast always ON \u2014 CC: "Mission Complete! You have been awarded {credit} Casino Credit" (comma-formatted); FS: "\u2026 {spins} Bonus Spins to {game_name}". Button 2 (v3.22, reward-scoped): <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionTable</span> (CC) / <span style="color:#ffffff;">"Play" \u2192 /docs/usered/CanadaDailyMissionSlots</span> (FS). T&amp;Cs are two canonical baked templates word-verified against all 52 attached filings (CC set re-filed Oct 2026: table-games wagering; FS incl. the 16 interim L&amp;W filings). <span style="color:#ffffff;">Changes require reaching out to Adrian Van de Camp.</span></li>
-  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.31 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
+  <li><strong>Images (108-file manifest v0_2, Drive-validated Oct 8, 2026):</strong> V2-only folder. <span style="color:#ffffff;">{Weekday}_CC_/_BS_</span> Masthead + Promo_Detail; CC discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{get}.png</span>; FS discovers <span style="color:#ffffff;">{Weekday}_B{bet}_G{spins}S_{vtok}V.png</span> (vtok in cents: 20V/40V/60V/100V/200V/400V). <span style="color:#ffffff;">Mon/Wed/Fri/Sun FS filenames carry an _INT suffix</span> \u2014 the interim L&amp;W creative; the un-suffixed Set 1 names stay RESERVED for the Pragmatic creative; nothing is ever renamed (_INT retires at the v3.32 Pragmatic swap). Set your path once via Edit Images (localStorage key daily_missions_v2_image_path).</li>
 </ul>`;
 
 
@@ -11479,7 +11634,7 @@ asyncio.run(main())
 `;
 }
 
-function buildLCREACTScript(allNames, imagePath, hiwText) {
+function buildLCREACTScript(allNames, imagePath, hiwText, jurisdiction) {
   const namesLines       = allNames.map(n => `    "${n.code}",`).join('\n');
   const sendToXPLines    = allNames.map(n => `    ${n.sendToXP ? 'True' : 'False'},`).join('\n');
   const daysOptinLines   = allNames.map(n => `    ${n.daysToOptin},`).join('\n');
@@ -11491,7 +11646,7 @@ function buildLCREACTScript(allNames, imagePath, hiwText) {
 
   // Build per-amount T&C lookup for injection into the script
   const tcDataLines = Object.entries(LCREACT_TC_DATA).map(([amt, d]) => {
-    const tc = getLCREACTTC(amt).replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+    const tc = getLCREACTTC(amt, jurisdiction).replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
     return `    "${amt}": """${tc}""",`;
   }).join('\n');
 
@@ -11579,6 +11734,9 @@ ${doBonusLines}
 
 HOW_IT_WORKS = """${hiwSafe}"""
 
+# v3.31 — region-scoped T&C: US scripts carry the re-filed CAS_15361 ($10)
+# and CAS_15363 ($25) texts (Oct 17, 2026 -> Apr 17, 2027); CA scripts and
+# the US $50 tier (CAS_9456) carry the original copy unchanged.
 TC_BY_AMOUNT = {
 ${tcDataLines}
 }
@@ -12936,7 +13094,7 @@ Credit on all 7 days); the weekday selects the TIER SET (Set 1 = Mon/Wed/Fri/Sun
 Set 2 = Tue/Thu/Sat) and, for Bonus Spins, the game. FS is live on all 7 weekdays
 as of v3.21: Tue/Thu/Sat on the Huff N' Puff trio, and Mon/Wed/Fri/Sun on four
 INTERIM Light & Wonder games (dry-run-proven Oct 8, 2026) until the four Pragmatic
-titles land in Playmaker — v3.31 (the pre-planned Pragmatic swap) swaps the
+titles land in Playmaker — v3.32 (the pre-planned Pragmatic swap) swaps the
 builds over; the interim games never build once Pragmatic is live.
 
 v3.22: Button 2's link is reward-scoped — "Play" -> /docs/usered/CanadaDailyMissionTable
@@ -13151,7 +13309,7 @@ def image_files_for(c):
     # with vtok in cents (20/40/60/100/200/400 -> ..._20V.png etc.).
     # v3.21: Mon/Wed/Fri/Sun FS uses the interim L&W creative - the same three
     # filenames with an _INT suffix (the un-suffixed Set 1 names stay RESERVED for
-    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.31 Pragmatic swap).
+    # the Pragmatic creative; nothing is ever renamed; _INT retires at the v3.32 Pragmatic swap).
     w = c["weekday"]
     rtok = "BS" if c["reward"] == "FS" else "CC"
     if c["reward"] == "FS":
@@ -16718,7 +16876,7 @@ function generateScript() {
   } else if (offerType === 'VIPBG') {
     script = buildVIPBGScript(allNames, imagePath, hiwText, tcText);
   } else if (offerType === 'LCREACT') {
-    script = buildLCREACTScript(allNames, imagePath, hiwText);
+    script = buildLCREACTScript(allNames, imagePath, hiwText, jurisdiction);
   } else {
     script = `import asyncio
 import random
