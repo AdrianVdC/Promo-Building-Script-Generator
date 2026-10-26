@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NATS Bonus Creator v3.31</title>
+  <title>NATS Bonus Creator v3.31.1</title>
   <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
@@ -731,6 +731,7 @@
       <div class="eyebrow" style="margin-top: 10px; font-size: 28px; font-family: system-ui, -apple-system, sans-serif; letter-spacing: normal; text-transform: none;">Fanatics</div>
       <h1 style="font-size: 28px; line-height: 1.2;">NATS Bonus Creator</h1>
       <p class="subtitle">Configure dates & amounts — generate a ready-to-run Python script.</p>
+      <div style="margin-top:8px; padding:7px 12px; background:#3a0e0e; border:1px solid #ff5a5a; border-radius:6px; color:#ffb3b3; font-weight:700; font-size:13px; letter-spacing:0.3px;">⛔ OLD-NAMING TOOL (v3.31.1) — generation is BLOCKED for any card dated Nov 1, 2026 or later. November+ codes: use the NEW v4 tool link.</div>
     </div>
     <div class="header-actions">
       <button class="btn-generate" style="width:100%; padding:11px;" onclick="generateScript()">Generate Script</button>
@@ -16136,10 +16137,27 @@ function generateScript() {
   const jurSuffix = j => (j === 'US' || j === 'CA') ? '' : `_${j}`;
   const offerType = getOfferType();
 
+  // v3.31.1 — Nov 1, 2026 naming-cutover date guard (HARD BLOCK, no
+  // acknowledgment path): this OLD-convention tool refuses to generate for any
+  // card dated on or after 110126. The MMDDYY date is parsed to a REAL calendar
+  // date (never string-compared), so e.g. 010527 (Jan 5, 2027) is correctly
+  // blocked. Malformed / invalid dates are NOT handled here — they fall through
+  // to the existing per-type validation alerts unchanged.
+  const V4_CUTOVER = new Date(2026, 10, 1); // Nov 1, 2026 (JS months are 0-based)
+  const v4CutoverBlocked = (s) => {
+    if (!/^\d{6}$/.test(s || '')) return false;
+    const mm = parseInt(s.slice(0, 2), 10), dd = parseInt(s.slice(2, 4), 10), yy = 2000 + parseInt(s.slice(4, 6), 10);
+    const dt = new Date(yy, mm - 1, dd);
+    if (dt.getFullYear() !== yy || dt.getMonth() !== mm - 1 || dt.getDate() !== dd) return false; // invalid date -> existing alerts
+    return dt >= V4_CUTOVER;
+  };
+  const v4CutoverAlert = (label) => alert(`${label}: this code is dated November 1, 2026 or later. The v4 naming convention is in effect from Nov 1 \u2014 this OLD-naming tool (v3.31.1) BLOCKS generation for those dates, with no override. Open the NEW v4 tool link (v3.32+) and generate there.`);
+
   // ── RAF: bypass allNames loop entirely ───────────────────────────────────
   if (offerType === 'RAF') {
     const d = days[0];
     if (!d.date || d.date.length !== 6) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
+    if (v4CutoverBlocked(d.date)) { v4CutoverAlert(`RAF (${d.date})`); return; }
     if (!d.rafSpinAmount || parseFloat(d.rafSpinAmount) <= 0) { alert('Please enter Spins / Day.'); return; }
     if (!d.rafBetAmount || parseFloat(d.rafBetAmount) <= 0) { alert('Please enter Bet Amount.'); return; }
     if (!d.rafSpinValue) { alert('Please select Spin Value.'); return; }
@@ -16186,6 +16204,7 @@ function generateScript() {
   if (offerType === 'SUO') {
     const d = days[0];
     if (!d.date || d.date.length !== 6) { alert('Please enter a valid 6-digit date (MMDDYY).'); return; }
+    if (v4CutoverBlocked(d.date)) { v4CutoverAlert(`SUO (${d.date})`); return; }
     if (!d.suoSpinAmount || parseFloat(d.suoSpinAmount) <= 0) { alert('Please enter Spins / Day.'); return; }
     if (!d.suoBetAmount || parseFloat(d.suoBetAmount) <= 0) { alert('Please enter Bet Amount.'); return; }
     if (!d.suoSpinValue) { alert('Please select Spin Value.'); return; }
@@ -16235,6 +16254,7 @@ function generateScript() {
     const date = days[i].date;
     if (!date) continue;
     if (date.length !== 6) { alert(`Day ${i + 1}: please enter a valid 6-digit date (MMDDYY).`); return; }
+    if (v4CutoverBlocked(date)) { v4CutoverAlert(`Day ${i + 1} (${date})`); return; }
 
     if (offerType === 'USVIPBGPM') {
       // v3.9 - US VIP Offer Library B&G (Playmaker). Codes:
